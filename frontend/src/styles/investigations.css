@@ -307,3 +307,8 @@
 /* Dark theme: the case reference kept the light-mode brand violet, which is
    too dark against the navy row. */
 .tp-app[data-theme="dark"] .tp-inv-case { color: #a9cbef; }
+
+/* Dark theme: hero eyebrow, count and the first metric's top rule. */
+.tp-app[data-theme="dark"] .tp-inv-phase5-eyebrow { color: #a9cbef; }
+.tp-app[data-theme="dark"] .tp-inv-phase5-hero-count { color: #cfe1f2; }
+.tp-app[data-theme="dark"] .tp-inv-phase5 .tp-inv-metric:nth-child(1) { border-top-color: #4a7ba8; }

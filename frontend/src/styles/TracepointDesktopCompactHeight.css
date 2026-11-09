@@ -205,3 +205,14 @@
     margin: 0 !important;
   }
 }
+
+
+/* TRACEPOINT_NAV_BREATHING_V1
+   The row is nowrap, so its spacing is capped by the narrowest width it has
+   to survive: at 1024px the nine items only just fit. Above 1200px there is
+   a few hundred pixels of unused width to the right of the last item, so the
+   row can afford to breathe there without risking the small end. */
+@media (min-width: 1200px) {
+  .tp-app .tp-sidebar nav { gap: 10px !important; }
+  .tp-app .tp-sidebar nav .tp-nav-item { padding: 7px 15px !important; }
+}

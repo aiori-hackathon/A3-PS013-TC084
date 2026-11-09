@@ -54,3 +54,9 @@
 
 /* Dark theme: placeholder copy lifted to clear 4.5:1 on the navy panel. */
 .tp-app[data-theme="dark"] .lab-phase7 .lab-placeholder span { color: #a2abbd; }
+
+
+/* Dark theme: the banner icon chip kept the light-mode lilac. */
+.tp-app[data-theme="dark"] .lab-phase7 .lab-banner > svg { color: #a9cbef; background: rgba(141, 183, 223, .14); }
+.tp-app[data-theme="dark"] .lab-phase7 .lab-placeholder svg { color: #8fb0cc; }
+.tp-app[data-theme="dark"] .lab-phase7 .lab-kv code { color: #cfe1f2; }

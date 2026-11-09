@@ -413,3 +413,10 @@
 /* Dark theme: the stat label grey was chosen against white and reads at
    roughly 3.3:1 on the navy card. */
 .tp-app[data-theme="dark"] .tp-graph-phase5 .tp-graph-stats span { color: #9aa8bd; }
+
+
+/* Dark theme: hero icon accents written against the light hero. */
+.tp-app[data-theme="dark"] .tp-graph-phase5-hero h2 svg { color: #a9cbef !important; }
+.tp-app[data-theme="dark"] .tp-graph-phase5 .tp-graph-stats > .tp-card:nth-child(1) { border-top-color: #4a7ba8 !important; }
+.tp-app[data-theme="dark"] .tp-graph-legend i { border-top-color: #8fb0cc !important; }
+.tp-app[data-theme="dark"] .tp-graph-edge.tentative { color: #9fc2e4 !important; }

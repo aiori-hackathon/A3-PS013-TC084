@@ -51,7 +51,7 @@
   font-size: 10px;
   font-weight: 700;
   padding: 3px 0;
-  color: #6842ce;
+  color: #5b6475;
 }
 .tp-custody-entry.verify .tp-custody-action { color: #26624c; }
 .tp-custody-entry.export .tp-custody-action { color: #8c6c35; }
@@ -76,7 +76,9 @@
 .tp-app[data-theme="dark"] .tp-custody-empty { color: #b5c0d1; }
 .tp-app[data-theme="dark"] .tp-custody-time { color: #93a0b4; }
 .tp-app[data-theme="dark"] .tp-custody-caution { border-top-color: #2a3547; }
-.tp-app[data-theme="dark"] .tp-custody-action { color: #b9a6f0; }
+/* Four action types, four hues, none of them purple: ingest reads neutral
+   because arrival is not a judgement, the rest keep their meaning. */
+.tp-app[data-theme="dark"] .tp-custody-action { color: #c3d1e1; }
 .tp-app[data-theme="dark"] .tp-custody-entry.verify .tp-custody-action { color: #86cfae; }
 .tp-app[data-theme="dark"] .tp-custody-entry.export .tp-custody-action { color: #dcb878; }
 .tp-app[data-theme="dark"] .tp-custody-entry.link .tp-custody-action { color: #8fc0e8; }

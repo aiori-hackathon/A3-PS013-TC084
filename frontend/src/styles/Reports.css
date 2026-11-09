@@ -377,9 +377,9 @@
   color: #f0f4fb !important;
 }
 .tp-app[data-theme="dark"] .tr-reports .tr-report-id {
-  background: #292044 !important;
-  color: #d8ccff !important;
-  border-color: #504276 !important;
+  background: #1e3148 !important;
+  color: #a9cbef !important;
+  border-color: #3a5068 !important;
 }
 .tp-app[data-theme="dark"] .tr-reports .tr-report-tags .tr-report-tag {
   background: #283448 !important;
@@ -423,3 +423,8 @@
   border-color: #71414a !important;
 }
 
+
+
+/* Dark theme: accents written for the light hero. */
+.tp-app[data-theme="dark"] .tr-reports .tr-report-hero-aside { border-left-color: #3a5068 !important; border-top-color: #3a5068 !important; }
+.tp-app[data-theme="dark"] .tr-reports .tr-report-stat > svg { color: #a9cbef !important; }
