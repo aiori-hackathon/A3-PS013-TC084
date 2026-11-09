@@ -80,3 +80,22 @@
 .tp-app[data-theme="dark"] .tp-custody-entry.verify .tp-custody-action { color: #86cfae; }
 .tp-app[data-theme="dark"] .tp-custody-entry.export .tp-custody-action { color: #dcb878; }
 .tp-app[data-theme="dark"] .tp-custody-entry.link .tp-custody-action { color: #8fc0e8; }
+
+/* TRACEPOINT_LAZY_PAGE_V1 — shown when a workspace bundle cannot be fetched. */
+.tp-page-error {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  gap: 11px;
+  padding: 46px 24px;
+  max-width: 540px;
+  margin: 0 auto;
+}
+.tp-page-error svg:first-child { color: #c2763f; }
+.tp-page-error strong { font-size: 16px; color: #292d39; }
+.tp-page-error p { margin: 0; color: #72798a; font-size: 13px; line-height: 1.6; }
+.tp-page-error .tp-button { margin-top: 5px; display: inline-flex; align-items: center; gap: 7px; }
+
+.tp-app[data-theme="dark"] .tp-page-error strong { color: #e8eef7; }
+.tp-app[data-theme="dark"] .tp-page-error p { color: #b5c0d1; }
+.tp-app[data-theme="dark"] .tp-page-error svg:first-child { color: #e0a06a; }

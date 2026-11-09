@@ -6,7 +6,6 @@ import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from '.
 import { Card } from './components/ui/card';
 import {
   lazy,
-  Suspense,
   useCallback,
   useEffect,
   useMemo,
@@ -20,6 +19,7 @@ import './styles/TracepointInteractionPolish.css';
 import './styles/TracepointPublicSector.css';
 import './styles/TracepointWorkflowGuide.css';
 
+import LazyPage from './LazyPage';
 const InvestigationGraph = lazy(() => import('./InvestigationGraph'));
 const Reports = lazy(() => import('./Reports'));
 const Investigations = lazy(() => import('./Investigations'));
@@ -268,7 +268,7 @@ export default function Dashboard({ user, onSignOut }) {
           </button>
           <Button variant="outline" className="tp-button" onClick={() => {
 {page === 'ingestion' && (
-  <Suspense fallback={<div className="tp-empty" role="status">Loading Log Ingestion Lab…</div>}>
+  <LazyPage name="Log Ingestion Lab">
     <LogIngestionLab
       onIngested={() => {
         refresh();
@@ -276,29 +276,29 @@ export default function Dashboard({ user, onSignOut }) {
       }}
       onViewTimeline={() => openPage('timeline')}
     />
-  </Suspense>
+  </LazyPage>
 )}
 
 {page === 'investigations' && (
-  <Suspense fallback={<div className="tp-empty" role="status">Loading Investigations…</div>}>
+  <LazyPage name="Investigations">
     <Investigations events={events} />
-  </Suspense>
+  </LazyPage>
 )}
 
 {page === 'graph' && (
-  <Suspense fallback={<div className="tp-empty" role="status">Loading Investigation Graph…</div>}>
+  <LazyPage name="Investigation Graph">
     <div className="tp-graph-page">
       <InvestigationGraph theme={theme} />
     </div>
-  </Suspense>
+  </LazyPage>
 )}
 
 {page === 'reports' && (
-  <Suspense fallback={<div className="tp-empty" role="status">Loading Reports…</div>}>
+  <LazyPage name="Reports">
     <div className="tp-reports-page">
       <Reports onExportCsv={exportCsv} />
     </div>
-  </Suspense>
+  </LazyPage>
 )}
 }} disabled={loading}><RefreshCw size={16} className={loading ? 'tp-spin' : ''}/> Refresh</Button>{page === 'timeline' && <Button className="tp-button primary" onClick={exportCsv}><ArrowDownToLine size={16}/> Export CSV</Button>}</div></div>
       {error && <div className="tp-error" role="alert">{error}</div>}
@@ -375,12 +375,12 @@ export default function Dashboard({ user, onSignOut }) {
       </section>
     </div>}
     {page === 'evidence' && (
-      <Suspense fallback={<div className="tp-empty" role="status">Loading Evidence Library…</div>}>
+      <LazyPage name="Evidence Library">
         <EvidenceLibrary refreshSignal={evidenceRefresh} />
-      </Suspense>
+      </LazyPage>
     )}
     {page === 'ingestion' && (
-      <Suspense fallback={<div className="tp-empty" role="status">Loading Log Ingestion Lab…</div>}>
+      <LazyPage name="Log Ingestion Lab">
         <LogIngestionLab
           onIngested={() => {
             refresh();
@@ -388,19 +388,19 @@ export default function Dashboard({ user, onSignOut }) {
           }}
           onViewTimeline={() => openPage('timeline')}
         />
-      </Suspense>
+      </LazyPage>
     )}
     {page === 'investigations' && (
-      <Suspense fallback={<div className="tp-empty" role="status">Loading Investigations…</div>}>
+      <LazyPage name="Investigations">
         <Investigations events={events} />
-      </Suspense>
+      </LazyPage>
     )}
     {page === 'graph' && (
-      <Suspense fallback={<div className="tp-empty" role="status">Loading Investigation Graph…</div>}>
+      <LazyPage name="Investigation Graph">
         <div className="tp-graph-page">
           <InvestigationGraph theme={theme} />
         </div>
-      </Suspense>
+      </LazyPage>
     )}
     {page === 'benchmark' && <IncidentTriageBenchmark openPage={openPage} />}
 
@@ -461,11 +461,11 @@ export default function Dashboard({ user, onSignOut }) {
     )}
 
     {page === 'reports' && (
-      <Suspense fallback={<div className="tp-empty" role="status">Loading Reports…</div>}>
+      <LazyPage name="Reports">
         <div className="tp-reports-page">
           <Reports onExportCsv={exportCsv} />
         </div>
-      </Suspense>
+      </LazyPage>
     )}
       </div>
       {/* TRACEPOINT_HACKATHON_FOOTER_V3 */}
