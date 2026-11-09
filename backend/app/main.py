@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from uuid import UUID, uuid4
 from app.parser import parse_log, CLOCK_TOLERANCE_SECONDS
+from app import custody
 from app.reports import router as reports_router
 
 from fastapi import FastAPI, Header, HTTPException, Request
@@ -113,6 +114,11 @@ def _store_log_batch(payload: LogBatch, raw_bytes: bytes, owner_user_id: int):
         ):
             raise HTTPException(status_code=404, detail="Evidence not found")
 
+        custody.record(
+            owner_user_id, "ingest",
+            device_id=payload.device_id, batch_id=batch_name,
+            status="duplicate", sha256=sha256,
+        )
         return {
             "status": "duplicate",
             "batch_id": batch_name,
@@ -135,6 +141,11 @@ def _store_log_batch(payload: LogBatch, raw_bytes: bytes, owner_user_id: int):
         file.flush()
         os.fsync(file.fileno())
 
+    custody.record(
+        owner_user_id, "ingest",
+        device_id=payload.device_id, batch_id=batch_name,
+        status="accepted", sha256=sha256, line_count=len(payload.lines),
+    )
     return {"status": "accepted", **metadata}
 
 
@@ -382,6 +393,7 @@ from app.investigations import router as investigations_router
 
 app.include_router(investigations_router)
 app.include_router(reports_router)
+app.include_router(custody.router)
 
 # TRACEPOINT_DEMO_LAB_V1
 DEMO_SCENARIOS = {
@@ -755,6 +767,10 @@ def verify_evidence_for_owner(device_id: str, batch_id: str, owner_user_id: int)
     except OSError:
         raise HTTPException(status_code=500, detail="Could not read evidence file")
     verified = hmac.compare_digest(actual_hash, expected_hash.lower())
+    custody.record(
+        owner_user_id, "verify", device_id=device_id, batch_id=batch_id,
+        result="verified" if verified else "mismatch", sha256=actual_hash,
+    )
     return {
         "status": "verified" if verified else "mismatch",
         "verified": verified,

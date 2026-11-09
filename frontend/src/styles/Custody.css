@@ -1,0 +1,82 @@
+/* TRACEPOINT_CUSTODY_V1 — handling record panel on the Evidence page. */
+
+.tp-custody .tp-card-head { align-items: flex-start; gap: 14px; }
+
+.tp-custody-seal {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 13px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+.tp-custody-seal.intact { background: #e9f6f0; color: #26624c; }
+.tp-custody-seal.broken { background: #fdeceb; color: #8d2b22; }
+
+.tp-custody-detail,
+.tp-custody-caution,
+.tp-custody-empty {
+  margin: 0;
+  padding: 0 24px 16px;
+  color: #72798a;
+  font-size: 12px;
+}
+.tp-custody-empty { padding: 24px; }
+.tp-custody-caution { border-top: 1px solid #eceaf6; padding-top: 14px; }
+
+.tp-custody-list {
+  list-style: none;
+  margin: 0;
+  padding: 0 24px 6px;
+  display: grid;
+  gap: 2px;
+}
+
+.tp-custody-entry {
+  display: grid;
+  grid-template-columns: 82px minmax(0, 1fr) minmax(0, 1.4fr) auto;
+  align-items: baseline;
+  gap: 14px;
+  padding: 11px 0;
+  border-bottom: 1px solid #f1f0f7;
+  font-size: 13px;
+}
+.tp-custody-entry:last-child { border-bottom: 0; }
+
+.tp-custody-action {
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 0;
+  color: #6842ce;
+}
+.tp-custody-entry.verify .tp-custody-action { color: #26624c; }
+.tp-custody-entry.export .tp-custody-action { color: #8c6c35; }
+.tp-custody-entry.link .tp-custody-action { color: #2d6ca3; }
+
+.tp-custody-target { font-weight: 600; color: #292d39; overflow-wrap: anywhere; }
+.tp-custody-meta { color: #72798a; font-size: 12px; overflow-wrap: anywhere; }
+.tp-custody-time { color: #8a90a0; font-size: 11px; white-space: nowrap; }
+
+@media (max-width: 740px) {
+  .tp-custody-entry { grid-template-columns: 1fr; gap: 3px; padding: 13px 0; }
+  .tp-custody-time { white-space: normal; }
+}
+
+.tp-app[data-theme="dark"] .tp-custody-seal.intact { background: #1d3a30; color: #9fdcc2; }
+.tp-app[data-theme="dark"] .tp-custody-seal.broken { background: #42241f; color: #f0a79c; }
+.tp-app[data-theme="dark"] .tp-custody-entry { border-bottom-color: #2a3547; }
+.tp-app[data-theme="dark"] .tp-custody-target { color: #e3eaf5; }
+.tp-app[data-theme="dark"] .tp-custody-meta,
+.tp-app[data-theme="dark"] .tp-custody-detail,
+.tp-app[data-theme="dark"] .tp-custody-caution,
+.tp-app[data-theme="dark"] .tp-custody-empty { color: #b5c0d1; }
+.tp-app[data-theme="dark"] .tp-custody-time { color: #93a0b4; }
+.tp-app[data-theme="dark"] .tp-custody-caution { border-top-color: #2a3547; }
+.tp-app[data-theme="dark"] .tp-custody-action { color: #b9a6f0; }
+.tp-app[data-theme="dark"] .tp-custody-entry.verify .tp-custody-action { color: #86cfae; }
+.tp-app[data-theme="dark"] .tp-custody-entry.export .tp-custody-action { color: #dcb878; }
+.tp-app[data-theme="dark"] .tp-custody-entry.link .tp-custody-action { color: #8fc0e8; }

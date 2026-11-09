@@ -13,6 +13,7 @@ import {
   Copy,
 } from "lucide-react";
 import "./styles/Tracepoint.css";
+import "./styles/Custody.css";
 // TRACEPOINT_TRUST_SCORE_V1
 import { useEvidenceTrustScores, TrustScoreBadge, TrustScoreDetails } from "./EvidenceTrustScore";
 
@@ -34,6 +35,8 @@ export default function EvidenceLibrary({ refreshSignal = 0 }) {
   const [results, setResults] = useState({});
   const [verifying, setVerifying] = useState(null);
   const { scores, scoreError } = useEvidenceTrustScores(refreshSignal);
+  // TRACEPOINT_CUSTODY_V1
+  const [custody, setCustody] = useState(null);
 
   const keyFor = (batch) => `${batch.device_id}/${batch.batch_id}`;
 
@@ -57,8 +60,21 @@ export default function EvidenceLibrary({ refreshSignal = 0 }) {
     }
   }
 
+  async function loadCustody() {
+    try {
+      const response = await fetch("/api/v1/custody", { credentials: "same-origin" });
+      if (!response.ok) throw new Error("Unable to load the custody record.");
+      setCustody(await response.json());
+    } catch {
+      // The register is still usable without its handling record, so this
+      // failure is shown in the panel rather than over the whole page.
+      setCustody({ unavailable: true });
+    }
+  }
+
   useEffect(() => {
     loadEvidence();
+    loadCustody();
   }, [refreshSignal]);
 
   async function verify(batch) {
@@ -95,6 +111,9 @@ export default function EvidenceLibrary({ refreshSignal = 0 }) {
       }));
     } finally {
       setVerifying(null);
+      // A verification is itself a handling event, so the panel below is
+      // out of date the moment one finishes.
+      loadCustody();
     }
   }
 
@@ -257,6 +276,70 @@ export default function EvidenceLibrary({ refreshSignal = 0 }) {
               </tbody>
             </table>
           </div>
+        )}
+      </section>
+
+      {/* TRACEPOINT_CUSTODY_V1 */}
+      <section className="tp-card tp-ev-card tp-custody">
+        <div className="tp-card-head">
+          <div>
+            <h3><ShieldCheck size={17}/> Chain of custody</h3>
+            <p>
+              Every ingest, verification, case link and export on this account,
+              sealed so the record cannot be edited without showing it.
+            </p>
+          </div>
+          {custody?.chain && (
+            <span className={`tp-custody-seal ${custody.chain.intact ? "intact" : "broken"}`}>
+              {custody.chain.intact ? <CheckCircle2 size={15}/> : <AlertTriangle size={15}/>}
+              {custody.chain.intact
+                ? `Chain intact · ${custody.chain.entries} entries`
+                : `Chain broken at entry ${custody.chain.broken_at}`}
+            </span>
+          )}
+        </div>
+
+        {custody?.unavailable && (
+          <p className="tp-custody-empty">The handling record could not be loaded.</p>
+        )}
+
+        {custody && !custody.unavailable && !custody.items?.length && (
+          <p className="tp-custody-empty">
+            No evidence has been handled on this account yet. Ingest a batch and
+            it will be recorded here.
+          </p>
+        )}
+
+        {!!custody?.items?.length && (
+          <>
+            <p className="tp-custody-detail">{custody.chain?.detail}</p>
+            <ol className="tp-custody-list">
+              {custody.items.map((entry) => {
+                let detail = {};
+                try { detail = JSON.parse(entry.detail || "{}"); } catch { detail = {}; }
+                const target = entry.batch_id
+                  ? `${entry.device_id || "unknown device"} · ${entry.batch_id.slice(0, 8)}…`
+                  : entry.case_id ? `case TP-${String(entry.case_id).padStart(4, "0")}` : "—";
+                return (
+                  <li key={entry.id} className={`tp-custody-entry ${entry.action}`}>
+                    <span className="tp-custody-action">{entry.action}</span>
+                    <span className="tp-custody-target">{target}</span>
+                    <span className="tp-custody-meta">
+                      {Object.entries(detail)
+                        .map(([key, value]) => `${key.replaceAll("_", " ")}: ${value}`)
+                        .join(" · ") || "—"}
+                    </span>
+                    <time className="tp-custody-time">{formatDate(entry.recorded_at)}</time>
+                  </li>
+                );
+              })}
+            </ol>
+            <p className="tp-custody-caution">
+              An intact chain shows these entries have not been altered since they
+              were written. It does not show that the record is complete, and it
+              does not independently establish who performed each action.
+            </p>
+          </>
         )}
       </section>
 

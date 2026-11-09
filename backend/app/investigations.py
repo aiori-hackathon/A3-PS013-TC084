@@ -9,6 +9,7 @@ from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, Field
 
 from app.auth import connect
+from app import custody
 
 router = APIRouter(prefix="/api/v1/investigations", tags=["investigations"])
 
@@ -209,6 +210,13 @@ def link_event(case_id: int, payload: LinkEvent, request: Request):
             (cursor.lastrowid,)
         ).fetchone()
 
+    reference = json.loads(payload.event_reference)
+    custody.record(
+        user_id, "link", case_id=case_id,
+        device_id=reference.get("device_id"),
+        batch_id=reference.get("batch_id"),
+        event_timestamp=reference.get("timestamp"),
+    )
     return dict(row)
 
 

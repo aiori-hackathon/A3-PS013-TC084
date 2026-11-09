@@ -19,6 +19,7 @@ from reportlab.platypus import (
 )
 
 from app.auth import connect
+from app import custody
 from app.investigations import current_user_id, get_owned_case, filter_owned_event_rows
 
 router = APIRouter(
@@ -297,6 +298,33 @@ def download_report(case_id: int, request: Request):
         "or chain of custody."
     )
 
+    section("Chain of Custody")
+    chain = custody.verify_chain(user_id)
+    paragraph(
+        "<b>Handling record:</b> "
+        f"{chain['entries']} entries. "
+        + ("The chain is intact: every entry matches its seal and follows the "
+           "one before it." if chain["intact"] else
+           f"THE CHAIN IS BROKEN at entry {chain['broken_at']}. "
+           f"{chain['detail']}")
+    )
+    for item in custody.entries_for_user(user_id, limit=25):
+        target = item["batch_id"] or (
+            f"case TP-{item['case_id']:04d}" if item["case_id"] else "—"
+        )
+        paragraph(
+            f"<b>{safe(item['recorded_at'])}</b> &mdash; "
+            f"{safe(item['action'])} &mdash; {safe(target)} "
+            f"{safe(item['detail'])}"
+        )
+    paragraph(
+        "<b>What this shows:</b> the entries above are sealed with SHA-256 "
+        "over the preceding entry, so removing or altering one breaks every "
+        "seal that follows. An intact chain shows the record has not been "
+        "edited. It does not show that the record is complete, nor does it "
+        "independently establish who performed each action."
+    )
+
     section("Report Disclaimer")
     paragraph(
         "This report is generated from investigation records stored "
@@ -335,6 +363,14 @@ def download_report(case_id: int, request: Request):
         onLaterPages=draw_footer,
     )
     buffer.seek(0)
+
+    # Recorded after the document is built, so the entry means a report was
+    # actually produced. It lands after the entries printed inside it, which
+    # is why a report never contains the line describing its own export.
+    custody.record(
+        user_id, "export", case_id=case_id,
+        format="pdf", linked_events=len(events),
+    )
 
     return StreamingResponse(
         buffer,
