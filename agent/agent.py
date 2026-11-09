@@ -61,7 +61,13 @@ def load_state():
     if os.getenv("TRACEPOINT_START_AT_END") == "1" and LOG_FILE.exists():
         size = LOG_FILE.stat().st_size
         print(f"Starting at the end of the file ({size} bytes already present)")
-        return {"offset": size}
+        # Write it down now. A poll that finds no new lines returns without
+        # saving state, so without this the next poll would recompute "the
+        # end" against a file that has grown in the meantime, and every line
+        # written between the two polls would be skipped and never collected.
+        state = {"offset": size}
+        save_json_atomic(STATE_FILE, state)
+        return state
 
     return {"offset": 0}
 
