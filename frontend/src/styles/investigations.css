@@ -299,3 +299,11 @@
 .tp-ai-disclaimer {
   color: #b8c5d6;
 }
+
+
+/* Dark theme: same metric-label grey as the graph, lifted for the navy card. */
+.tp-app[data-theme="dark"] .tp-inv-phase5 .tp-inv-metric span { color: #9aa8bd; }
+
+/* Dark theme: the case reference kept the light-mode brand violet, which is
+   too dark against the navy row. */
+.tp-app[data-theme="dark"] .tp-inv-case { color: #b7a0ff; }

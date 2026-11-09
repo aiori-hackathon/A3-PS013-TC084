@@ -1037,8 +1037,8 @@
 .tp-app[data-theme="dark"] .tp-nav-item:hover,
 .tp-app[data-theme="dark"] .tp-signout:hover { background: #202b3d; }
 .tp-app[data-theme="dark"] .tp-nav-item.active {
-  background: #302451;
-  color: #d5c5ff;
+  background: #21374d;
+  color: #f0f5fa;
 }
 .tp-app[data-theme="dark"] .tp-page-header p,
 .tp-app[data-theme="dark"] .tp-workspace small,
@@ -1102,8 +1102,8 @@
 .tp-app[data-theme="dark"] .tp-workspace-avatar,
 .tp-app[data-theme="dark"] .tp-profile-avatar,
 .tp-app[data-theme="dark"] .tp-topbar-avatar {
-  background: #302451;
-  color: #d7c7ff;
+  background: #1e3148;
+  color: #cfe1f2;
 }
 .tp-app[data-theme="dark"] .tp-table th,
 .tp-app[data-theme="dark"] .tp-inv-phase5-table th,

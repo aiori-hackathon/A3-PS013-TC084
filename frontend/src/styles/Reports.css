@@ -291,9 +291,11 @@
   color-scheme: dark;
 }
 .tp-app[data-theme="dark"] .tr-reports .tr-report-hero {
-  background: #202036 !important;
+  /* Matches the Overview and Benchmark heroes. This panel used to be the one
+     violet surface in a navy theme, which read as a different product. */
+  background: linear-gradient(112deg, #18263a 0%, #1a2d43 55%, #203c57 100%) !important;
   color: #f0f4fb !important;
-  border: 1px solid #3b3858 !important;
+  border: 1px solid #3a5068 !important;
   box-shadow: none !important;
 }
 .tp-app[data-theme="dark"] .tr-reports .tr-report-hero h2,
@@ -302,11 +304,11 @@
 }
 .tp-app[data-theme="dark"] .tr-reports .tr-report-hero p,
 .tp-app[data-theme="dark"] .tr-reports .tr-report-hero small {
-  color: #c4c2d6 !important;
+  color: #c3d1e1 !important;
 }
 .tp-app[data-theme="dark"] .tr-reports .tr-report-eyebrow,
 .tp-app[data-theme="dark"] .tr-reports .tr-report-hero-aside > span {
-  color: #c4b4ff !important;
+  color: #a9cbef !important;
 }
 .tp-app[data-theme="dark"] .tr-reports .tr-report-stats .tr-report-stat,
 .tp-app[data-theme="dark"] .tr-reports .tr-report-panel,

@@ -175,3 +175,17 @@
     align-items: flex-start !important;
   }
 }
+
+
+/* Dark theme. The amber below was picked against white; on the navy card it
+   reads at roughly 2.6:1, so it is lightened rather than re-hued. */
+.tp-app[data-theme="dark"] .tp-benchmark-eyebrow {
+  color: #e3b45f !important;
+}
+.tp-app[data-theme="dark"] .tp-benchmark-method-number {
+  color: #e8bd6b !important;
+}
+.tp-app[data-theme="dark"] .tp-benchmark-section-heading > span {
+  color: #e8bd6b !important;
+  background: rgba(230, 173, 50, .16) !important;
+}

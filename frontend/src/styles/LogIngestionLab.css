@@ -50,3 +50,7 @@
 .lab-phase7 .lab-footnote { margin:18px 26px 0; font-size:12px; line-height:1.65; }
 @media(max-width:1050px) { .lab-phase7 .lab-grid { grid-template-columns:1fr; } }
 @media(max-width:600px) { .lab-phase7 .lab-banner { align-items:flex-start; padding:23px; } .lab-phase7 .lab-banner strong { font-size:21px; } .lab-phase7 .lab-card > h2 { padding-left:18px; padding-right:18px; } .lab-phase7 .lab-card > p:first-of-type { padding-left:18px; padding-right:18px; } .lab-phase7 .lab-card > .lab-label { margin-left:18px; margin-right:18px; } .lab-phase7 .lab-card > select { margin-left:18px; width:calc(100% - 36px); } .lab-phase7 .lab-kv { margin-left:18px; margin-right:18px; } .lab-phase7 .lab-logs,.lab-phase7 .lab-placeholder,.lab-phase7 .lab-success,.lab-phase7 .lab-hash,.lab-phase7 .lab-events { margin-left:18px; margin-right:18px; } .lab-phase7 .lab-submit { margin-left:18px; margin-right:18px; } }
+
+
+/* Dark theme: placeholder copy lifted to clear 4.5:1 on the navy panel. */
+.tp-app[data-theme="dark"] .lab-phase7 .lab-placeholder span { color: #a2abbd; }

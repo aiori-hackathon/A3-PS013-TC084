@@ -349,3 +349,20 @@
   background: transparent !important;
   visibility: visible !important;
 }
+
+
+/* Dark theme. These accents were only ever defined for the light surface, so
+   the step numbers and kickers kept a mid-navy that all but vanished here. */
+.tp-app[data-theme="dark"] .tp-workflow-kicker,
+.tp-app[data-theme="dark"] .tp-workflow-step-label {
+  color: #9cc3e7 !important;
+  background: rgba(141, 183, 223, .12) !important;
+}
+.tp-app[data-theme="dark"] .tp-workflow-number {
+  color: #a9cbef !important;
+  background: rgba(141, 183, 223, .16) !important;
+}
+.tp-app[data-theme="dark"] .tp-workflow-principle {
+  color: #f0e3c6 !important;
+  background: rgba(213, 161, 59, .14) !important;
+}

@@ -421,6 +421,8 @@
 }
 .tp-app .tp-button { border-radius: 3px !important; font-weight: 650 !important; box-shadow: none !important; transform: none !important; }
 .tp-app .tp-button.primary { background: var(--tp-portal-blue) !important; color: #fff !important; border-color: var(--tp-portal-blue) !important; }
+.tp-app[data-theme="dark"] .tp-button.primary { color: var(--tp-portal-on-blue) !important; }
+.tp-app[data-theme="dark"] .tp-button.primary:hover { background: #a9c9e9 !important; border-color: #a9c9e9 !important; }
 .tp-app .tp-button.primary:hover { background: #19466e !important; }
 .tp-app .tp-link, .tp-app .tp-forensic-all-events { color: var(--tp-portal-blue) !important; }
 
@@ -749,6 +751,9 @@
   --tp-portal-navy-deep: #10283e;
   --tp-portal-blue: #8db7df;
   --tp-portal-blue-soft: #20374c;
+  /* The blue above is a light tint in this theme, so a white label on it
+     lands near 2:1. Primary buttons take dark ink instead. */
+  --tp-portal-on-blue: #0e2033;
   --tp-portal-page: #0d1520;
   --tp-portal-border: #36465a;
   --tp-portal-text: #e8eef5;
@@ -1573,3 +1578,9 @@
   .tp-app .tp-actions { align-items: center !important; justify-content: flex-start !important; width: 100% !important; }
   .tp-app[data-page="graph"] .tp-actions, .tp-app[data-page="reports"] .tp-actions { justify-content: flex-end !important; }
 }
+
+
+/* Dark theme: section indexes and eyebrows were mid-blue on white; on the
+   dark surface they fell just under the 4.5:1 line. */
+.tp-app[data-theme="dark"] .tp-forensic-section-index { color: #8fb0cc !important; }
+.tp-app[data-theme="dark"] .tp-timeline-eyebrow { color: #8bb4d4 !important; }
