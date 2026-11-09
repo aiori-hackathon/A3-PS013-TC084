@@ -8,16 +8,35 @@ from pathlib import Path
 
 import requests
 
-SERVER_URL = "http://127.0.0.1:8000/api/v1/ingest"
-DEVICE_ID = "macbook-01"
-LOG_TYPE = "auth"
+# Everything here can be set from the environment so one agent can follow a
+# real log on a real host. The defaults are the original sample setup, so
+# running it with no configuration behaves exactly as before.
+SERVER_URL = os.getenv(
+    "TRACEPOINT_SERVER", "http://127.0.0.1:8000"
+).rstrip("/") + "/api/v1/ingest"
+DEVICE_ID = os.getenv("TRACEPOINT_DEVICE_ID", "macbook-01")
+LOG_TYPE = os.getenv("TRACEPOINT_LOG_TYPE", "auth")
 
-LOG_FILE = Path("sample.log")
-STATE_FILE = Path("agent-state.json")
-PENDING_FILE = Path("pending-batch.json")
+# Syslog lines carry no year and no offset, so the server has to be told which
+# zone the source wrote them in. Getting this wrong silently shifts every
+# inferred timestamp, which then reads as a skewed clock rather than a
+# misconfigured agent. A Linux host running UTC needs TRACEPOINT_TIMEZONE=UTC.
+SOURCE_TIMEZONE = os.getenv("TRACEPOINT_TIMEZONE", "Asia/Kolkata")
 
-POLL_INTERVAL = 5
-MAX_LINES = 100
+LOG_FILE = Path(os.getenv("TRACEPOINT_LOG_FILE", "sample.log")).expanduser()
+
+# The read offset belongs to one file on one device. Keying the state by both
+# means pointing the agent at a different log starts from its beginning
+# instead of resuming at a byte offset that means nothing in the new file.
+_STATE_KEY = hashlib.sha256(
+    f"{DEVICE_ID}|{LOG_FILE.resolve()}".encode("utf-8")
+).hexdigest()[:12]
+STATE_DIR = Path(os.getenv("TRACEPOINT_STATE_DIR", ".")).expanduser()
+STATE_FILE = STATE_DIR / f"agent-state-{_STATE_KEY}.json"
+PENDING_FILE = STATE_DIR / f"pending-batch-{_STATE_KEY}.json"
+
+POLL_INTERVAL = int(os.getenv("TRACEPOINT_POLL_SECONDS", "5"))
+MAX_LINES = int(os.getenv("TRACEPOINT_MAX_LINES", "100"))
 
 
 def save_json_atomic(path, data):
@@ -34,6 +53,15 @@ def save_json_atomic(path, data):
 def load_state():
     if STATE_FILE.exists():
         return json.loads(STATE_FILE.read_text())
+
+    # First run against a log that already has history. Starting at zero would
+    # replay the whole file, which on a real auth.log means thousands of lines
+    # of old events arriving as if they just happened. Opt in to following
+    # only what gets written from now on.
+    if os.getenv("TRACEPOINT_START_AT_END") == "1" and LOG_FILE.exists():
+        size = LOG_FILE.stat().st_size
+        print(f"Starting at the end of the file ({size} bytes already present)")
+        return {"offset": size}
 
     return {"offset": 0}
 
@@ -78,7 +106,9 @@ def send_pending_batch(api_key):
 
 
 def collect_new_lines():
-    LOG_FILE.touch(exist_ok=True)
+    if not LOG_FILE.exists():
+        print(f"Log file not found: {LOG_FILE}")
+        return
 
     state = load_state()
     offset = state["offset"]
@@ -115,6 +145,7 @@ def collect_new_lines():
         "device_id": DEVICE_ID,
         "batch_id": str(uuid.uuid4()),
         "log_type": LOG_TYPE,
+        "source_timezone": SOURCE_TIMEZONE,
         "lines": lines
     }
 
@@ -136,7 +167,11 @@ def main():
         raise RuntimeError("AGENT_API_KEY is not configured")
 
     print("The Missing Links Agent started")
-    print(f"Watching: {LOG_FILE.resolve()}")
+    print(f"Watching:  {LOG_FILE}")
+    print(f"Device:    {DEVICE_ID}")
+    print(f"Server:    {SERVER_URL}")
+    print(f"Timezone:  {SOURCE_TIMEZONE}")
+    print(f"State:     {STATE_FILE}")
     print(f"Polling every {POLL_INTERVAL} seconds")
 
     while True:
