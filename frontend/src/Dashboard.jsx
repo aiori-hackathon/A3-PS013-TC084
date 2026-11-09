@@ -234,7 +234,7 @@ export default function Dashboard({ user, onSignOut }) {
     </div>
 
     <aside className={`tp-sidebar ${mobileOpen ? 'tp-open' : ''}`}>
-      <div className="tp-brand"><img className="tp-brand-mark tp-brand-image" src="/tracepoint-detective-circle.png" alt="" aria-hidden="true" /><span className="tp-brand-word">Tracepoint<span>.</span></span></div>
+      <div className="tp-brand"><img className="tp-brand-mark tp-brand-image" src="/tracepoint-detective-circle.webp" alt="" aria-hidden="true" /><span className="tp-brand-word">Tracepoint<span>.</span></span></div>
       <div className="tp-workspace"><span className="tp-workspace-avatar">TP</span><div><strong>Security workspace</strong><small>Evidence & investigations</small></div></div>
       <div className="tp-nav-label">Workspace</div>
       <nav aria-label="Main navigation">{navigation.map(([id, label, Icon]) => <button key={id} className={`tp-nav-item ${page === id ? 'active' : ''}`} onClick={() => openPage(id)}><Icon size={18}/><span>{label}</span>{page === id && <ChevronRight size={15} className="tp-nav-chevron"/>}</button>)}</nav>
@@ -304,7 +304,8 @@ export default function Dashboard({ user, onSignOut }) {
       {error && <div className="tp-error" role="alert">{error}</div>}
       {page === 'overview' && <>
       <div className="tp-forensic-intro">
-        <img className="tp-eye-hud-art" src="/tracepoint-eye-hud.png" alt="" aria-hidden="true" />
+        <img className="tp-eye-hud-art" src="/tracepoint-eye-hud.webp" alt="" aria-hidden="true"
+          width="560" height="365" decoding="async" fetchPriority="low" />
         <div className="tp-forensic-intro-copy">
           <span className="tp-forensic-kicker"><Activity size={14}/> LIVE EVIDENCE OVERVIEW</span>
           <strong>Follow the signal. Verify the evidence.</strong>
@@ -417,7 +418,7 @@ export default function Dashboard({ user, onSignOut }) {
             <span className="tp-workflow-number">01</span><div className="tp-workflow-step-copy">
               <span className="tp-workflow-step-label">COLLECT</span><h3>Ingest raw logs</h3>
               <p>Start with a log batch or the collection-agent flow. Check that the ingestion result is accepted before continuing.</p>
-              <button type="button" className="tp-button primary" onClick={() => openPage('ingestion')}>Open Log Ingestion Lab <ChevronRight size={16}/></button>
+              <button type="button" className="tp-button" onClick={() => openPage('ingestion')}>Open Log Ingestion Lab <ChevronRight size={16}/></button>
             </div>
           </article>
           <article className="tp-workflow-step">
@@ -452,7 +453,7 @@ export default function Dashboard({ user, onSignOut }) {
             <span className="tp-workflow-number">06</span><div className="tp-workflow-step-copy">
               <span className="tp-workflow-step-label">DOCUMENT</span><h3>Generate the incident report</h3>
               <p>Review the case report, linked events, analyst notes and integrity details before exporting or sharing the report.</p>
-              <button type="button" className="tp-button primary" onClick={() => openPage('reports')}>Open Reports <ChevronRight size={16}/></button>
+              <button type="button" className="tp-button" onClick={() => openPage('reports')}>Open Reports <ChevronRight size={16}/></button>
             </div>
           </article>
         </div>

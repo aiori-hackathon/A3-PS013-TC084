@@ -1027,7 +1027,9 @@
   padding: 10px 11px !important;
   font-weight: 650 !important;
 }
-.tp-app .tp-sidebar nav { gap: 3px !important; }
+/* 3px left the items touching, which made the bordered active pill look
+   wedged between its neighbours. */
+.tp-app .tp-sidebar nav { gap: 6px !important; }
 .tp-app .tp-page-header {
   display: flex !important;
   align-items: center !important;

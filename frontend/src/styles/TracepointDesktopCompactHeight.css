@@ -65,7 +65,9 @@
     flex-flow: row nowrap !important;
     align-items: center !important;
     justify-content: flex-start !important;
-    gap: 3px !important;
+    /* The row is nowrap, so this is as loose as it goes before the last item
+       runs off the edge at 1024px. */
+    gap: 6px !important;
     width: 100% !important;
     min-width: 0 !important;
     max-width: 100% !important;
@@ -88,7 +90,7 @@
     min-width: 0 !important;
     min-height: 32px !important;
     margin: 0 !important;
-    padding: 6px 9px !important;
+    padding: 6px 11px !important;
     line-height: 1.2 !important;
     white-space: nowrap !important;
   }

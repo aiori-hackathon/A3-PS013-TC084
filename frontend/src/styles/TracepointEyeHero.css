@@ -24,7 +24,7 @@
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: #12365a url("/tracepoint-detective-circle.png") center / contain no-repeat;
+  background: #12365a url("/tracepoint-detective-circle.webp") center / contain no-repeat;
   box-shadow: 0 0 0 1px rgba(18, 54, 90, .10);
 }
 .tp-app .tp-brand-word {
@@ -44,7 +44,7 @@
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  background: #12365a url("/tracepoint-detective-circle.png") center / contain no-repeat;
+  background: #12365a url("/tracepoint-detective-circle.webp") center / contain no-repeat;
 }
 
 /* Overview hero: soft blurred blue light, HUD eye illustration, real content in front. */
@@ -79,7 +79,7 @@
   height: 218px;
   transform: translateY(-50%);
   pointer-events: none;
-  background-image: url("/tracepoint-eye-hud.png");
+  background-image: url("/tracepoint-eye-hud.webp");
   background-position: center;
   background-repeat: no-repeat;
   background-size: contain;
