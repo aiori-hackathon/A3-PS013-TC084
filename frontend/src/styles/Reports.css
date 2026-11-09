@@ -319,7 +319,7 @@
   box-shadow: none !important;
 }
 .tp-app[data-theme="dark"] .tr-reports .tr-report-stat > svg {
-  color: #b7a0ff !important;
+  color: #a9cbef !important;
 }
 .tp-app[data-theme="dark"] .tr-reports .tr-report-stat > span,
 .tp-app[data-theme="dark"] .tr-reports .tr-report-details,
@@ -413,9 +413,9 @@
   background: #2a3850 !important;
 }
 .tp-app[data-theme="dark"] .tr-reports .tp-button.primary {
-  background: #6842ce !important;
-  color: #ffffff !important;
-  border-color: #8062e5 !important;
+  background: var(--tp-portal-blue) !important;
+  color: var(--tp-portal-on-blue) !important;
+  border-color: var(--tp-portal-blue) !important;
 }
 .tp-app[data-theme="dark"] .tr-reports .tr-report-error {
   background: #492a31 !important;

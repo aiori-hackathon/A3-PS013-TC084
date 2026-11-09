@@ -306,4 +306,4 @@
 
 /* Dark theme: the case reference kept the light-mode brand violet, which is
    too dark against the navy row. */
-.tp-app[data-theme="dark"] .tp-inv-case { color: #b7a0ff; }
+.tp-app[data-theme="dark"] .tp-inv-case { color: #a9cbef; }

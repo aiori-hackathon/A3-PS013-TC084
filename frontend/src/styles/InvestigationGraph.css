@@ -203,7 +203,7 @@
 }
 .tp-app[data-theme="dark"] .tp-graph-root .tp-graph-stats > .tp-card > svg,
 .tp-app[data-theme="dark"] .tp-graph-root .tp-graph-gaps h3 > svg {
-  color: #b7a0ff !important;
+  color: #a9cbef !important;
 }
 .tp-app[data-theme="dark"] .tp-graph-root .tp-graph-panel-head,
 .tp-app[data-theme="dark"] .tp-graph-root .tp-graph-gaps button {
@@ -215,7 +215,7 @@
   border-color: #3b4960 !important;
 }
 .tp-app[data-theme="dark"] .tp-graph-root .tp-graph-legend i {
-  background: #b7a0ff !important;
+  background: #a9cbef !important;
 }
 .tp-app[data-theme="dark"] .tp-graph-root .tp-graph-sequence {
   border-color: #354258 !important;
@@ -265,7 +265,7 @@
   color: #e8edf6 !important;
 }
 .tp-app[data-theme="dark"] .tp-graph-root .tp-graph-empty > svg {
-  color: #b7a0ff !important;
+  color: #a9cbef !important;
 }
 .tp-app[data-theme="dark"] .tp-graph-root .tp-graph-root .tp-button,
 .tp-app[data-theme="dark"] .tp-graph-root .tp-button {

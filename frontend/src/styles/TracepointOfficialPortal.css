@@ -402,10 +402,17 @@
 .tp-app .tp-evidence-table td,
 .tp-app .tp-ev-table td,
 .tp-app .tp-inv-phase5-table td { color: #34485c !important; border-bottom: 1px solid #e2e7ed !important; }
-.tp-app .tp-table tbody tr:hover,
-.tp-app .tp-evidence-table tbody tr:hover,
-.tp-app .tp-ev-table tbody tr:hover,
-.tp-app .tp-inv-phase5-table tbody tr:hover { background: #f2f6f9 !important; }
+/* Light only. This carried !important and no theme qualifier, so it beat the
+   dark hover rule: the row turned white while its text stayed light, which
+   made a hovered row unreadable in dark mode. */
+.tp-app:not([data-theme="dark"]) .tp-table tbody tr:hover,
+.tp-app:not([data-theme="dark"]) .tp-evidence-table tbody tr:hover,
+.tp-app:not([data-theme="dark"]) .tp-ev-table tbody tr:hover,
+.tp-app:not([data-theme="dark"]) .tp-inv-phase5-table tbody tr:hover { background: #f2f6f9 !important; }
+.tp-app[data-theme="dark"] .tp-table tbody tr:hover,
+.tp-app[data-theme="dark"] .tp-evidence-table tbody tr:hover,
+.tp-app[data-theme="dark"] .tp-ev-table tbody tr:hover,
+.tp-app[data-theme="dark"] .tp-inv-phase5-table tbody tr:hover { background: #1d2a3b !important; }
 .tp-app .tp-forensic-event-icon { border-radius: 4px !important; background: #eaf1f7 !important; border-color: #d8e5ef !important; color: var(--tp-portal-blue) !important; }
 .tp-app .tp-forensic-event-icon.is-failure { background: #fff3e0 !important; border-color: #f2dfba !important; color: #985b10 !important; }
 .tp-app .tp-forensic-device { background: transparent !important; border: 0 !important; color: #364f67 !important; }
