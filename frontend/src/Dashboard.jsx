@@ -11,7 +11,7 @@ import {
   useMemo,
   useState
 } from 'react';
-import { Wifi, WifiOff, Activity, ArrowDownToLine, ChevronRight, CircleHelp, Clock3, FileClock, FileText, Fingerprint, LayoutDashboard, LogOut, Menu, RefreshCw, Search, ShieldAlert, SlidersHorizontal, Terminal, X, GitBranch, Sun, Moon, BookOpen} from 'lucide-react';
+import { Wifi, WifiOff, Activity, ArrowDownToLine, ChevronRight, CircleHelp, Clock3, FileClock, FileText, Fingerprint, LayoutDashboard, LogOut, Menu, RefreshCw, Search, ShieldAlert, SlidersHorizontal, Terminal, X, GitBranch, BookOpen} from 'lucide-react';
 import IncidentTriageBenchmark from './IncidentTriageBenchmark';
 import './styles/Tracepoint.css';
 import './styles/TracepointTimelineGraphModal.css';
@@ -170,13 +170,15 @@ export default function Dashboard({ user, onSignOut }) {
   const [level, setLevel] = useState('all');
   const [selected, setSelected] = useState(null);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [theme, setTheme] = useState(() => {
-    try { return window.localStorage.getItem('tracepoint.theme') === 'dark' ? 'dark' : 'light'; }
-    catch { return 'light'; }
-  });
+  // TRACEPOINT_LIGHT_ONLY_V1: the app ships in one appearance. The dark rules
+  // are still in the stylesheets and nothing reads data-theme="dark" any more,
+  // so restoring the toggle means restoring this state and the buttons.
+  const theme = 'light';
   useEffect(() => {
-    try { window.localStorage.setItem('tracepoint.theme', theme); } catch { /* storage unavailable */ }
-  }, [theme]);
+    // Clear the saved choice, or anyone who left the app in dark mode keeps a
+    // key that would silently take effect if the toggle ever came back.
+    try { window.localStorage.removeItem('tracepoint.theme'); } catch { /* storage unavailable */ }
+  }, []);
   const [evidenceRefresh, setEvidenceRefresh] = useState(0);
   // TRACEPOINT_NAV_V2_STATUS: real API health check, every 30 seconds.
   const [apiStatus, setApiStatus] = useState('checking');
@@ -247,25 +249,12 @@ export default function Dashboard({ user, onSignOut }) {
         <span className="tp-topbar-divider" aria-hidden="true"/>
         <div className="tp-topbar-account"><span className="tp-topbar-user">{user?.name || 'Account'}</span><small>Analyst workspace</small></div>
         <span className="tp-topbar-avatar">{(user?.name || 'U')[0].toUpperCase()}</span>
-        <button
-          type="button"
-          className="tp-nav-theme-toggle"
-          onClick={() => setTheme(current => current === 'dark' ? 'light' : 'dark')}
-          aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-          title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-        >
-          {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
-        </button>
       </div><div className="tp-profile"><span className="tp-profile-avatar">{(user?.name || 'U')[0].toUpperCase()}</span><div><strong>{user?.name || 'Account'}</strong><small>{user?.email || ''}</small></div></div><button className="tp-signout" onClick={onSignOut} aria-label="Sign out" title="Sign out"><LogOut size={17}/> <span className="tp-signout-label">Sign out</span></button></div>
     </aside>
     <main className="tp-main">
     {/* TRACEPOINT_SINGLE_NAV_V1: status and account live in primary navigation */}
 
       <div className="tp-content"><div className={`tp-page-header ${page === 'guide' ? 'tp-page-header-guide' : ''}`}><div><h1>{title}</h1><p>{page === 'overview' ? 'Security activity and collected evidence across your workspace.' : page === 'timeline' ? 'Explore, filter and inspect security events.' : page === 'ingestion' ? 'Explore sample logs and follow them through the ingestion pipeline.' : page === 'evidence' ? 'Evidence collection and integrity records.' : page === 'graph' ? 'Explore evidence-linked authentication sequences.' : page === 'investigations' ? 'Review events and prepare incident investigations.' : page === 'guide' ? 'Follow the workflow from raw log ingestion to an incident report.' : page === 'benchmark' ? 'Measure incident triage time using the same synthetic scenario and checklist.' : 'Export collected security activity.'}</p></div><div className="tp-actions">
-          <button type="button" className="tp-button tp-theme-toggle" onClick={() => setTheme(current => current === 'dark' ? 'light' : 'dark')} aria-pressed={theme === 'dark'} aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}>
-            {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
-            <span>{theme === 'dark' ? 'Light mode' : 'Dark mode'}</span>
-          </button>
           <Button variant="outline" className="tp-button" onClick={() => {
 {page === 'ingestion' && (
   <LazyPage name="Log Ingestion Lab">
@@ -489,7 +478,7 @@ export default function Dashboard({ user, onSignOut }) {
           <button type="button" onClick={() => openPage('ingestion')}>Log Ingestion Lab</button>
           <button type="button" onClick={() => openPage('graph')}>Investigation Graph</button>
           <button type="button" onClick={() => openPage('reports')}>Reports</button>
-          <button type="button" onClick={() => { setTheme(current => current === 'dark' ? 'light' : 'dark'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>Switch appearance</button>
+
         </div>
         <div className="tp-footer-column tp-footer-info">
           <h3>Project information</h3>
