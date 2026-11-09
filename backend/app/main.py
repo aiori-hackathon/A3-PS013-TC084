@@ -5,7 +5,7 @@ import secrets
 from datetime import datetime, timezone
 from pathlib import Path
 from uuid import UUID, uuid4
-from app.parser import parse_log
+from app.parser import parse_log, CLOCK_TOLERANCE_SECONDS
 from app.reports import router as reports_router
 
 from fastapi import FastAPI, Header, HTTPException, Request
@@ -283,6 +283,93 @@ def get_timeline(
         user["id"], severity=severity, device_id=device_id,
         event_type=event_type, username=username,
     )
+
+
+# TRACEPOINT_CLOCK_SKEW_V1
+# Per-device view of how each source clock compares with receipt time.
+# The parser records one offset per event; this groups them so an analyst can
+# see whether a whole device is drifting rather than judging single lines.
+from statistics import median as _median
+
+
+def clock_skew_for_user(owner_user_id: int):
+    """Summarize each device's clock against the server's receipt times."""
+    events = get_timeline_for_user(owner_user_id)["events"]
+
+    by_device = {}
+    for event in events:
+        by_device.setdefault(event.get("device_id") or "unknown", []).append(event)
+
+    devices = []
+    for device_id, device_events in sorted(by_device.items()):
+        offsets = [
+            event["clock_offset_seconds"] for event in device_events
+            if isinstance(event.get("clock_offset_seconds"), (int, float))
+        ]
+        # Lines whose timestamp this server inferred from its own receipt time
+        # cannot testify about the source clock, so they are counted separately.
+        inferred = sum(
+            1 for event in device_events
+            if event.get("timestamp_source") == "syslog_inferred"
+        )
+
+        if not offsets:
+            devices.append({
+                "device_id": device_id, "events": len(device_events),
+                "comparable_events": 0, "inferred_timestamps": inferred,
+                "status": "unknown",
+                "detail": "No event on this device carries a timestamp that can be compared with its receipt time.",
+            })
+            continue
+
+        worst_ahead = max(offsets)
+        middle = round(_median(offsets))
+
+        if worst_ahead > CLOCK_TOLERANCE_SECONDS:
+            status = "clock_ahead"
+            detail = (
+                f"At least one line is dated {worst_ahead} seconds after this server received it. "
+                "A line cannot be written after it arrives, so this device's clock is ahead."
+            )
+        elif middle < -CLOCK_TOLERANCE_SECONDS:
+            status = "older_than_receipt"
+            detail = (
+                f"Lines arrive a median of {abs(middle)} seconds older than their receipt time. "
+                "That is expected for logs collected after the fact and is not by itself evidence "
+                "of a slow clock; compare against a device you know ships promptly."
+            )
+        else:
+            status = "within_tolerance"
+            detail = (
+                f"Median offset is {middle} seconds, inside the "
+                f"{CLOCK_TOLERANCE_SECONDS}-second tolerance."
+            )
+
+        devices.append({
+            "device_id": device_id,
+            "events": len(device_events),
+            "comparable_events": len(offsets),
+            "inferred_timestamps": inferred,
+            "median_offset_seconds": middle,
+            "max_offset_seconds": worst_ahead,
+            "min_offset_seconds": min(offsets),
+            "status": status,
+            "detail": detail,
+        })
+
+    return {
+        "tolerance_seconds": CLOCK_TOLERANCE_SECONDS,
+        "devices": devices,
+        "skewed_devices": sum(1 for d in devices if d["status"] == "clock_ahead"),
+    }
+
+
+@app.get("/api/v1/clock-skew")
+def get_clock_skew(request: Request):
+    user = _thread_current_user(request)
+    if user is None:
+        raise HTTPException(status_code=401, detail="Sign in required")
+    return clock_skew_for_user(user["id"])
 
 
 # END TRACEPOINT_TIMELINE_CACHE_V1

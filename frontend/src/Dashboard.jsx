@@ -54,6 +54,17 @@ const dateLabel = value => { const d = new Date(value); return value && !Number.
 const fullDate = value => { const d = new Date(value); return value && !Number.isNaN(d.getTime()) ? d.toLocaleString(undefined, { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', second: '2-digit', timeZoneName: 'short' }) : text(value); };
 const unpack = data => Array.isArray(data) ? data : (data?.events || data?.timeline || data?.items || data?.data?.events || []);
 const csvValue = value => '"' + String(value ?? '').replaceAll('"', '""') + '"';
+// The parser compares each source clock against the time this server received
+// the line. A line dated after receipt proves the source clock is ahead; one
+// dated before it only means the log was collected after the fact.
+const clockDuration = seconds => seconds < 90 ? `${seconds}s` : seconds < 5400 ? `${Math.round(seconds / 60)} min` : `${(seconds / 3600).toFixed(1)} h`;
+const clockLabel = e => {
+  if (typeof e.clock_offset_seconds !== 'number') return 'Not comparable with receipt time';
+  const amount = clockDuration(Math.abs(e.clock_offset_seconds));
+  if (e.clock_skew === 'ahead') return `Source clock ahead of receipt by ${amount}`;
+  if (e.clock_skew === 'older_than_receipt') return `Recorded ${amount} before receipt — normal for collected logs`;
+  return `Within tolerance (${amount})`;
+};
 const fail = e => /fail|denied|invalid|reject/i.test([eventType(e), message(e)].join(' '));
 const severityClass = value => {
   const normalized = String(value ?? '').trim().toLowerCase().replace(/[^a-z]/g, '');
@@ -197,6 +208,7 @@ export default function Dashboard({ user, onSignOut }) {
   // TRACEPOINT_OVERVIEW_REDESIGN_V1: all signals are derived from actual timeline events.
   const parsingIssues = events.filter(e => e.parse_status && !['parsed', 'success', 'ok', 'complete'].includes(String(e.parse_status).toLowerCase()) || Number(e.parse_gap_count || 0) > 0).length;
   const timestampIssues = events.filter(e => e.timestamp_conflict === true || e.timestamp_inferred === true).length;
+  const clockAhead = events.filter(e => e.clock_skew === 'ahead').length;
   const affectedDevices = new Set(events.filter(fail).map(device).filter(d => d !== '—')).size;
   const failures = events.filter(fail).length;
   const devices = new Set(events.map(device).filter(d => d !== '—')).size;
@@ -333,6 +345,7 @@ export default function Dashboard({ user, onSignOut }) {
         <div className="tp-forensic-review-items">
           <div><strong>{loading ? '…' : parsingIssues}</strong><span>Events with parsing gaps</span></div>
           <div><strong>{loading ? '…' : timestampIssues}</strong><span>Inferred or conflicting timestamps</span></div>
+          <div><strong>{loading ? '…' : clockAhead}</strong><span>Events dated after receipt</span></div>
           <div><strong>{loading ? '…' : failures}</strong><span>Events matching failure indicators</span></div>
         </div>
       </div>
@@ -487,6 +500,6 @@ export default function Dashboard({ user, onSignOut }) {
       </footer>
 
     </main>
-    {selected && <div className="tp-overlay tp-timeline-event-overlay" onMouseDown={() => setSelected(null)}><aside className="tp-drawer tp-timeline-event-modal" onMouseDown={e => e.stopPropagation()} role="dialog" aria-modal="true" aria-label="Event details"><div className="tp-drawer-header"><div><span>Event inspection</span><h2>{eventType(selected)}</h2><div className={`tp-severity ${severityClass(severity(selected))}`}>{severity(selected)}</div></div><button onClick={() => setSelected(null)} aria-label="Close event details"><X size={21}/></button></div><div className="tp-drawer-body"><h3>Event information</h3>{[['Timestamp', fullDate(timestamp(selected))], ['Source device', device(selected)], ['Username', selected.username], ['Event type', eventType(selected)], ['Severity', severity(selected)], ['Message', message(selected)]].map(([label, value]) => <div className="tp-detail" key={label}><span>{label}</span><strong>{text(value)}</strong></div>)}<h3>Raw event data</h3><pre>{JSON.stringify(selected, null, 2)}</pre></div></aside></div>}
+    {selected && <div className="tp-overlay tp-timeline-event-overlay" onMouseDown={() => setSelected(null)}><aside className="tp-drawer tp-timeline-event-modal" onMouseDown={e => e.stopPropagation()} role="dialog" aria-modal="true" aria-label="Event details"><div className="tp-drawer-header"><div><span>Event inspection</span><h2>{eventType(selected)}</h2><div className={`tp-severity ${severityClass(severity(selected))}`}>{severity(selected)}</div></div><button onClick={() => setSelected(null)} aria-label="Close event details"><X size={21}/></button></div><div className="tp-drawer-body"><h3>Event information</h3>{[['Timestamp', fullDate(timestamp(selected))], ['Source device', device(selected)], ['Username', selected.username], ['Event type', eventType(selected)], ['Severity', severity(selected)], ['Message', message(selected)], ['Clock check', clockLabel(selected)]].map(([label, value]) => <div className="tp-detail" key={label}><span>{label}</span><strong>{text(value)}</strong></div>)}<h3>Raw event data</h3><pre>{JSON.stringify(selected, null, 2)}</pre></div></aside></div>}
   </div>;
 }

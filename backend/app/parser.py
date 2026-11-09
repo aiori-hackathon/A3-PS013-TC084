@@ -8,6 +8,23 @@ SYSLOG = re.compile(r"^([A-Z][a-z]{2}\s+\d{1,2}\s+\d{2}:\d{2}:\d{2})\b")
 MACOS = re.compile(r"^(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}(?:\.\d+)?[+-]\d{4})\s")
 ISO = re.compile(r"^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:?\d{2}))\b")
 
+# TRACEPOINT_CLOCK_SKEW_V1: how far a source clock may differ from receipt
+# time before it is worth reporting. Covers ordinary NTP drift and the delay
+# between a line being written and the batch reaching the server.
+CLOCK_TOLERANCE_SECONDS = 120
+
+def _utc_datetime(value):
+    """Parse an ISO-8601 string into an aware UTC datetime, or None."""
+    if not isinstance(value, str):
+        return None
+    try:
+        parsed = datetime.fromisoformat(value.replace('Z', '+00:00'))
+    except ValueError:
+        return None
+    if parsed.tzinfo is None:
+        return None
+    return parsed.astimezone(timezone.utc)
+
 def _timestamp(value):
     if not isinstance(value, str):
         return None
@@ -25,6 +42,7 @@ def parse_log(line, device_id, batch_id, log_type, received_at=None, source_time
         'source_timezone': source_timezone, 'received_at': received_at,
         'event_type': 'unknown', 'severity': 'info', 'username': None,
         'log_format': 'unknown', 'parse_status': 'partial', 'parse_warnings': [],
+        'clock_offset_seconds': None, 'clock_skew': 'unknown',
     }
     message = line
     if line.lstrip().startswith('{'):
@@ -107,6 +125,23 @@ def parse_log(line, device_id, batch_id, log_type, received_at=None, source_time
                 event['timestamp_utc'] = parsed_time.astimezone(timezone.utc).isoformat()
         except ValueError:
             event['parse_warnings'].append('Cannot normalize timestamp to UTC')
+    # TRACEPOINT_CLOCK_SKEW_V1: compare the source clock against receipt time.
+    # A line cannot be written after the server received it, so a timestamp
+    # later than receipt is proof the source clock runs ahead. The reverse
+    # proves nothing on its own: collected logs are normally older than the
+    # moment they arrive, so that case is recorded as an observation and left
+    # for the device summary to judge across a whole batch.
+    received_utc = _utc_datetime(received_at)
+    claimed_utc = _utc_datetime(event['timestamp_utc'])
+    if claimed_utc and received_utc:
+        offset = round((claimed_utc - received_utc).total_seconds())
+        event['clock_offset_seconds'] = offset
+        if offset > CLOCK_TOLERANCE_SECONDS:
+            event['clock_skew'] = 'ahead'
+        elif offset < -CLOCK_TOLERANCE_SECONDS:
+            event['clock_skew'] = 'older_than_receipt'
+        else:
+            event['clock_skew'] = 'within_tolerance'
     # TRACEPOINT_PARSING_GAPS_V1: expose exactly which fields could not be extracted.
     event['missing_fields'] = [
         field for field in ('timestamp', 'event_type', 'log_format')
