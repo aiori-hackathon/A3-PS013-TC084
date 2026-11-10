@@ -6,6 +6,9 @@ import './styles/TracepointInteractionPolish.css';
 
 const API = '/api/v1/investigations';
 const stamp = v => v ? new Date(v).toLocaleString() : '—';
+// Sorting the picker uses the same timestamp fallbacks as eventRef, so an event
+// orders by the time it actually displays rather than by whichever field exists.
+const eventTime = e => Date.parse(e.timestamp || e.event_timestamp || e.received_at || '') || 0;
 const eventLabel = e => `${e.event_type || e.type || 'Event'} · ${e.device_id || e.hostname || 'Unknown device'} · ${e.username || 'Unknown user'} · ${stamp(e.timestamp || e.event_timestamp || e.received_at)}`;
 // The backend rebuilds this same object from its own copy of the event and
 // rejects a link unless the two match exactly, so the fallbacks here have to
@@ -132,7 +135,17 @@ export default function Investigations({ events = [] }) {
   const visible = useMemo(() => cases.filter(c => `${c.id} ${c.title} ${c.description} ${c.status} ${c.severity}`.toLowerCase().includes(query.toLowerCase())), [cases, query]);
   const counts = { total: cases.length, open: cases.filter(c => c.status === 'open').length, investigating: cases.filter(c => c.status === 'investigating').length, resolved: cases.filter(c => c.status === 'resolved').length };
   const linked = new Set((active?.events || []).map(e => e.event_reference));
-  const available = events.map((e, index) => ({ e, index })).filter(({ e }) => !linked.has(eventRef(e)));
+  // Newest first, matching the timeline table, so the events an analyst just
+  // collected are at the top of the picker instead of the bottom of it. The
+  // original index travels with each entry because the Link button still reads
+  // events[eventIndex] from the unsorted prop.
+  const available = useMemo(
+    () => events
+      .map((e, index) => ({ e, index }))
+      .filter(({ e }) => !linked.has(eventRef(e)))
+      .sort((a, b) => eventTime(b.e) - eventTime(a.e)),
+    [events, active],
+  );
 
   return <div className="tp-inv tp-inv-phase5">
     <div className="tp-inv-phase5-hero">
