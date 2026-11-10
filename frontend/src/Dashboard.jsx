@@ -9,6 +9,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState
 } from 'react';
 import { Wifi, WifiOff, Activity, ArrowDownToLine, ChevronRight, CircleHelp, Clock3, FileClock, FileText, Fingerprint, LayoutDashboard, LogOut, Menu, RefreshCw, Search, ShieldAlert, SlidersHorizontal, Terminal, X, GitBranch, BookOpen} from 'lucide-react';
@@ -195,15 +196,42 @@ export default function Dashboard({ user, onSignOut }) {
     return () => { active = false; clearInterval(timer); };
   }, []);
 
-  const refresh = useCallback(async () => {
-    setLoading(true); setError('');
+  // A quiet refresh skips the loading skeleton. Returning to the tab should
+  // leave the page looking the same until the newer events simply appear.
+  const refresh = useCallback(async ({ quiet = false } = {}) => {
+    if (!quiet) setLoading(true);
+    setError('');
     try {
       const response = await fetch('/api/v1/timeline', { credentials: 'same-origin' });
       if (!response.ok) throw new Error(response.status === 401 ? 'Your session has expired. Sign out and sign in again.' : `Unable to load events (HTTP ${response.status}).`);
       setEvents(unpack(await response.json()));
-    } catch (err) { setError(err.message); } finally { setLoading(false); }
+    } catch (err) { setError(err.message); } finally { if (!quiet) setLoading(false); }
   }, []);
   useEffect(() => { refresh(); }, [refresh]);
+
+  // TRACEPOINT_REFRESH_ON_RETURN_V1: log collection happens in a terminal while
+  // the browser sits in the background, so coming back to the tab re-reads the
+  // timeline and the evidence library. This refetches data rather than reloading
+  // the document, which would throw away the open case, filters and scroll.
+  const lastRefreshRef = useRef(Date.now());
+  useEffect(() => {
+    const MIN_GAP_MS = 3000;
+    const refetch = () => {
+      if (document.visibilityState !== 'visible') return;
+      // Switching apps fires focus and visibilitychange together, and flicking
+      // away and back should not cost two round trips either.
+      if (Date.now() - lastRefreshRef.current < MIN_GAP_MS) return;
+      lastRefreshRef.current = Date.now();
+      refresh({ quiet: true });
+      setEvidenceRefresh(v => v + 1);
+    };
+    document.addEventListener('visibilitychange', refetch);
+    window.addEventListener('focus', refetch);
+    return () => {
+      document.removeEventListener('visibilitychange', refetch);
+      window.removeEventListener('focus', refetch);
+    };
+  }, [refresh]);
   const sorted = useMemo(() => [...events].sort((a, b) => (Date.parse(timestamp(b)) || 0) - (Date.parse(timestamp(a)) || 0)), [events]);
   const levels = useMemo(() => [...new Set(events.map(severity))].sort(), [events]);
   const filtered = useMemo(() => sorted.filter(e => (level === 'all' || severity(e) === level) && [eventType(e), device(e), message(e), e.username, timestamp(e)].some(v => text(v).toLowerCase().includes(search.trim().toLowerCase()))), [sorted, level, search]);
