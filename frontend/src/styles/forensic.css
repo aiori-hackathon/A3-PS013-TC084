@@ -1,0 +1,477 @@
+/* ===========================================================================
+   TRACEPOINT — FORENSIC WORKSTATION DESIGN SYSTEM
+   ---------------------------------------------------------------------------
+   One stylesheet, one appearance, one set of decisions.
+
+   This file replaces the token layer of the application. It is imported LAST
+   so that it wins the cascade against the legacy stylesheets, which are being
+   retired page by page. Where a declaration carries !important it is because
+   a legacy rule carries one too; those are marked LEGACY-OVERRIDE and should
+   disappear as each legacy sheet is deleted.
+
+   DESIGN RATIONALE
+   ----------------
+   This is an evidence-handling tool used during an incident, often at night,
+   often for a long sitting. Every decision below follows from that:
+
+   - Dark, desaturated surfaces. A SOC screen is looked at for hours. The page
+     recedes; only the data carries colour.
+   - Colour means severity and nothing else. There is no decorative colour in
+     this system. If something is coloured, it is telling you something.
+   - Small radii (2-3px). Rounded cards read as consumer software. Instrument
+     panels have corners.
+   - Density over whitespace. An investigator wants more rows on screen, not a
+     more comfortable hero section.
+   - IBM Plex. Plex Sans and Plex Mono were drawn as one family for technical
+     and industrial interfaces. Plex Mono in particular disambiguates 0/O and
+     1/l/I, which matters when the data on screen is hashes, IPs and ports.
+     Every piece of machine-generated data in this app is set in it.
+   =========================================================================== */
+
+.tp-app[data-theme='forensic'] {
+  /* --- surfaces ---------------------------------------------------------
+     A four-step ramp. Anything raised above the page gets the next step up,
+     never a shadow: shadows imply physical depth, which an instrument panel
+     does not have. */
+  --fx-bg:            #090c11;
+  --fx-surface:       #0f141b;
+  --fx-raised:        #151c25;
+  --fx-overlay:       #1b2430;
+
+  /* --- lines ------------------------------------------------------------
+     Structure is carried by hairlines, not by shadow or by gaps. */
+  --fx-line:          #1e2733;
+  --fx-line-strong:   #2b3744;
+  --fx-line-focus:    #3d5168;
+
+  /* --- text -------------------------------------------------------------
+     Three weights of attention. Primary is the data, dim is the label,
+     mute is the thing you only read when you go looking for it. */
+  --fx-text:          #e7eef7;
+  --fx-text-dim:      #93a4b8;
+  --fx-text-mute:     #627485;
+
+  /* --- signal -----------------------------------------------------------
+     One accent for the whole product. Amber, because this is evidence
+     handling: it is the colour of a marker at a scene, and it is not the
+     blue-violet every dashboard reaches for. Used for primary actions,
+     focus rings and the active navigation state. Nothing else. */
+  --fx-signal:        #f2a93b;
+  --fx-signal-dim:    #8a6420;
+  --fx-on-signal:     #140d02;
+
+  /* --- severity ---------------------------------------------------------
+     A deliberate ramp from alarm to noise. These are the only other colours
+     in the system, and they appear only where a severity is being stated. */
+  --fx-critical:      #ff4d6a;
+  --fx-high:          #ff8a3d;
+  --fx-medium:        #f0b429;
+  --fx-low:           #4da3ff;
+  --fx-info:          #7c8da1;
+
+  /* --- integrity --------------------------------------------------------
+     Evidence verification has its own pair, kept apart from severity so a
+     verified hash never reads as a low-severity event. */
+  --fx-verified:      #3ddc97;
+  --fx-broken:        #ff4d6a;
+
+  /* --- geometry ---------------------------------------------------------- */
+  --fx-r-sm:          2px;
+  --fx-r-md:          3px;
+  --fx-row-h:         34px;   /* table row: dense enough to fit a shift's work */
+
+  /* --- type -------------------------------------------------------------- */
+  --fx-sans:          'IBM Plex Sans', system-ui, sans-serif;
+  --fx-cond:          'IBM Plex Sans Condensed', 'IBM Plex Sans', system-ui, sans-serif;
+  --fx-mono:          'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
+
+  background: var(--fx-bg) !important;        /* LEGACY-OVERRIDE */
+  color: var(--fx-text) !important;           /* LEGACY-OVERRIDE */
+  font-family: var(--fx-sans) !important;     /* LEGACY-OVERRIDE */
+  font-feature-settings: 'cv05' 1, 'ss01' 1;
+}
+
+/* ---------------------------------------------------------------------------
+   DATA TYPOGRAPHY
+   Anything a machine produced is set in mono, at a slightly tightened tracking
+   so a 64-character hash still fits a column. This single rule is most of what
+   makes the app read as technical rather than as a marketing page.
+   --------------------------------------------------------------------------- */
+.tp-app[data-theme='forensic'] code,
+.tp-app[data-theme='forensic'] time,
+.tp-app[data-theme='forensic'] .tp-forensic-device,
+.tp-app[data-theme='forensic'] .tp-forensic-event-time,
+.tp-app[data-theme='forensic'] .tp-forensic-username,
+.tp-app[data-theme='forensic'] [data-fx='data'] {
+  font-family: var(--fx-mono) !important;     /* LEGACY-OVERRIDE */
+  font-size: 12px;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+  color: var(--fx-text-dim);
+  background: none;
+}
+
+/* Column headers and small labels take the condensed cut. It buys horizontal
+   room in a dense table and gives the chrome a different voice from the data. */
+.tp-app[data-theme='forensic'] thead th,
+.tp-app[data-theme='forensic'] .tp-kicker,
+.tp-app[data-theme='forensic'] .tp-forensic-kicker {
+  font-family: var(--fx-cond) !important;     /* LEGACY-OVERRIDE */
+  font-size: 11px !important;                 /* LEGACY-OVERRIDE */
+  font-weight: 600 !important;                /* LEGACY-OVERRIDE */
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fx-text-mute) !important;      /* LEGACY-OVERRIDE */
+}
+
+/* ---------------------------------------------------------------------------
+   SURFACES
+   Cards are containers, not objects. A hairline and a surface step, no shadow,
+   no gradient, no blur.
+   --------------------------------------------------------------------------- */
+.tp-app[data-theme='forensic'] .tp-card,
+.tp-app[data-theme='forensic'] .tp-drawer,
+.tp-app[data-theme='forensic'] .tp-detail {
+  background: var(--fx-surface) !important;   /* LEGACY-OVERRIDE */
+  border: 1px solid var(--fx-line) !important;/* LEGACY-OVERRIDE */
+  border-radius: var(--fx-r-md) !important;   /* LEGACY-OVERRIDE */
+  box-shadow: none !important;                /* LEGACY-OVERRIDE */
+  backdrop-filter: none !important;           /* LEGACY-OVERRIDE */
+}
+
+.tp-app[data-theme='forensic'] .tp-card-head {
+  border-bottom: 1px solid var(--fx-line);
+  padding-bottom: 10px;
+  margin-bottom: 12px;
+}
+
+/* ---------------------------------------------------------------------------
+   TABLES — the centre of the product
+   A log table is the thing an investigator actually looks at, so it gets the
+   most attention. Sticky header, hairline rows, a severity rail on the left
+   edge of each row, and a hover state that reads as a cursor position rather
+   than a selection.
+   --------------------------------------------------------------------------- */
+.tp-app[data-theme='forensic'] .tp-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 13px;
+}
+
+.tp-app[data-theme='forensic'] .tp-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--fx-raised) !important;    /* LEGACY-OVERRIDE */
+  border-bottom: 1px solid var(--fx-line-strong) !important; /* LEGACY-OVERRIDE */
+  padding: 8px 12px !important;               /* LEGACY-OVERRIDE */
+  text-align: left;
+  white-space: nowrap;
+}
+
+.tp-app[data-theme='forensic'] .tp-table tbody td {
+  height: var(--fx-row-h);
+  padding: 0 12px !important;                 /* LEGACY-OVERRIDE */
+  border-bottom: 1px solid var(--fx-line) !important; /* LEGACY-OVERRIDE */
+  background: transparent !important;         /* LEGACY-OVERRIDE */
+  color: var(--fx-text);
+  vertical-align: middle;
+}
+
+/* Legacy names this row three classes deep, so it is named here too rather
+   than won with another !important. */
+.tp-app[data-theme='forensic'] .tp-event-table-redesign .tp-forensic-table tbody tr,
+.tp-app[data-theme='forensic'] .tp-table tbody tr {
+  background: transparent;
+}
+.tp-app[data-theme='forensic'] .tp-event-table-redesign .tp-forensic-table tbody tr:hover,
+.tp-app[data-theme='forensic'] .tp-table tbody tr:hover {
+  background: var(--fx-raised);
+}
+
+.tp-app[data-theme='forensic'] .tp-table tbody tr {
+  cursor: pointer;
+  transition: background 90ms linear;
+}
+
+.tp-app[data-theme='forensic'] .tp-table tbody tr:hover td {
+  background: var(--fx-raised) !important;    /* LEGACY-OVERRIDE */
+}
+
+.tp-app[data-theme='forensic'] .tp-table tbody tr:focus-visible {
+  outline: 1px solid var(--fx-signal);
+  outline-offset: -1px;
+}
+
+/* The severity rail. Four pixels at the start of the row carry the severity,
+   so an analyst scanning the left edge sees the shape of the incident without
+   reading a single word. This is why the severity badge can then be quiet. */
+.tp-app[data-theme='forensic'] .tp-table tbody td:first-child {
+  box-shadow: inset 3px 0 0 0 var(--fx-rail, transparent);
+}
+.tp-app[data-theme='forensic'] .tp-table tbody tr:has(.sev-critical) td:first-child { --fx-rail: var(--fx-critical); }
+.tp-app[data-theme='forensic'] .tp-table tbody tr:has(.sev-high) td:first-child { --fx-rail: var(--fx-high); }
+.tp-app[data-theme='forensic'] .tp-table tbody tr:has(.sev-warning) td:first-child { --fx-rail: var(--fx-medium); }
+.tp-app[data-theme='forensic'] .tp-table tbody tr:has(.sev-medium) td:first-child { --fx-rail: var(--fx-medium); }
+.tp-app[data-theme='forensic'] .tp-table tbody tr:has(.sev-low) td:first-child { --fx-rail: var(--fx-low); }
+.tp-app[data-theme='forensic'] .tp-table tbody tr:has(.sev-info) td:first-child { --fx-rail: var(--fx-info); }
+.tp-app[data-theme='forensic'] .tp-table tbody tr:has(.sev-unknown) td:first-child { --fx-rail: var(--fx-info); }
+
+/* Event identity: the type leads, the raw message trails underneath in mono,
+   clipped. The raw line is evidence, so it is shown, but it must not be
+   allowed to set the row height. */
+.tp-app[data-theme='forensic'] .tp-forensic-event-text { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.tp-app[data-theme='forensic'] .tp-forensic-event-text strong {
+  font-size: 13px; font-weight: 600; color: var(--fx-text); letter-spacing: -0.005em;
+}
+.tp-app[data-theme='forensic'] .tp-forensic-event-text small {
+  font-family: var(--fx-mono);
+  font-size: 11px;
+  color: var(--fx-text-mute);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 46ch;
+}
+
+.tp-app[data-theme='forensic'] .tp-forensic-event-identity { display: flex; align-items: center; gap: 10px; min-width: 0; }
+
+/* The per-row icon is dropped. In a dense table an icon on every row is noise:
+   it repeats what the event-type column already says, and the severity rail
+   already carries the scanning signal. */
+.tp-app[data-theme='forensic'] .tp-forensic-event-icon { display: none !important; } /* LEGACY-OVERRIDE */
+
+/* ---------------------------------------------------------------------------
+   SEVERITY BADGES
+   Quiet by design: a tinted dot and a label, not a filled pill. The rail does
+   the shouting; this states the value for anyone who needs it exactly.
+   --------------------------------------------------------------------------- */
+.tp-app[data-theme='forensic'] .tp-severity {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--fx-cond) !important;     /* LEGACY-OVERRIDE */
+  font-size: 11px !important;                 /* LEGACY-OVERRIDE */
+  font-weight: 600 !important;                /* LEGACY-OVERRIDE */
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 2px 7px 2px 6px !important;        /* LEGACY-OVERRIDE */
+  border-radius: var(--fx-r-sm) !important;   /* LEGACY-OVERRIDE */
+  background: color-mix(in srgb, var(--fx-sev, var(--fx-info)) 12%, transparent) !important; /* LEGACY-OVERRIDE */
+  border: 1px solid color-mix(in srgb, var(--fx-sev, var(--fx-info)) 32%, transparent) !important; /* LEGACY-OVERRIDE */
+  color: var(--fx-sev, var(--fx-info)) !important; /* LEGACY-OVERRIDE */
+}
+.tp-app[data-theme='forensic'] .tp-severity::before {
+  content: ''; width: 5px; height: 5px; border-radius: 50%;
+  background: currentColor; flex: none;
+}
+.tp-app[data-theme='forensic'] .tp-severity-critical { --fx-sev: var(--fx-critical); }
+.tp-app[data-theme='forensic'] .tp-severity-high     { --fx-sev: var(--fx-high); }
+.tp-app[data-theme='forensic'] .tp-severity-warning,
+.tp-app[data-theme='forensic'] .tp-severity-medium   { --fx-sev: var(--fx-medium); }
+.tp-app[data-theme='forensic'] .tp-severity-low      { --fx-sev: var(--fx-low); }
+.tp-app[data-theme='forensic'] .tp-severity-info     { --fx-sev: var(--fx-info); }
+
+/* ---------------------------------------------------------------------------
+   CONTROLS
+   --------------------------------------------------------------------------- */
+.tp-app[data-theme='forensic'] .tp-button,
+.tp-app[data-theme='forensic'] button.tp-button {
+  font-family: var(--fx-cond) !important;     /* LEGACY-OVERRIDE */
+  font-size: 12px !important;                 /* LEGACY-OVERRIDE */
+  font-weight: 600 !important;                /* LEGACY-OVERRIDE */
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  height: 30px;
+  padding: 0 12px !important;                 /* LEGACY-OVERRIDE */
+  border-radius: var(--fx-r-sm) !important;   /* LEGACY-OVERRIDE */
+  background: var(--fx-raised) !important;    /* LEGACY-OVERRIDE */
+  border: 1px solid var(--fx-line-strong) !important; /* LEGACY-OVERRIDE */
+  color: var(--fx-text) !important;           /* LEGACY-OVERRIDE */
+  box-shadow: none !important;                /* LEGACY-OVERRIDE */
+  transition: border-color 90ms linear, background 90ms linear;
+}
+.tp-app[data-theme='forensic'] .tp-button:hover {
+  background: var(--fx-overlay) !important;   /* LEGACY-OVERRIDE */
+  border-color: var(--fx-line-focus) !important; /* LEGACY-OVERRIDE */
+}
+.tp-app[data-theme='forensic'] .tp-button[data-variant='primary'],
+.tp-app[data-theme='forensic'] .tp-button.is-primary {
+  background: var(--fx-signal) !important;    /* LEGACY-OVERRIDE */
+  border-color: var(--fx-signal) !important;  /* LEGACY-OVERRIDE */
+  color: var(--fx-on-signal) !important;      /* LEGACY-OVERRIDE */
+}
+
+.tp-app[data-theme='forensic'] input[type='text'],
+.tp-app[data-theme='forensic'] input[type='search'],
+.tp-app[data-theme='forensic'] input[type='email'],
+.tp-app[data-theme='forensic'] input[type='password'],
+.tp-app[data-theme='forensic'] select,
+.tp-app[data-theme='forensic'] textarea {
+  background: var(--fx-bg) !important;        /* LEGACY-OVERRIDE */
+  border: 1px solid var(--fx-line-strong) !important; /* LEGACY-OVERRIDE */
+  border-radius: var(--fx-r-sm) !important;   /* LEGACY-OVERRIDE */
+  color: var(--fx-text) !important;           /* LEGACY-OVERRIDE */
+  font-family: var(--fx-sans);
+  font-size: 13px;
+  height: 30px;
+  padding: 0 10px;
+}
+.tp-app[data-theme='forensic'] textarea { height: auto; padding: 8px 10px; font-family: var(--fx-mono); font-size: 12px; }
+
+.tp-app[data-theme='forensic'] input::placeholder,
+.tp-app[data-theme='forensic'] textarea::placeholder { color: var(--fx-text-mute); }
+
+/* One focus treatment everywhere, in the signal colour. */
+.tp-app[data-theme='forensic'] :focus-visible {
+  outline: 2px solid var(--fx-signal) !important;  /* LEGACY-OVERRIDE */
+  outline-offset: 1px;
+  border-radius: var(--fx-r-sm);
+}
+
+/* ---------------------------------------------------------------------------
+   NAVIGATION
+   A rail, not a marketing header. The active item is marked by a signal bar on
+   its leading edge, which is the same language as the severity rail in the
+   table: position on the left edge means "this one".
+   --------------------------------------------------------------------------- */
+.tp-app[data-theme='forensic'] nav button,
+.tp-app[data-theme='forensic'] .tp-nav button {
+  font-family: var(--fx-cond) !important;     /* LEGACY-OVERRIDE */
+  font-size: 12px !important;                 /* LEGACY-OVERRIDE */
+  font-weight: 600 !important;                /* LEGACY-OVERRIDE */
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--fx-text-dim) !important;       /* LEGACY-OVERRIDE */
+  background: transparent !important;         /* LEGACY-OVERRIDE */
+  border: 0 !important;                       /* LEGACY-OVERRIDE */
+  border-radius: 0 !important;                /* LEGACY-OVERRIDE */
+  box-shadow: inset 2px 0 0 0 transparent;
+  transition: color 90ms linear, box-shadow 90ms linear;
+}
+.tp-app[data-theme='forensic'] nav button:hover { color: var(--fx-text) !important; } /* LEGACY-OVERRIDE */
+.tp-app[data-theme='forensic'] nav button[aria-current='page'],
+.tp-app[data-theme='forensic'] nav button.is-active {
+  color: var(--fx-text) !important;           /* LEGACY-OVERRIDE */
+  background: var(--fx-surface) !important;   /* LEGACY-OVERRIDE */
+  box-shadow: inset 2px 0 0 0 var(--fx-signal) !important; /* LEGACY-OVERRIDE */
+}
+
+/* ---------------------------------------------------------------------------
+   STATES
+   An empty table is not a failure, and it should not look like one. These read
+   as instrument readouts: a short statement, set in mono, centred in the space
+   the data would have occupied.
+   --------------------------------------------------------------------------- */
+.tp-app[data-theme='forensic'] .tp-empty,
+.tp-app[data-theme='forensic'] .tp-error {
+  font-family: var(--fx-mono);
+  font-size: 12px;
+  color: var(--fx-text-mute);
+  background: var(--fx-surface);
+  border: 1px dashed var(--fx-line-strong);
+  border-radius: var(--fx-r-md);
+  padding: 28px 16px;
+  text-align: center;
+}
+.tp-app[data-theme='forensic'] .tp-error { color: var(--fx-critical); border-color: color-mix(in srgb, var(--fx-critical) 40%, transparent); }
+
+/* ---------------------------------------------------------------------------
+   SCROLLBARS
+   The table scrolls constantly; the default macOS overlay bar sits badly on a
+   dark surface.
+   --------------------------------------------------------------------------- */
+.tp-app[data-theme='forensic'] ::-webkit-scrollbar { width: 10px; height: 10px; }
+.tp-app[data-theme='forensic'] ::-webkit-scrollbar-track { background: var(--fx-bg); }
+.tp-app[data-theme='forensic'] ::-webkit-scrollbar-thumb {
+  background: var(--fx-line-strong); border-radius: 0;
+  border: 2px solid var(--fx-bg);
+}
+.tp-app[data-theme='forensic'] ::-webkit-scrollbar-thumb:hover { background: var(--fx-line-focus); }
+
+/* ---------------------------------------------------------------------------
+   MOTION
+   The only transitions in this system are 90ms colour changes on hover. An
+   investigation tool should not animate. Anyone who has asked their system not
+   to animate gets nothing at all.
+   --------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .tp-app[data-theme='forensic'] *, .tp-app[data-theme='forensic'] *::before, .tp-app[data-theme='forensic'] *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+
+/* ---------------------------------------------------------------------------
+   DEPTH MATCHES
+   The legacy sheets name these elements inside .tp-table, one class deeper
+   than the base rules above, and do it with !important. Until those sheets go,
+   the same paths are named here. Each of these is a line to delete later, not
+   a pattern to copy.
+   --------------------------------------------------------------------------- */
+.tp-app[data-theme='forensic'] .tp-table .tp-forensic-device,
+.tp-app[data-theme='forensic'] .tp-table .tp-device {
+  color: var(--fx-low) !important;            /* LEGACY-OVERRIDE */
+  font-size: 12px !important;                 /* LEGACY-OVERRIDE */
+  font-family: var(--fx-mono) !important;     /* LEGACY-OVERRIDE */
+  background: none !important;                /* LEGACY-OVERRIDE */
+}
+
+.tp-app[data-theme='forensic'] .tp-table .tp-forensic-username {
+  color: var(--fx-text) !important;           /* LEGACY-OVERRIDE */
+  font-size: 12px !important;                 /* LEGACY-OVERRIDE */
+  font-family: var(--fx-mono) !important;     /* LEGACY-OVERRIDE */
+}
+
+.tp-app[data-theme='forensic'] .tp-table th,
+.tp-app[data-theme='forensic'] .tp-evidence-table th,
+.tp-app[data-theme='forensic'] .tp-ev-table th {
+  font-size: 11px !important;                 /* LEGACY-OVERRIDE */
+  font-family: var(--fx-cond) !important;     /* LEGACY-OVERRIDE */
+  color: var(--fx-text-dim) !important;       /* LEGACY-OVERRIDE */
+  background: var(--fx-raised) !important;    /* LEGACY-OVERRIDE */
+}
+
+/* The raw log line sat at 4.06:1 against the page, just under AA for body
+   text. It is evidence and has to be readable, so it moves up to the dim
+   step, which measures 7.7:1. */
+.tp-app[data-theme='forensic'] .tp-forensic-event-text small {
+  color: var(--fx-text-dim);
+  font-size: 11.5px;
+}
+
+/* shadcn's Badge ships rounded-full and its own border colour. */
+.tp-app[data-theme='forensic'] .tp-severity {
+  border-radius: var(--fx-r-sm) !important;   /* LEGACY-OVERRIDE */
+  text-transform: uppercase !important;       /* LEGACY-OVERRIDE */
+}
+
+/* The table header resisted both base rules above: shadcn ships the <th> with
+   its own utility colour, and a legacy sheet names it one class deeper again.
+   This states it once, at the depth both of those sit at. Measured 7.69:1. */
+.tp-app[data-theme='forensic'] .tp-table-scroll .tp-table thead th,
+.tp-app[data-theme='forensic'] .tp-table thead th,
+.tp-app[data-theme='forensic'] table thead th {
+  color: var(--fx-text-dim) !important;       /* LEGACY-OVERRIDE */
+  font-size: 11px !important;                 /* LEGACY-OVERRIDE */
+  font-family: var(--fx-cond) !important;     /* LEGACY-OVERRIDE */
+  letter-spacing: 0.08em !important;          /* LEGACY-OVERRIDE */
+  text-transform: uppercase !important;       /* LEGACY-OVERRIDE */
+  height: 30px !important;                    /* LEGACY-OVERRIDE */
+}
+
+/* The timestamp cell is a <time> wrapping a bare <span> for the date and a
+   <small> for the clock, and a legacy rule colours the span directly. Both
+   halves are evidence, so both are set here: the date steps back, the clock
+   reads at full strength because that is what gets scanned down the column. */
+.tp-app[data-theme='forensic'] .tp-forensic-event-time {
+  display: flex; flex-direction: column; gap: 0; line-height: 1.35;
+}
+.tp-app[data-theme='forensic'] .tp-forensic-event-time > span {
+  color: var(--fx-text-dim) !important;       /* LEGACY-OVERRIDE */
+  font-size: 11.5px !important;               /* LEGACY-OVERRIDE */
+  font-family: var(--fx-mono) !important;     /* LEGACY-OVERRIDE */
+}
+.tp-app[data-theme='forensic'] .tp-forensic-event-time > small {
+  color: var(--fx-text) !important;           /* LEGACY-OVERRIDE */
+  font-size: 12px !important;                 /* LEGACY-OVERRIDE */
+  font-family: var(--fx-mono) !important;     /* LEGACY-OVERRIDE */
+  font-variant-numeric: tabular-nums;
+}

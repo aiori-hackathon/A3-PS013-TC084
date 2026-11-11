@@ -34,6 +34,9 @@ import './styles/TracepointEyeHeroFix.css';
 import './styles/TracepointThemeContrast.css';
 import './styles/TracepointResponsiveNavigation.css';
 import './styles/TracepointDesktopCompactHeight.css';
+// Imported last on purpose: this is the design system, and it has to win
+// the cascade against the legacy sheets above while they are retired.
+import './styles/forensic.css';
 const navigation = [
   ['overview', 'Overview', LayoutDashboard],
   ['timeline', 'Event timeline', Activity],
@@ -171,10 +174,14 @@ export default function Dashboard({ user, onSignOut }) {
   const [level, setLevel] = useState('all');
   const [selected, setSelected] = useState(null);
   const [mobileOpen, setMobileOpen] = useState(false);
-  // TRACEPOINT_LIGHT_ONLY_V1: the app ships in one appearance. The dark rules
-  // are still in the stylesheets and nothing reads data-theme="dark" any more,
-  // so restoring the toggle means restoring this state and the buttons.
-  const theme = 'light';
+  // TRACEPOINT_FORENSIC_V1: the app ships in one appearance, and this value is
+  // the switch that selects it. The legacy stylesheets scope 368 rules to
+  // [data-theme="light"] and 933 to [data-theme="dark"]; naming the theme
+  // something neither of them matches retires all 1301 at once, without
+  // deleting a sheet that also carries layout. forensic.css then styles the
+  // app unopposed. Retiring those sheets properly is follow-up work; until
+  // then, setting this back to 'light' restores the old appearance exactly.
+  const theme = 'forensic';
   useEffect(() => {
     // Clear the saved choice, or anyone who left the app in dark mode keeps a
     // key that would silently take effect if the toggle ever came back.
