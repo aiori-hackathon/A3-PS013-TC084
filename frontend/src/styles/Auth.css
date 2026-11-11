@@ -1,10 +1,510 @@
-/* Scoped auth styling: does not override the existing dashboard. */
-.thread-auth{min-height:100vh;display:grid;grid-template-columns:minmax(390px,47%) minmax(0,53%);background:#fff;color:#25232b;font-family:Arial,Helvetica,sans-serif;font-size:15px}
-.auth-left{display:flex;flex-direction:column;padding:34px clamp(30px,5vw,86px) 25px;min-height:100vh}
-.auth-brand{display:flex;align-items:center;gap:10px;font-size:23px;font-weight:700;letter-spacing:-.9px}.auth-brand-dot,.auth-logo span,.preview-brand span{color:#6842ce}.auth-logo{display:grid;place-items:center;width:36px;height:36px;border-radius:10px;background:#f0eafa;color:#5435a5;font-size:22px}
-.auth-form-area{width:min(100%,420px);margin:auto; padding:45px 0}.auth-kicker{display:flex;align-items:center;gap:8px;color:#746e82;font-size:11px;font-weight:700;letter-spacing:1.4px}.auth-kicker-dot{width:7px;height:7px;background:#6842ce;border-radius:50%}.auth-form-area h1{font-size:clamp(29px,3vw,38px);font-weight:700;letter-spacing:-1.4px;line-height:1.2;margin:18px 0 11px}.auth-subtitle{color:#787581;font-size:15px;line-height:1.6;margin:0 0 35px}.auth-form-area form{display:grid;gap:20px}.auth-form-area label{display:grid;gap:9px;font-size:13px;font-weight:600;color:#3b3644}.auth-form-area input{width:100%;height:48px;border:1px solid #dcd9e3;border-radius:8px;padding:0 14px;background:#fff;color:#25232b;font-size:14px;outline:none;transition:border-color .15s,box-shadow .15s}.auth-form-area input:focus{border-color:#6842ce;box-shadow:0 0 0 3px #6842ce20}.auth-password-wrap{position:relative}.auth-password-wrap input{padding-right:48px}.auth-password-wrap button{position:absolute;right:8px;top:7px;height:34px;width:34px;display:grid;place-items:center;border:0;background:transparent;color:#888291;border-radius:6px}.auth-submit{display:flex;align-items:center;justify-content:center;gap:10px;background:#6842ce;color:white;border:0;border-radius:8px;min-height:48px;font-size:14px;font-weight:600;margin-top:7px;transition:background .15s}.auth-submit:hover{background:#5633b7}.auth-submit:disabled{opacity:.7;cursor:wait}.auth-switch{font-size:14px;text-align:center;color:#77717e;margin-top:27px}.auth-switch button{border:0;background:transparent;color:#6842ce;font-weight:700;padding:3px}.auth-error{background:#fff0f0;color:#9c3131;padding:12px;border-radius:7px;font-size:13px;line-height:1.5}.auth-footer{display:flex;justify-content:space-between;gap:10px;color:#9994a0;font-size:11px}
-.auth-right{background:#f7f7fa;border-left:1px solid #eceaf1;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:50px clamp(25px,4vw,75px);overflow:hidden}.auth-preview-label{align-self:flex-start;font-size:11px;font-weight:700;letter-spacing:1.1px;color:#8b839b;margin-bottom:23px;display:flex;align-items:center;gap:9px}.auth-preview-line{height:2px;width:23px;background:#6842ce}.auth-preview-window{width:100%;max-width:720px;background:#fff;border:1px solid #e7e4ed;border-radius:12px;box-shadow:0 18px 55px #3a25551a;overflow:hidden;transform:rotate(-1deg)}.preview-top{height:48px;border-bottom:1px solid #ecebf0;display:flex;align-items:center;gap:12px;padding:0 16px}.preview-brand{font-size:17px;font-weight:700;letter-spacing:-.5px;margin-right:auto}.preview-top-pill{font-size:10px;color:#8b8693}.preview-avatar{background:#f0eafa;color:#6842ce;border-radius:7px;padding:7px;font-size:10px;font-weight:700}.preview-body{display:flex;min-height:280px}.preview-sidebar{width:125px;border-right:1px solid #eeedf2;background:#fcfcfd;padding:20px 8px;flex-shrink:0}.preview-nav{padding:9px 8px;font-size:10px;color:#8a8792;border-radius:5px;white-space:nowrap}.preview-nav.active{background:#f1ebfb;color:#6842ce;font-weight:700}.preview-content{padding:20px;flex:1;min-width:0}.preview-small{font-size:9px;color:#a49dab;letter-spacing:1px}.preview-content h3{font-size:20px;margin:10px 0 5px;letter-spacing:-.5px}.preview-content p{font-size:10px;color:#9b95a0;margin:0 0 17px}.preview-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.preview-metrics div{border:1px solid #eceaf0;border-radius:6px;padding:10px}.preview-metrics small{font-size:9px;color:#9993a1;display:block}.preview-metrics strong{font-size:19px;display:block;margin-top:9px}.preview-table{border:1px solid #eceaf0;border-radius:6px;margin-top:14px;overflow:hidden}.preview-table-title{font-size:11px;font-weight:700;padding:11px;display:flex;justify-content:space-between}.preview-table-title span{font-size:9px;font-weight:400;color:#aaa3b1}.preview-table-head{background:#faf9fc;padding:9px 11px;font-size:9px;letter-spacing:.5px;color:#a19ba7;display:flex;justify-content:space-between}.preview-table-row{padding:10px 11px;border-top:1px solid #f1f0f4;font-size:10px;display:flex;justify-content:space-between}.preview-table-row span{display:flex;align-items:center;gap:7px}.preview-table-row em{font-size:9px;font-style:normal;color:#7b7583}.preview-dot{width:6px;height:6px;background:#d49b6c;border-radius:50%;display:inline-block}.preview-dot.purple{background:#6842ce}.auth-preview-copy{align-self:flex-start;margin-top:48px;max-width:480px}.auth-preview-icon{color:#6842ce}.auth-preview-copy h2{font-size:25px;letter-spacing:-.8px;margin:12px 0}.auth-preview-copy p{color:#8a8491;font-size:14px;line-height:1.6;margin:0 0 22px}.auth-feature{display:flex;align-items:center;gap:9px;color:#625c6b;font-size:13px;margin:10px 0}.auth-feature svg{color:#6842ce}
-@media(max-width:850px){.thread-auth{grid-template-columns:1fr}.auth-left{min-height:100vh}.auth-right{display:none}}@media(max-width:480px){.auth-left{padding:24px}.auth-footer{font-size:10px}}
+/* ===========================================================================
+   AUTHENTICATION
+   ---------------------------------------------------------------------------
+   The sign-in screen is the first thing anyone sees, so it carries the same
+   identity as the workspace behind it: near-black surfaces, hairline
+   structure, one lime signal colour, Archivo for the interface and JetBrains
+   Mono for anything a machine would have written.
 
-/* Tracepoint: understated product identity */
-.auth-brand{font-size:25px;letter-spacing:-1.1px}.auth-preview-window{transform:none;box-shadow:0 12px 34px #3023420b}.auth-preview-copy{margin-top:32px}.auth-preview-copy h2{margin-top:0}.auth-right{padding-top:35px;padding-bottom:35px}.auth-kicker,.auth-preview-label{letter-spacing:.8px}.auth-preview-copy p{margin-bottom:0}.auth-form-area h1{font-size:36px}.preview-nav{padding-left:12px}.auth-brand-dot{color:#6842ce}
+   This file used to be a light navy/blue/amber screen with a second
+   stylesheet layered over it in !important, plus a dark variant gated on an
+   .auth-dark class that nothing in Auth.jsx ever set - so the dark theme was
+   dead code and the screen always rendered light. Both of those files are
+   gone. This is the whole of the authentication styling now.
+
+   The tokens are redeclared here rather than imported: forensic.css scopes
+   its variables to .tp-app[data-theme='forensic'], and App.jsx renders Auth
+   entirely outside that element. The values are copied from it, so the two
+   must be changed together.
+   =========================================================================== */
+
+.thread-auth {
+  --fx-bg:          #090c11;
+  --fx-surface:     #0f141b;
+  --fx-raised:      #151c25;
+  --fx-overlay:     #1b2430;
+
+  --fx-line:        #1e2733;
+  --fx-line-strong: #2b3744;
+  --fx-line-focus:  #3d5168;
+
+  --fx-text:        #e7eef7;
+  --fx-text-dim:    #93a4b8;
+  /* --fx-text-mute (#627485) is a border colour only. It measures 3.83:1 on
+     the input surface, so it is never used for text, placeholders included.
+     Placeholder text gets its own value: light enough to clear 4.5:1 (it
+     measures 5.13:1 on --fx-surface), still clearly a hint rather than a
+     value the field already holds. */
+  --fx-text-mute:   #627485;
+  --fx-placeholder: #76899c;
+
+  --fx-signal:      #c3f04a;
+  --fx-signal-dim:  #6f8c22;
+  --fx-on-signal:   #101705;
+
+  --fx-critical:    #ff4d6a;
+  --fx-low:         #4fd1c5;
+
+  --fx-r-sm:        2px;
+  --fx-r-md:        3px;
+
+  --fx-sans:        'Archivo', system-ui, -apple-system, sans-serif;
+  --fx-mono:        'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: minmax(390px, 46%) minmax(0, 54%);
+  background: var(--fx-bg);
+  color: var(--fx-text);
+  font-family: var(--fx-sans);
+  font-size: 15px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* --- left: the form ------------------------------------------------------ */
+.thread-auth .auth-left {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 34px clamp(30px, 5vw, 80px) 26px;
+  min-height: 100vh;
+  background: var(--fx-bg);
+  border-right: 1px solid var(--fx-line);
+}
+
+.thread-auth .auth-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 25px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: var(--fx-text);
+}
+.thread-auth .auth-brand-dot { color: var(--fx-signal); }
+
+.thread-auth .auth-form-area {
+  width: min(100%, 430px);
+  margin: auto;
+  padding: 45px 0;
+}
+
+/* Mono, because it reads as a system label rather than a tagline. */
+.thread-auth .auth-kicker {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--fx-mono);
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 1.1px;
+  color: var(--fx-text-dim);
+}
+.thread-auth .auth-kicker::before {
+  content: '';
+  width: 22px;
+  height: 2px;
+  background: var(--fx-signal);
+}
+
+.thread-auth .auth-form-area h1 {
+  font-size: clamp(31px, 3.1vw, 40px);
+  font-weight: 600;
+  letter-spacing: -1.1px;
+  line-height: 1.15;
+  margin: 20px 0 12px;
+  color: var(--fx-text);
+}
+
+.thread-auth .auth-subtitle {
+  color: var(--fx-text-dim);
+  font-size: 15px;
+  line-height: 1.6;
+  margin: 0 0 34px;
+}
+
+.thread-auth .auth-form-area form { display: grid; gap: 19px; }
+
+.thread-auth .auth-form-area label {
+  display: grid;
+  gap: 8px;
+  font-family: var(--fx-mono);
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--fx-text-dim);
+}
+
+.thread-auth .auth-form-area input {
+  width: 100%;
+  height: 48px;
+  padding: 0 14px;
+  background: var(--fx-surface);
+  color: var(--fx-text);
+  border: 1px solid var(--fx-line-strong);
+  border-radius: var(--fx-r-md);
+  font-family: var(--fx-sans);
+  font-size: 14.5px;
+  letter-spacing: normal;
+  text-transform: none;
+  outline: none;
+  transition: border-color 130ms ease, box-shadow 130ms ease;
+}
+.thread-auth .auth-form-area input::placeholder { color: var(--fx-placeholder); }
+.thread-auth .auth-form-area input:hover { border-color: var(--fx-line-focus); }
+.thread-auth .auth-form-area input:focus {
+  border-color: var(--fx-signal);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--fx-signal) 18%, transparent);
+}
+/* The password field is a monospace field: it is the one input where telling
+   0 from O matters. */
+.thread-auth .auth-password-wrap input { font-family: var(--fx-mono); font-size: 14px; }
+
+.thread-auth .auth-password-wrap { position: relative; }
+.thread-auth .auth-password-wrap input { padding-right: 48px; }
+.thread-auth .auth-password-wrap button {
+  position: absolute;
+  right: 7px;
+  top: 7px;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  color: var(--fx-text-dim);
+  border-radius: var(--fx-r-sm);
+  cursor: pointer;
+  transition: color 130ms ease, background 130ms ease;
+}
+.thread-auth .auth-password-wrap button:hover {
+  color: var(--fx-text);
+  background: var(--fx-overlay);
+}
+
+.thread-auth .auth-submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 48px;
+  margin-top: 8px;
+  background: var(--fx-signal);
+  color: var(--fx-on-signal);
+  border: 1px solid var(--fx-signal);
+  border-radius: var(--fx-r-md);
+  font-family: var(--fx-sans);
+  font-size: 14.5px;
+  font-weight: 600;
+  letter-spacing: 0.1px;
+  cursor: pointer;
+  transition: background 130ms ease, border-color 130ms ease;
+}
+.thread-auth .auth-submit:hover {
+  background: color-mix(in srgb, var(--fx-signal) 86%, #ffffff);
+  border-color: color-mix(in srgb, var(--fx-signal) 86%, #ffffff);
+}
+.thread-auth .auth-submit:disabled { opacity: 0.62; cursor: wait; }
+
+.thread-auth .auth-submit:focus-visible,
+.thread-auth .auth-switch button:focus-visible,
+.thread-auth .auth-password-wrap button:focus-visible {
+  outline: 2px solid var(--fx-signal);
+  outline-offset: 2px;
+}
+
+.thread-auth .auth-switch {
+  margin-top: 26px;
+  font-size: 14px;
+  text-align: center;
+  color: var(--fx-text-dim);
+}
+.thread-auth .auth-switch button {
+  border: 0;
+  background: transparent;
+  color: var(--fx-signal);
+  font-family: var(--fx-sans);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 3px;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: color-mix(in srgb, var(--fx-signal) 40%, transparent);
+}
+.thread-auth .auth-switch button:hover { text-decoration-color: var(--fx-signal); }
+
+/* A failed sign-in is a signal, so it is marked like one: the severity colour
+   on the left edge rather than a filled pink box. */
+.thread-auth .auth-error {
+  padding: 12px 14px;
+  background: color-mix(in srgb, var(--fx-critical) 11%, var(--fx-surface));
+  color: #ffd9df;
+  border: 1px solid color-mix(in srgb, var(--fx-critical) 34%, transparent);
+  border-left: 2px solid var(--fx-critical);
+  border-radius: var(--fx-r-sm);
+  font-family: var(--fx-mono);
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+.thread-auth .auth-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-family: var(--fx-mono);
+  font-size: 11px;
+  color: var(--fx-text-dim);
+}
+
+/* --- right: the product preview ------------------------------------------ */
+/* A faint grid over a near-black field, so the panel reads as instrument
+   surface rather than as an empty column. */
+.thread-auth .auth-right {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 38px clamp(25px, 4vw, 70px);
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 60% 48% at 72% 14%, color-mix(in srgb, var(--fx-signal) 9%, transparent), transparent 70%),
+    linear-gradient(160deg, #0b1016 0%, #090c11 56%, #0c1218 100%);
+  color: var(--fx-text);
+}
+.thread-auth .auth-right::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image:
+    linear-gradient(to right, var(--fx-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--fx-line) 1px, transparent 1px);
+  background-size: 44px 44px;
+  opacity: 0.5;
+  mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, #000 30%, transparent 100%);
+}
+
+.thread-auth .auth-preview-label {
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 22px;
+  font-family: var(--fx-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  color: var(--fx-text-dim);
+}
+.thread-auth .auth-preview-label::before {
+  content: '';
+  width: 22px;
+  height: 2px;
+  background: var(--fx-signal);
+}
+
+.thread-auth .auth-preview-window {
+  width: 100%;
+  max-width: 720px;
+  background: var(--fx-surface);
+  border: 1px solid var(--fx-line-strong);
+  border-radius: var(--fx-r-md);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  transform: none;
+}
+
+.thread-auth .preview-top {
+  height: 48px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px;
+  background: var(--fx-raised);
+  border-bottom: 1px solid var(--fx-line-strong);
+}
+.thread-auth .preview-brand {
+  margin-right: auto;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  color: var(--fx-text);
+}
+.thread-auth .preview-brand span { color: var(--fx-signal); }
+.thread-auth .preview-top-pill {
+  font-family: var(--fx-mono);
+  font-size: 10.5px;
+  color: var(--fx-text-dim);
+}
+.thread-auth .preview-avatar {
+  padding: 6px 7px;
+  background: var(--fx-overlay);
+  color: var(--fx-text);
+  border: 1px solid var(--fx-line-strong);
+  border-radius: var(--fx-r-sm);
+  font-family: var(--fx-mono);
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.thread-auth .preview-body { display: flex; min-height: 282px; }
+
+.thread-auth .preview-sidebar {
+  width: 132px;
+  flex-shrink: 0;
+  padding: 16px 8px;
+  background: var(--fx-bg);
+  border-right: 1px solid var(--fx-line-strong);
+}
+.thread-auth .preview-nav {
+  padding: 9px 10px;
+  font-family: var(--fx-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.4px;
+  color: var(--fx-text-dim);
+  border-radius: var(--fx-r-sm);
+  white-space: nowrap;
+}
+/* The active row is marked the same way the real left rail marks it: an inset
+   signal bar, not a filled pill. */
+.thread-auth .preview-nav.active {
+  color: var(--fx-signal);
+  background: color-mix(in srgb, var(--fx-signal) 10%, transparent);
+  box-shadow: inset 2px 0 0 0 var(--fx-signal);
+  font-weight: 600;
+}
+
+.thread-auth .preview-content { flex: 1; min-width: 0; padding: 20px; }
+.thread-auth .preview-small {
+  font-family: var(--fx-mono);
+  font-size: 9.5px;
+  letter-spacing: 1px;
+  color: var(--fx-text-dim);
+}
+.thread-auth .preview-content h3 {
+  margin: 10px 0 5px;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.4px;
+  color: var(--fx-text);
+}
+.thread-auth .preview-content p {
+  margin: 0 0 16px;
+  font-size: 11px;
+  color: var(--fx-text-dim);
+}
+
+.thread-auth .preview-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.thread-auth .preview-metrics div {
+  padding: 10px;
+  background: var(--fx-raised);
+  border: 1px solid var(--fx-line);
+  border-radius: var(--fx-r-sm);
+}
+.thread-auth .preview-metrics small {
+  display: block;
+  font-family: var(--fx-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.3px;
+  color: var(--fx-text-dim);
+}
+/* The figures are em dashes in the markup, not numbers. This is a layout
+   preview shown before sign-in, so it states no counts it cannot have. */
+.thread-auth .preview-metrics strong {
+  display: block;
+  margin-top: 8px;
+  font-family: var(--fx-mono);
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--fx-text);
+}
+
+.thread-auth .preview-table {
+  margin-top: 14px;
+  background: var(--fx-raised);
+  border: 1px solid var(--fx-line);
+  border-radius: var(--fx-r-sm);
+  overflow: hidden;
+}
+.thread-auth .preview-table-title {
+  display: flex;
+  justify-content: space-between;
+  padding: 11px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--fx-text);
+}
+.thread-auth .preview-table-title span {
+  font-family: var(--fx-mono);
+  font-size: 9.5px;
+  font-weight: 400;
+  color: var(--fx-text-dim);
+}
+.thread-auth .preview-table-head {
+  display: flex;
+  justify-content: space-between;
+  padding: 9px 11px;
+  background: var(--fx-overlay);
+  font-family: var(--fx-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.6px;
+  color: var(--fx-text-dim);
+}
+.thread-auth .preview-table-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 11px;
+  border-top: 1px solid var(--fx-line);
+  font-size: 10.5px;
+  color: var(--fx-text);
+}
+.thread-auth .preview-table-row span { display: flex; align-items: center; gap: 7px; }
+.thread-auth .preview-table-row em {
+  font-family: var(--fx-mono);
+  font-size: 9.5px;
+  font-style: normal;
+  color: var(--fx-low);
+}
+
+.thread-auth .auth-preview-copy {
+  align-self: flex-start;
+  max-width: 480px;
+  margin-top: 40px;
+  color: var(--fx-text);
+}
+.thread-auth .auth-preview-copy h2 {
+  margin: 0 0 12px;
+  font-size: 26px;
+  font-weight: 600;
+  letter-spacing: -0.7px;
+  color: var(--fx-text);
+}
+.thread-auth .auth-preview-copy p {
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--fx-text-dim);
+}
+
+/* --- narrow -------------------------------------------------------------- */
+@media (max-width: 850px) {
+  .thread-auth { grid-template-columns: 1fr; }
+  .thread-auth .auth-left { min-height: 100vh; border-right: 0; }
+  .thread-auth .auth-right { display: none; }
+}
+@media (max-width: 480px) {
+  .thread-auth .auth-left { padding: 24px; }
+  .thread-auth .auth-footer { font-size: 10px; flex-direction: column; gap: 4px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .thread-auth * { transition: none !important; }
+}

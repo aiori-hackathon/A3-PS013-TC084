@@ -1,0 +1,174 @@
+/* ===========================================================================
+   CHARTS
+   ---------------------------------------------------------------------------
+   The system's rule is that colour carries severity and nothing else. A chart
+   is the one place that cannot hold: a distribution of seven event types needs
+   seven distinguishable series, and none of them is a severity.
+
+   So charts get their own scale, --fx-cat-1..6, declared in forensic.css and
+   used nowhere outside this file. It is kept clearly apart from the severity
+   ramp in hue so a chart series is never mistaken for an alarm level, and
+   every chart that uses it carries a legend or a label per row, so the colour
+   is never the only thing saying what a bar is.
+   =========================================================================== */
+
+.tp-charts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+  gap: 14px;
+  margin: 16px 0;
+}
+
+.tp-chart-wide { grid-column: 1 / -1; }
+
+.tp-chart-card { padding: 16px 18px 14px; }
+
+.tp-chart-head { margin-bottom: 14px; }
+.tp-chart-head h3 {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 2px;
+  letter-spacing: -0.01em;
+}
+.tp-chart-head p {
+  margin: 0;
+  font-size: 11.5px;
+  font-family: var(--fx-mono, monospace);
+  color: var(--fx-text-dim, #93a4b8);
+}
+
+.tp-chart-empty {
+  font-family: var(--fx-mono, monospace);
+  font-size: 11.5px;
+  color: var(--fx-text-dim, #93a4b8);
+  border: 1px dashed var(--fx-line-strong, #2b3744);
+  border-radius: var(--fx-r-sm, 2px);
+  padding: 18px 14px;
+  margin: 0;
+  text-align: center;
+}
+
+/* Said to a screen reader, and shown as the row's own tooltip on hover. */
+.tp-chart-sr {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0;
+  overflow: hidden; clip-path: inset(50%);
+  white-space: nowrap; border: 0;
+}
+
+/* --- daily columns ------------------------------------------------------- */
+.tp-chart-cols {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 140px;
+  padding-bottom: 2px;
+}
+
+.tp-chart-col {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  justify-content: flex-end;
+  gap: 5px;
+}
+
+.tp-chart-stack {
+  width: 100%;
+  max-width: 26px;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  /* A day with no events still shows a hairline, so an empty day reads as
+     measured-and-zero rather than as missing data. */
+  border-bottom: 1px solid var(--fx-line-strong, #2b3744);
+}
+
+.tp-chart-seg {
+  display: block;
+  width: 100%;
+  transition: opacity 90ms linear;
+}
+.tp-chart-seg.is-failed { background: var(--fx-cat-1, #ff6b6b); }
+.tp-chart-seg.is-ok     { background: var(--fx-cat-5, #4fd1c5); }
+
+.tp-chart-col:hover .tp-chart-seg { opacity: 0.78; }
+
+.tp-chart-col-label {
+  font-family: var(--fx-mono, monospace);
+  font-size: 9.5px;
+  color: var(--fx-text-mute, #627485);
+  white-space: nowrap;
+}
+
+.tp-chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--fx-line, #1e2733);
+  font-family: var(--fx-mono, monospace);
+  font-size: 10.5px;
+  color: var(--fx-text-dim, #93a4b8);
+}
+.tp-chart-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.tp-chart-legend i {
+  width: 9px; height: 9px; border-radius: 1px; display: inline-block;
+}
+.tp-chart-legend i.is-failed { background: var(--fx-cat-1, #ff6b6b); }
+.tp-chart-legend i.is-ok     { background: var(--fx-cat-5, #4fd1c5); }
+.tp-chart-legend-note { margin-left: auto; color: var(--fx-text-mute, #627485); }
+
+/* --- ranked bars --------------------------------------------------------- */
+.tp-chart-ranked { list-style: none; margin: 0; padding: 0; display: grid; gap: 7px; }
+
+.tp-chart-ranked li {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(70px, 34%) 1fr auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.tp-chart-ranked-label {
+  font-family: var(--fx-mono, monospace);
+  font-size: 11.5px;
+  color: var(--fx-text, #e7eef7);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tp-chart-ranked-track {
+  height: 8px;
+  background: var(--fx-overlay, #1b2430);
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.tp-chart-ranked-fill {
+  display: block;
+  height: 100%;
+  background: var(--tp-cat, var(--fx-cat-1));
+  min-width: 2px;
+}
+
+.tp-chart-ranked-value {
+  font-family: var(--fx-mono, monospace);
+  font-size: 11.5px;
+  color: var(--fx-text, #e7eef7);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.tp-chart-ranked-value small { color: var(--fx-text-dim, #93a4b8); }
+
+@media (prefers-reduced-motion: reduce) {
+  .tp-chart-seg { transition: none; }
+}

@@ -26,6 +26,34 @@ const formatDate = (value) => {
 const shortHash = (value) =>
   value ? `${value.slice(0, 16)}…${value.slice(-8)}` : "—";
 
+
+function AnimatedEvidenceCount({ value }) {
+  const [shown, setShown] = useState(0);
+
+  useEffect(() => {
+    const target = Math.max(0, Number(value) || 0);
+    const duration = 2300;
+    let start;
+    let frame;
+
+    const animate = now => {
+      if (start === undefined) start = now;
+      const progress = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setShown(Math.round(target * eased));
+
+      if (progress < 1) {
+        frame = requestAnimationFrame(animate);
+      }
+    };
+
+    frame = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(frame);
+  }, [value]);
+
+  return <>{shown.toLocaleString()}</>;
+}
+
 export default function EvidenceLibrary({ refreshSignal = 0 }) {
   const [batches, setBatches] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -180,17 +208,17 @@ export default function EvidenceLibrary({ refreshSignal = 0 }) {
       <div className="tp-ev-stats tp-evidence-stats">
         <div className="tp-card tp-ev-stat">
           <span>Evidence batches</span>
-          <strong>{batches.length}</strong>
+          <strong><AnimatedEvidenceCount value={batches.length} /></strong>
           <small>Stored collection batches</small>
         </div>
         <div className="tp-card tp-ev-stat">
           <span>Evidence records</span>
-          <strong>{totalLines}</strong>
+          <strong><AnimatedEvidenceCount value={totalLines} /></strong>
           <small>Collected log lines</small>
         </div>
         <div className="tp-card tp-ev-stat">
           <span>Verified this session</span>
-          <strong>{verifiedCount}</strong>
+          <strong><AnimatedEvidenceCount value={verifiedCount} /></strong>
           <small>Passed SHA-256 comparison</small>
         </div>
       </div>

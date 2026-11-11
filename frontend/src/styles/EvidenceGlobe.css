@@ -1,0 +1,214 @@
+/* The evidence globe.
+
+   Colour: the globe takes the product's own accent, not the severity ramp.
+   An earlier version tinted the whole sphere by the highest severity present,
+   which turned the largest object on the overview amber on a workspace that
+   was merely busy. Severity belongs on the individual markers, where it says
+   something about one event. The body of the globe is brand. */
+
+.tp-globe {
+  --fx-globe: var(--fx-signal, #c3f04a);
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  flex: 0 0 auto;
+}
+
+.tp-globe[data-empty] { --fx-globe: var(--fx-line-focus, #3d5168); }
+
+.tp-globe-svg {
+  width: clamp(300px, 27vw, 420px);
+  height: auto;
+  overflow: visible;
+}
+
+/* The lit edge is a gradient now, not a stroke. A 1.1px ring round the whole
+   circumference read as a border drawn on a flat disc, which is exactly what
+   made it look like a ball rather than a globe. */
+.tp-globe-rim { pointer-events: none; }
+
+/* The atmosphere: the sphere's edge blurred outward into the dark. */
+/* Thin. The first pass used a 7px stroke at 0.55 blurred over 9px, which
+   wrapped the sphere in a fat green halo instead of lighting its edge. */
+.tp-globe-atmo {
+  fill: none;
+  stroke: var(--fx-globe);
+  stroke-width: 3;
+  opacity: 0.4;
+}
+
+/* The surface grid. Dots nearer the viewer are larger and brighter, which is
+   what gives the flat projection its depth; land is brighter than ocean,
+   which is what makes the continents readable at this dot size. */
+.tp-globe-surface .is-land { fill: var(--fx-globe); }
+/* The background grid. Deliberately far quieter than the land: it is there so
+   the sphere still reads as a dotted surface when it turns to face an ocean,
+   not to compete with the continents. */
+.tp-globe-surface .is-grid { fill: color-mix(in srgb, var(--fx-globe) 55%, transparent); }
+
+/* The failure share used to be drawn as an arc round the rim. On a workspace
+   where most events carry a failure indicator that became a thick red ring
+   around almost the whole globe, which dominated everything else on the
+   overview. The figure is in the readout underneath instead, where it is
+   easier to read and does not shout. */
+
+/* Correlation arcs. A shared username is the stronger claim, so it is the
+   brighter line. */
+.tp-globe-arcs path {
+  fill: none;
+  stroke-width: 0.8;
+  vector-effect: non-scaling-stroke;
+}
+.tp-globe-arcs .is-device { stroke: color-mix(in srgb, var(--fx-globe) 30%, transparent); }
+.tp-globe-arcs .is-user {
+  stroke: color-mix(in srgb, var(--fx-globe) 78%, transparent);
+  stroke-width: 1.2;
+}
+
+
+
+.tp-globe-markers {
+  pointer-events: auto;
+}
+
+.tp-globe-markers circle {
+  transition: opacity 180ms ease;
+}
+
+.tp-globe-markers g:hover circle {
+  opacity: 1;
+}
+
+/* No CSS spin here. Rotating the group would turn the whole projected disc,
+   which looks like a spinning sticker rather than a globe. The component
+   advances a longitude offset and reprojects the surface and event markers. */
+
+/* --- readouts ------------------------------------------------------------ */
+.tp-globe-readout {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: baseline;
+  gap: 4px 16px;
+  max-width: 330px;
+  text-align: center;
+}
+
+.tp-globe-stat {
+  font-family: var(--fx-sans, system-ui), sans-serif;
+  font-size: 13px;
+  color: var(--fx-text-dim, #93a4b8);
+  white-space: nowrap;
+}
+.tp-globe-stat strong {
+  font-family: var(--fx-mono, monospace);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--fx-text, #e7eef7);
+  margin-right: 4px;
+  font-variant-numeric: tabular-nums;
+}
+.tp-globe-stat.is-flagged strong { color: var(--fx-critical, #ff4d6a); }
+
+.tp-globe-note {
+  flex: 1 0 100%;
+  font-family: var(--fx-sans, system-ui), sans-serif;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--fx-text-dim, #93a4b8);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tp-globe-surface { animation: none; }
+}
+
+@media (max-width: 1100px) {
+  .tp-globe-svg { width: 230px; }
+}
+
+/* It can be turned, so it says so: grab on hover, grabbing while held, and a
+   focus ring because the arrow keys drive it too. touch-action is off so a
+   drag on a touchscreen turns the globe instead of scrolling the page. */
+.tp-globe-svg {
+  cursor: grab;
+  touch-action: none;
+  outline: none;
+}
+.tp-globe-svg[data-dragging] { cursor: grabbing; }
+.tp-globe-svg:focus-visible {
+  outline: 2px solid var(--fx-signal, #c3f04a);
+  outline-offset: 6px;
+  border-radius: 50%;
+}
+
+
+/* An ambient glow cast beyond the SVG box, so the globe sits in light rather
+   than being cut out of the panel. Two shadows: a tight one for the edge and
+   a wide, faint one for the spill. */
+.tp-globe-svg {
+  filter:
+    drop-shadow(0 0 10px color-mix(in srgb, var(--fx-globe) 22%, transparent))
+    drop-shadow(0 0 46px color-mix(in srgb, var(--fx-globe) 12%, transparent));
+}
+
+/* The Refresh control in the page header is hidden rather than removed: in
+   Dashboard.jsx the page content is nested inside that button's onClick body,
+   so deleting the element would take a large block of JSX with it. The data
+   still refreshes - returning to the tab re-reads it, and the evidence,
+   investigations and reports pages each have their own refresh control. */
+.tp-app[data-theme='forensic'] .tp-page-header .tp-actions > .tp-button:first-child {
+  display: none !important;
+}
+
+/* OPEN TRAIN INSPIRED — TRACEPOINT GLOBE */
+
+.tp-globe {
+  --fx-globe: #829bff;
+}
+
+/* Remove the busy network appearance */
+.tp-globe-arcs {
+  display: none;
+}
+
+/* Remove the faint ocean dot grid */
+.tp-globe-surface .is-grid {
+  display: none;
+}
+
+/* Make the globe body genuinely dark */
+#tp-globe-shade stop:nth-child(1) {
+  stop-color: #08090d;
+  stop-opacity: 1;
+}
+
+#tp-globe-shade stop:nth-child(2) {
+  stop-color: #030407;
+  stop-opacity: 1;
+}
+
+#tp-globe-shade stop:nth-child(3) {
+  stop-color: #010204;
+  stop-opacity: 1;
+}
+
+/* White geographical dots */
+.tp-globe-surface .is-land {
+  fill: #f0f2ff !important;
+}
+
+/* Subtle blue atmospheric lighting */
+.tp-globe-atmo {
+  stroke: #8295ff !important;
+  stroke-width: 2;
+  opacity: 0.24;
+}
+
+/* Keep the rim subtle */
+.tp-globe-svg {
+  filter:
+    drop-shadow(0 0 12px rgba(105, 125, 255, 0.12))
+    drop-shadow(0 0 40px rgba(105, 125, 255, 0.08));
+}

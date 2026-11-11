@@ -1,10 +1,8 @@
 import { useState } from "react";
 import { ArrowRight, Eye, EyeOff } from "lucide-react";
 import "./styles/Auth.css";
-import "./styles/TracepointAuthOfficial.css";
 
 export default function Auth({ onAuthenticated }) {
-  // TRACEPOINT_AUTH_ICON_THEME_TOGGLE_V1
   const [mode, setMode] = useState("login");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -65,7 +63,7 @@ export default function Auth({ onAuthenticated }) {
           </form>
           <p className="auth-switch">{isSignup ? "Already have an account?" : "New to Tracepoint?"} <button onClick={() => switchMode(isSignup ? "login" : "signup")}>{isSignup ? "Sign in" : "Create an account"}</button></p>
         </div>
-        <footer className="auth-footer"><span>© Tracepoint · Tracepoint</span><span>AIORI 3 · PS-013</span></footer>
+        <footer className="auth-footer"><span>© Tracepoint · The Missing Links</span><span>AIORI 3 · PS-013</span></footer>
       </section>
       <section className="auth-right">
         <div className="auth-preview-label">BUILT FOR SMALL INCIDENT RESPONSE TEAMS</div>

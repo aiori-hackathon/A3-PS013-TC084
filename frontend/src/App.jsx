@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import Auth from "./Auth";
 import Dashboard from "./Dashboard";
+import "./styles/booting.css";
 
 export default function App() {
   const [user, setUser] = useState(null);
@@ -19,7 +20,15 @@ export default function App() {
       setUser(null);
     } catch (err) { window.alert(err.message); }
   }
-  if (checking) return <div style={{ padding: 48, fontFamily: "Arial, sans-serif" }}>Opening Tracepoint…</div>;
+  /* Shown for the length of the session check. It matches the two screens it
+     sits between, so the app does not flash a light panel before deciding
+     whether to show sign-in or the workspace. */
+  if (checking) return (
+    <div className="tp-booting" role="status" aria-live="polite">
+      <span className="tp-booting-mark" aria-hidden="true" />
+      <span>Opening Tracepoint…</span>
+    </div>
+  );
   if (!user) return <Auth onAuthenticated={setUser} />;
   return <Dashboard user={user} onSignOut={signOut} />;
 }

@@ -1,0 +1,33 @@
+/* The session check. App.jsx renders this while /api/v1/auth/me is in flight,
+   before it knows whether to show the sign-in screen or the workspace, so it
+   is deliberately plain: it states that something is loading and nothing
+   else. No progress bar, because there is no progress to report. */
+.tp-booting {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: #090c11;
+  color: #93a4b8;
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+  font-size: 13px;
+  letter-spacing: 0.4px;
+}
+
+.tp-booting-mark {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #c3f04a;
+  animation: tp-booting-pulse 1.25s ease-in-out infinite;
+}
+
+@keyframes tp-booting-pulse {
+  0%, 100% { opacity: 0.25; transform: scale(0.8); }
+  50%      { opacity: 1;    transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tp-booting-mark { animation: none; opacity: 1; }
+}

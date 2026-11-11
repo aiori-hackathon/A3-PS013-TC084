@@ -5,6 +5,34 @@ import './styles/InvestigationGraph.css';
 import './styles/TracepointInteractionPolish.css';
 import { useEvidenceTrustScores, TrustScoreDetails } from './EvidenceTrustScore'; // GRAPH_TRUST_SCORE_V1
 
+
+function AnimatedMetricCount({ value }) {
+  const [shown, setShown] = useState(0);
+
+  useEffect(() => {
+    const target = Math.max(0, Number(value) || 0);
+    const duration = 2300;
+    let start;
+    let frame;
+
+    const animate = now => {
+      if (start === undefined) start = now;
+      const progress = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setShown(Math.round(target * eased));
+
+      if (progress < 1) {
+        frame = requestAnimationFrame(animate);
+      }
+    };
+
+    frame = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(frame);
+  }, [value]);
+
+  return <>{shown.toLocaleString()}</>;
+}
+
 export default function InvestigationGraph() {
   const pageTheme = document.querySelector('.tp-app')?.getAttribute('data-theme') || 'light'; // TRACEPOINT_GRAPH_PORTAL_THEME_V3
   const [data, setData] = useState(null);
@@ -38,7 +66,7 @@ export default function InvestigationGraph() {
   return <section className="tp-graph-root tp-graph-phase5">
     <div className="tp-graph-intro tp-card tp-graph-phase5-hero"><div><h2><GitBranch size={19}/> Investigation Graph</h2><p>Explainable correlations between collected security events. Each node references a stored evidence batch and line.</p></div><button className="tp-button" onClick={load} disabled={loading}><RefreshCw size={16} className={loading ? 'tp-spin' : ''}/> Refresh graph</button></div>
     {error && <div className="tp-error" role="alert">{error}</div>}
-    <div className="tp-graph-stats"><div className="tp-card" data-tooltip="Number of event records represented in the loaded graph." title="Evidence-linked event count"><Activity size={19}/><strong>{nodes.length}</strong><span>Evidence-linked events</span></div><div className="tp-card" data-tooltip="Connections inferred from event sequence and available identifiers; review each relationship reason before drawing conclusions." title="Potential connections"><GitBranch size={19}/><strong>{edges.length}</strong><span>Potential connections</span></div><div className="tp-card" data-tooltip="Events with partial parsing or no normalized timestamp that need analyst review." title="Parsing or timestamp gaps"><AlertTriangle size={19}/><strong>{gaps.length}</strong><span>Parsing or timestamp gaps</span></div></div>
+    <div className="tp-graph-stats"><div className="tp-card" data-tooltip="Number of event records represented in the loaded graph." title="Evidence-linked event count"><Activity size={19}/><strong><AnimatedMetricCount value={nodes.length} /></strong><span>Evidence-linked events</span></div><div className="tp-card" data-tooltip="Connections inferred from event sequence and available identifiers; review each relationship reason before drawing conclusions." title="Potential connections"><GitBranch size={19}/><strong><AnimatedMetricCount value={edges.length} /></strong><span>Potential connections</span></div><div className="tp-card" data-tooltip="Events with partial parsing or no normalized timestamp that need analyst review." title="Parsing or timestamp gaps"><AlertTriangle size={19}/><strong><AnimatedMetricCount value={gaps.length} /></strong><span>Parsing or timestamp gaps</span></div></div>
     <div className="tp-card tp-graph-panel tp-graph-phase5-panel"><div className="tp-graph-panel-head"><div><h3>Authentication sequences</h3><p>Failed logins followed by successful logins for the same username within 30 minutes.</p></div><span className="tp-graph-legend"><i/> Tentative cross-device link</span></div>
       {!loading && !edges.length && <div className="tp-graph-empty"><ShieldAlert size={29}/><strong>No correlated authentication sequences found</strong><p>Try ingesting a sequence of failed and successful logins for the same user with valid timestamps.</p></div>}
       <div className="tp-graph-sequences">{edges.map((edge, index) => {

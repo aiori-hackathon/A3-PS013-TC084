@@ -1,0 +1,232 @@
+/* ===========================================================================
+   INVESTIGATION SCAN
+   ---------------------------------------------------------------------------
+   A targeting display rather than a spinner: four analysis signals leave a
+   central radar, each travelling to a different quadrant, and each label is
+   revealed where its signal lands.
+
+   The motion is staggered because the backend really does begin these four
+   operations in this order. What the motion never does is tick a stage off:
+   completion is driven by the response, from data-state on each label, so a
+   stage cannot read "confirmed" before the operation it names has returned.
+   =========================================================================== */
+
+.tp-scan {
+  display: flex;
+  justify-content: center;
+  padding: 18px 0 6px;
+}
+
+/* The audible version. Visually hidden, not display:none, so it is announced. */
+.tp-scan-sr {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0;
+  overflow: hidden; clip-path: inset(50%);
+  white-space: nowrap; border: 0;
+}
+
+.tp-scan-field {
+  position: relative;
+  width: 100%;
+  max-width: 540px;
+  aspect-ratio: 5 / 3;
+
+  /* Where each quadrant's label sits, and therefore how far its signal flies.
+     One pair of numbers per slot drives both, so a label and its signal can
+     never disagree about the destination. */
+  --tp-scan-x: 37%;
+  --tp-scan-y: 29%;
+}
+
+/* --- the radar ---------------------------------------------------------- */
+.tp-scan-radar {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: clamp(130px, 34%, 190px);
+  aspect-ratio: 1;
+  overflow: visible;
+}
+
+.tp-scan-ring {
+  fill: none;
+  stroke: var(--fx-line-strong, #2b3744);
+  stroke-width: 1;
+}
+.tp-scan-ring:first-of-type { stroke: var(--fx-line-focus, #3d5168); }
+
+.tp-scan-cross {
+  stroke: var(--fx-line, #1e2733);
+  stroke-width: 1;
+}
+
+.tp-scan-core {
+  fill: var(--fx-signal, #f2a93b);
+}
+
+/* The sweep keeps turning for as long as the panel is on screen, which is the
+   one part of this that is purely presentational: it says "still working",
+   nothing more. */
+.tp-scan-sweep {
+  transform-origin: 100px 100px;
+  animation: tp-scan-sweep 2.8s linear infinite;
+}
+.tp-scan-beam {
+  stroke: var(--fx-signal, #f2a93b);
+  stroke-width: 1.5;
+  opacity: 0.55;
+}
+@keyframes tp-scan-sweep {
+  to { transform: rotate(360deg); }
+}
+
+/* On settling the sweep dims but keeps turning, and the signals keep flying
+   for the short while the panel remains on screen.
+
+   An earlier version stopped both the moment the response landed, on the
+   argument that a display still scanning after the work finished says
+   something untrue. Measuring it changed my mind: against a backend that
+   answers in 105ms the stages settle almost immediately, so stopping the
+   motion there meant nobody ever saw any. The status claim lives in the four
+   stage labels, which resolve the instant the response lands and are the only
+   thing here that asserts anything. The sweep is ambient, so it keeps
+   turning - which is also what the brief asked for. */
+.tp-scan[data-settled] .tp-scan-sweep { opacity: 0.3; }
+
+/* --- the travelling signals ---------------------------------------------- */
+.tp-scan-signal {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--fx-signal, #f2a93b);
+  box-shadow: 0 0 10px 2px color-mix(in srgb, var(--fx-signal, #f2a93b) 55%, transparent);
+  animation: tp-scan-travel 1.55s cubic-bezier(0.16, 0.84, 0.44, 1) infinite;
+  animation-delay: calc(var(--tp-scan-order) * 180ms);
+  will-change: transform, opacity;
+}
+
+.tp-scan-signal[data-slot='tl'] { --tp-scan-dx: calc(var(--tp-scan-x) * -1); --tp-scan-dy: calc(var(--tp-scan-y) * -1); }
+.tp-scan-signal[data-slot='tr'] { --tp-scan-dx: var(--tp-scan-x);            --tp-scan-dy: calc(var(--tp-scan-y) * -1); }
+.tp-scan-signal[data-slot='bl'] { --tp-scan-dx: calc(var(--tp-scan-x) * -1); --tp-scan-dy: var(--tp-scan-y); }
+.tp-scan-signal[data-slot='br'] { --tp-scan-dx: var(--tp-scan-x);            --tp-scan-dy: var(--tp-scan-y); }
+
+@keyframes tp-scan-travel {
+  0%   { transform: translate(-50%, -50%) scale(0.35); opacity: 0; }
+  14%  { opacity: 1; }
+  78%  { opacity: 1; }
+  100% {
+    /* The percentages resolve against the signal's own box, so the distance is
+       carried in a separate translate that resolves against the field. */
+    transform: translate(-50%, -50%) scale(0.9);
+    translate: calc(var(--tp-scan-dx) * 5.4) calc(var(--tp-scan-dy) * 5.4);
+    opacity: 0;
+  }
+}
+
+/* --- the labels ---------------------------------------------------------- */
+.tp-scan-label {
+  position: absolute;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-width: 44%;
+  opacity: 0;
+  /* Revealed only once its signal has had time to arrive. One shot, forwards,
+     so a label never flickers back out while the sweep keeps turning. */
+  animation: tp-scan-reveal 420ms ease-out forwards;
+  animation-delay: calc(var(--tp-scan-order) * 180ms + 900ms);
+}
+
+.tp-scan-label[data-slot='tl'] { top: 6%;  left: 0;  text-align: left; }
+.tp-scan-label[data-slot='tr'] { top: 6%;  right: 0; text-align: right; align-items: flex-end; }
+.tp-scan-label[data-slot='bl'] { bottom: 6%; left: 0;  text-align: left; }
+.tp-scan-label[data-slot='br'] { bottom: 6%; right: 0; text-align: right; align-items: flex-end; }
+
+@keyframes tp-scan-reveal {
+  from { opacity: 0; filter: blur(2px); }
+  to   { opacity: 1; filter: blur(0); }
+}
+
+.tp-scan-label-text {
+  font-family: var(--fx-cond, system-ui), sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--fx-text, #e7eef7);
+  line-height: 1.3;
+}
+
+.tp-scan-label-note {
+  font-family: var(--fx-mono, monospace);
+  font-size: 10.5px;
+  letter-spacing: -0.01em;
+  color: var(--fx-text-dim, #93a4b8);
+}
+
+/* The one moment a stage is allowed to look finished. Driven by data-state,
+   which the component only sets from the response. */
+.tp-scan-label[data-state='done'] {
+  border-inline-start: 2px solid var(--fx-verified, #3ddc97);
+  padding-inline-start: 8px;
+}
+.tp-scan-label[data-state='done'][data-slot='tr'],
+.tp-scan-label[data-state='done'][data-slot='br'] {
+  border-inline-start: 0;
+  border-inline-end: 2px solid var(--fx-verified, #3ddc97);
+  padding-inline-start: 0;
+  padding-inline-end: 8px;
+}
+.tp-scan-label[data-state='done'] .tp-scan-label-note { color: var(--fx-verified, #3ddc97); }
+
+.tp-scan-label[data-state='empty'] .tp-scan-label-note { color: var(--fx-medium, #f0b429); }
+.tp-scan-label[data-state='failed'] .tp-scan-label-note { color: var(--fx-critical, #ff4d6a); }
+.tp-scan-label[data-state='failed'] .tp-scan-label-text { color: var(--fx-text-dim, #93a4b8); }
+
+/* --- narrow screens ------------------------------------------------------
+   The brief asks for the labels to rearrange while the motion still comes
+   from the centre. The radar moves to the top and the four labels stack
+   beneath it, so the signals still travel outward from the target - they just
+   travel down the column rather than into the corners. */
+@media (max-width: 620px) {
+  .tp-scan-field {
+    aspect-ratio: auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 14px;
+    padding-top: 160px;
+    --tp-scan-x: 18%;
+    --tp-scan-y: 16%;
+  }
+  .tp-scan-radar { top: 78px; width: 140px; }
+  .tp-scan-label {
+    position: static;
+    max-width: none;
+    text-align: left;
+    align-items: flex-start;
+  }
+  .tp-scan-label[data-slot='tr'],
+  .tp-scan-label[data-slot='br'] {
+    text-align: left;
+    align-items: flex-start;
+    border-inline-end: 0;
+    padding-inline-end: 0;
+  }
+  .tp-scan-label[data-state='done'][data-slot='tr'],
+  .tp-scan-label[data-state='done'][data-slot='br'] {
+    border-inline-start: 2px solid var(--fx-verified, #3ddc97);
+    padding-inline-start: 8px;
+  }
+}
+
+/* --- reduced motion ------------------------------------------------------
+   Nothing moves. The labels are present from the start and the stage notes
+   carry the whole message, which they were written to do anyway. */
+@media (prefers-reduced-motion: reduce) {
+  .tp-scan-sweep { animation: none; }
+  .tp-scan-signal { display: none; }
+  .tp-scan-label { animation: none; opacity: 1; }
+}

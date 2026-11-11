@@ -1,11 +1,44 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Plus, Search, X, ShieldAlert, FileText, Link2, Send, RefreshCw } from 'lucide-react';
 import './styles/Tracepoint.css';
 import './styles/investigations.css';
 import './styles/TracepointInteractionPolish.css';
+import InvestigationScan, {
+  stagesFromResult, STAGES_WORKING, STAGES_FAILED,
+  CREATE_STAGES, CREATE_WORKING, CREATE_FAILED, CREATE_DONE,
+} from './InvestigationScan';
 
 const API = '/api/v1/investigations';
 const stamp = v => v ? new Date(v).toLocaleString() : '—';
+
+
+function AnimatedMetricCount({ value }) {
+  const [shown, setShown] = useState(0);
+
+  useEffect(() => {
+    const target = Math.max(0, Number(value) || 0);
+    const duration = 2300;
+    let start;
+    let frame;
+
+    const animate = now => {
+      if (start === undefined) start = now;
+      const progress = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setShown(Math.round(target * eased));
+
+      if (progress < 1) {
+        frame = requestAnimationFrame(animate);
+      }
+    };
+
+    frame = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(frame);
+  }, [value]);
+
+  return <>{shown.toLocaleString()}</>;
+}
+
 // Sorting the picker uses the same timestamp fallbacks as eventRef, so an event
 // orders by the time it actually displays rather than by whichever field exists.
 const eventTime = e => Date.parse(e.timestamp || e.event_timestamp || e.received_at || '') || 0;
@@ -38,6 +71,47 @@ export default function Investigations({ events = [] }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [chatQuestion, setChatQuestion] = useState('');
+  // Which of the assistant's four stages have settled, and how.
+  const [scanStates, setScanStates] = useState(STAGES_WORKING);
+  // The scan outlives the request by a moment. Unmounting it the instant the
+  // response lands would mean the resolved stages - the only place the run
+  // reports what actually completed - were never on screen long enough to
+  // read, which would make the whole settled state dead code.
+  const [scanVisible, setScanVisible] = useState(false);
+  const scanTimer = useRef(null);
+  const scanStart = useRef(0);
+  useEffect(() => () => clearTimeout(scanTimer.current), []);
+
+  // Without a Groq key the request fails in about fifty milliseconds, and with
+  // one it can still return quickly, so the panel was mounting and unmounting
+  // faster than anyone could see it. These two numbers keep it on screen long
+  // enough to read.
+  //
+  // The stages still resolve the instant the response lands - the hold is on
+  // the panel, not on the truth. Nothing reads "working" after its operation
+  // returned, and nothing reads "confirmed" before it did.
+  const MIN_SCAN_MS = 2600;
+  const SETTLE_HOLD_MS = 1400;
+
+  const settleScan = states => {
+    setScanStates(states);
+    const elapsed = Date.now() - scanStart.current;
+    clearTimeout(scanTimer.current);
+    scanTimer.current = setTimeout(
+      () => setScanVisible(false),
+      Math.max(SETTLE_HOLD_MS, MIN_SCAN_MS - elapsed),
+    );
+  };
+  // Opening a case runs the scan over its own four stages. Same honesty rule:
+  // they read "working" until the request returns, then resolve to what it
+  // actually did. A single insert is quick, so the panel is held on screen
+  // long enough to read rather than flashing past.
+  const [createStates, setCreateStates] = useState(CREATE_WORKING);
+  const [createScanOn, setCreateScanOn] = useState(false);
+  const createTimer = useRef(null);
+  const createStart = useRef(0);
+  useEffect(() => () => clearTimeout(createTimer.current), []);
+
   const [chatMessages, setChatMessages] = useState([]);
   const [chatBusy, setChatBusy] = useState(false);
   const [chatError, setChatError] = useState('');
@@ -77,13 +151,36 @@ export default function Investigations({ events = [] }) {
   async function createCase(e) {
     e.preventDefault();
     setBusy(true); setError('');
+    clearTimeout(createTimer.current);
+    createStart.current = Date.now();
+    setCreateStates(CREATE_WORKING);
+    setCreateScanOn(true);
+
+    const settle = states => {
+      setCreateStates(states);
+      const elapsed = Date.now() - createStart.current;
+      clearTimeout(createTimer.current);
+      return new Promise(resolve => {
+        createTimer.current = setTimeout(() => {
+          setCreateScanOn(false);
+          resolve();
+        }, Math.max(SETTLE_HOLD_MS, MIN_SCAN_MS - elapsed));
+      });
+    };
+
     try {
       const result = await request(API, { method: 'POST', body: JSON.stringify(draft) });
+      // The response is the case read back by get_owned_case, so its presence
+      // is what confirms the last stage rather than an assumption.
+      await settle(result && result.id ? CREATE_DONE : CREATE_FAILED);
       setCreating(false);
       setDraft({ title: '', description: '', severity: 'medium' });
       await loadCases();
       await openCase(result.id);
-    } catch (err) { setError(err.message); }
+    } catch (err) {
+      await settle(CREATE_FAILED);
+      setError(err.message);
+    }
     finally { setBusy(false); }
   }
 
@@ -95,6 +192,11 @@ export default function Investigations({ events = [] }) {
     setChatQuestion('');
     setChatError('');
     setChatBusy(true);
+    // Every stage starts as working. Nothing here claims one has finished.
+    clearTimeout(scanTimer.current);
+    scanStart.current = Date.now();
+    setScanStates(STAGES_WORKING);
+    setScanVisible(true);
 
     const history = chatMessages
       .filter(message => message.role === 'user' || message.role === 'assistant')
@@ -115,6 +217,8 @@ export default function Investigations({ events = [] }) {
         }),
       });
 
+      settleScan(stagesFromResult(result));
+
       setChatMessages(previous => [
         ...previous,
         {
@@ -125,6 +229,7 @@ export default function Investigations({ events = [] }) {
         },
       ]);
     } catch (err) {
+      settleScan(STAGES_FAILED);
       setChatError(err.message || 'Could not contact the investigation assistant.');
       setChatQuestion(question);
     } finally {
@@ -154,11 +259,11 @@ export default function Investigations({ events = [] }) {
         <h2>Turn evidence into an investigation.</h2>
         <p>Organize security leads, link collected events, and document analyst findings with a clear case history.</p>
       </div>
-      <span className="tp-inv-phase5-hero-count">{counts.total} {counts.total === 1 ? 'CASE' : 'CASES'} IN REGISTER</span>
+      <span className="tp-inv-phase5-hero-count"><AnimatedMetricCount value={counts.total} /> {counts.total === 1 ? 'CASE' : 'CASES'} IN REGISTER</span>
     </div>
     <div className="tp-inv-metrics">
       {[['Total cases', counts.total], ['Open', counts.open], ['Investigating', counts.investigating], ['Resolved', counts.resolved]].map(([label, value]) =>
-        <div className="tp-card tp-inv-metric" key={label}><span>{label}</span><strong>{value}</strong></div>
+        <div className="tp-card tp-inv-metric" key={label}><span>{label}</span><strong><AnimatedMetricCount value={value} /></strong></div>
       )}
     </div>
 
@@ -177,7 +282,8 @@ export default function Investigations({ events = [] }) {
 
     {creating && <div className="tp-overlay tp-inv-modal-overlay tp-inv-create-overlay" onMouseDown={() => setCreating(false)}><aside className="tp-drawer tp-investigation-modal tp-investigation-create-modal" role="dialog" aria-modal="true" aria-label="Create investigation" onMouseDown={e => e.stopPropagation()}>
       <div className="tp-drawer-header"><div><span>New case</span><h2>Create investigation</h2></div><button onClick={() => setCreating(false)} aria-label="Close"><X size={21}/></button></div>
-      <form className="tp-drawer-body tp-inv-form" onSubmit={createCase}>
+      {createScanOn && <InvestigationScan states={createStates} stages={CREATE_STAGES} />}
+      <form className="tp-drawer-body tp-inv-form" onSubmit={createCase} hidden={createScanOn}>
         <label>Title<input required minLength={3} maxLength={160} value={draft.title} onChange={e => setDraft({ ...draft, title: e.target.value })} placeholder="e.g. Repeated SSH login failures"/></label>
         <label>Description<textarea maxLength={3000} rows={5} value={draft.description} onChange={e => setDraft({ ...draft, description: e.target.value })} placeholder="Describe the incident and initial findings"/></label>
         <label>Severity<select value={draft.severity} onChange={e => setDraft({ ...draft, severity: e.target.value })}>{['low', 'medium', 'high', 'critical'].map(s => <option key={s} value={s}>{s}</option>)}</select></label>
@@ -264,12 +370,7 @@ export default function Investigations({ events = [] }) {
                 )}
               </article>
             ))}
-            {chatBusy && (
-              <div className="tp-ai-thinking" role="status">
-                <span className="tp-ai-pulse" />
-                Reviewing linked evidence…
-              </div>
-            )}
+            {scanVisible && <InvestigationScan states={scanStates} />}
           </div>
 
           {chatError && <p className="tp-ai-error" role="alert">{chatError}</p>}

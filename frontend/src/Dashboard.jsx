@@ -13,7 +13,6 @@ import {
   useState
 } from 'react';
 import { Wifi, WifiOff, Activity, ArrowDownToLine, ChevronRight, CircleHelp, Clock3, FileClock, FileText, Fingerprint, LayoutDashboard, LogOut, Menu, RefreshCw, Search, ShieldAlert, SlidersHorizontal, Terminal, X, GitBranch, BookOpen} from 'lucide-react';
-import IncidentTriageBenchmark from './IncidentTriageBenchmark';
 import './styles/Tracepoint.css';
 import './styles/TracepointTimelineGraphModal.css';
 import './styles/TracepointInteractionPolish.css';
@@ -37,6 +36,9 @@ import './styles/TracepointDesktopCompactHeight.css';
 // Imported last on purpose: this is the design system, and it has to win
 // the cascade against the legacy sheets above while they are retired.
 import './styles/forensic.css';
+import TracepointMark from './TracepointMark';
+import EvidenceGlobe from './EvidenceGlobe';
+import EvidenceCharts from './EvidenceCharts';
 const navigation = [
   ['overview', 'Overview', LayoutDashboard],
   ['timeline', 'Event timeline', Activity],
@@ -45,15 +47,18 @@ const navigation = [
   ['investigations', 'Investigations', ShieldAlert],
   ['graph', 'Investigation Graph', GitBranch],
   ['guide', 'Workflow Guide', BookOpen],
-  ['benchmark', 'Triage Benchmark', Clock3],
-  ['reports', 'Reports', FileText],
 ];
 const text = value => value === undefined || value === null || value === '' ? '—' : String(value);
 const timestamp = e => e.timestamp || e.event_timestamp || e.time || e.received_at || e.datetime || '';
 const eventType = e => text(e.event_type || e.type || e.action || 'Event').replaceAll('_', ' ');
 const severity = e => text(e.severity || e.level || 'unknown').toLowerCase();
 const device = e => text(e.device_id || e.hostname || e.device || e.host);
-const message = e => text(e.message || e.raw_line || e.raw || e.description || e.details || eventType(e));
+// raw_log is the field the agent actually stores, and it was missing from this
+// chain, so every agent-collected event fell through to the final fallback -
+// eventType - and the table printed the same string twice on each row: "Failed
+// Login" over "failed login". The eventType fallback is gone with it: a row
+// with no message should say nothing, not repeat its own title.
+const message = e => text(e.message || e.raw_log || e.raw_line || e.raw || e.description || e.details || '');
 const dateLabel = value => { const d = new Date(value); return value && !Number.isNaN(d.getTime()) ? d.toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : text(value); };
 const fullDate = value => { const d = new Date(value); return value && !Number.isNaN(d.getTime()) ? d.toLocaleString(undefined, { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', second: '2-digit', timeZoneName: 'short' }) : text(value); };
 const unpack = data => Array.isArray(data) ? data : (data?.events || data?.timeline || data?.items || data?.data?.events || []);
@@ -138,7 +143,7 @@ function EventTable({ rows, loading, onSelect }) {
               <span className={`tp-forensic-event-icon ${fail(e) ? 'is-failure' : ''}`} aria-hidden="true"><Icon size={18}/></span>
               <span className="tp-forensic-event-text">
                 <strong>{eventType(e)}</strong>
-                <small title={message(e)}>{message(e)}</small>
+                {message(e) !== '—' && <small title={message(e)}>{message(e)}</small>}
               </span>
             </div>
           </TableCell>
@@ -157,6 +162,138 @@ function EventTable({ rows, loading, onSelect }) {
   </div>;
 }
 
+
+function AnimatedCount({ value, animationKey }) {
+  const [shown, setShown] = useState(0);
+
+  useEffect(() => {
+    const target = Math.max(0, Number(value) || 0);
+    const duration = 2300;
+    let start;
+    let frame;
+
+    const animate = now => {
+      if (start === undefined) start = now;
+      const progress = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setShown(Math.round(target * eased));
+
+      if (progress < 1) {
+        frame = requestAnimationFrame(animate);
+      }
+    };
+
+    frame = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(frame);
+  }, [value, animationKey]);
+
+  return <>{shown.toLocaleString()}</>;
+}
+
+function TimelineActivityChart({ events, animationKey }) {
+  const buckets = useMemo(() => {
+    const days = Array.from({ length: 7 }, (_, index) => {
+      const date = new Date();
+      date.setHours(0, 0, 0, 0);
+      date.setDate(date.getDate() - (6 - index));
+
+      return {
+        key: `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`,
+        label: date.toLocaleDateString('en', { weekday: 'short' }),
+        date,
+        total: 0,
+        failures: 0
+      };
+    });
+
+    const byDate = new Map(bucketsMap(days));
+
+    events.forEach(event => {
+      const date = new Date(timestamp(event));
+      if (Number.isNaN(date.getTime())) return;
+
+      const key = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+      const bucket = byDate.get(key);
+
+      if (bucket) {
+        bucket.total += 1;
+        if (fail(event)) bucket.failures += 1;
+      }
+    });
+
+    return days;
+  }, [events]);
+
+  const maximum = Math.max(1, ...buckets.map(day => day.total));
+  const scale = Math.ceil(maximum / 4) * 4 || 4;
+  const totalEvents = buckets.reduce((sum, day) => sum + day.total, 0);
+
+  return (
+    <section className="tp-timeline-chart" aria-label="Seven day event activity chart">
+      <div className="tp-timeline-chart-heading">
+        <div>
+          <span className="tp-timeline-eyebrow">COLLECTION ACTIVITY</span>
+          <h2>Event activity</h2>
+          <p>Actual collected events · Last 7 days</p>
+        </div>
+        <div className="tp-timeline-chart-legend">
+          <span><i className="tp-chart-legend-total" /> Events</span>
+          <span><i className="tp-chart-legend-failures" /> Failure indicators</span>
+        </div>
+      </div>
+
+      <div className="tp-timeline-chart-body">
+        <div className="tp-timeline-chart-axis" aria-hidden="true">
+          <span>{scale}</span>
+          <span>{Math.round(scale / 2)}</span>
+          <span>0</span>
+        </div>
+
+        <div className="tp-timeline-chart-plot">
+          <div className="tp-timeline-chart-grid" aria-hidden="true">
+            <span /><span /><span />
+          </div>
+
+          <div className="tp-timeline-chart-columns">
+            {buckets.map((day, index) => (
+              <div className="tp-timeline-chart-column" key={day.key}>
+                <div className="tp-timeline-chart-track">
+                  <div
+                    className="tp-timeline-chart-bar"
+                    style={{
+                      height: `${day.total ? Math.max(1, day.total / scale * 100) : 0}%`,
+                      '--bar-delay': `${index * 140}ms`
+                    }}
+                    title={`${day.total} events, ${day.failures} failure indicators`}
+                  >
+                    {day.failures > 0 && (
+                      <span
+                        className="tp-timeline-chart-failure"
+                        style={{ height: `${day.failures / day.total * 100}%` }}
+                      />
+                    )}
+                  </div>
+                </div>
+                <span className="tp-timeline-chart-day">{day.label}</span>
+                <span className="tp-timeline-chart-value">{day.total}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="tp-timeline-chart-footer">
+        <span>{totalEvents.toLocaleString()} events in this period</span>
+        <span>Failure indicators are pattern matches, not confirmed incidents</span>
+      </div>
+    </section>
+  );
+}
+
+function bucketsMap(days) {
+  return days.map(day => [day.key, day]);
+}
+
 export default function Dashboard({ user, onSignOut }) {
   // TRACEPOINT_PAGE_PERSIST_V1: remember the selected page for this tab.
   const [page, setPage] = useState(() => {
@@ -168,6 +305,10 @@ export default function Dashboard({ user, onSignOut }) {
     }
   });
   const [events, setEvents] = useState([]);
+  const initialPageRef = useRef(page);
+  const initialTimelineLoadRef = useRef(null);
+  const [timelineReady, setTimelineReady] = useState(false);
+  const [timelineAnimationKey, setTimelineAnimationKey] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');
@@ -214,7 +355,41 @@ export default function Dashboard({ user, onSignOut }) {
       setEvents(unpack(await response.json()));
     } catch (err) { setError(err.message); } finally { if (!quiet) setLoading(false); }
   }, []);
-  useEffect(() => { refresh(); }, [refresh]);
+  useEffect(() => {
+    const request = refresh();
+    if (initialPageRef.current === 'timeline') {
+      initialTimelineLoadRef.current = request;
+    }
+  }, [refresh]);
+
+  // Fetch fresh records once on each entry to Event Timeline.
+  useEffect(() => {
+    if (page !== 'timeline') {
+      setTimelineReady(false);
+      return;
+    }
+
+    let active = true;
+
+    // Start the counters immediately; fetch fresh records in parallel.
+    setTimelineReady(true);
+    setTimelineAnimationKey(key => key + 1);
+
+    const isInitialTimeline = initialPageRef.current === 'timeline';
+    initialPageRef.current = null;
+
+    const request = isInitialTimeline
+      ? (initialTimelineLoadRef.current || refresh({ quiet: true }))
+      : refresh({ quiet: true });
+
+    Promise.resolve(request).catch(() => {
+      // refresh() already handles and displays its own errors.
+    });
+
+    return () => {
+      active = false;
+    };
+  }, [page, refresh]);
 
   // TRACEPOINT_REFRESH_ON_RETURN_V1: log collection happens in a terminal while
   // the browser sits in the background, so coming back to the tab re-reads the
@@ -271,25 +446,31 @@ export default function Dashboard({ user, onSignOut }) {
     </div>
 
     <aside className={`tp-sidebar ${mobileOpen ? 'tp-open' : ''}`}>
-      <div className="tp-brand"><img className="tp-brand-mark tp-brand-image" src="/tracepoint-detective-circle.webp" alt="" aria-hidden="true" /><span className="tp-brand-word">Tracepoint<span>.</span></span></div>
+      <div className="tp-brand"><TracepointMark size={30} className="tp-brand-mark" /><span className="tp-brand-word">Tracepoint<span>.</span></span></div>
       <div className="tp-workspace"><span className="tp-workspace-avatar">TP</span><div><strong>Security workspace</strong><small>Evidence & investigations</small></div></div>
       <div className="tp-nav-label">Workspace</div>
       <nav aria-label="Main navigation">{navigation.map(([id, label, Icon]) => <button key={id} className={`tp-nav-item ${page === id ? 'active' : ''}`} onClick={() => openPage(id)}><Icon size={18}/><span>{label}</span>{page === id && <ChevronRight size={15} className="tp-nav-chevron"/>}</button>)}</nav>
       <div className="tp-sidebar-bottom">
-      <div className="tp-topbar-right">
         <div className={`tp-api-pill ${apiStatus}`} title={`Backend connection: ${apiStatus}`} role="status">
           {apiStatus === 'offline' ? <WifiOff size={14}/> : <Wifi size={14}/>}
           <span>{apiStatus === 'online' ? 'API connected' : apiStatus === 'offline' ? 'API offline' : 'Connecting…'}</span>
         </div>
-        <span className="tp-topbar-divider" aria-hidden="true"/>
-        <div className="tp-topbar-account"><span className="tp-topbar-user">{user?.name || 'Account'}</span><small>Analyst workspace</small></div>
-        <span className="tp-topbar-avatar">{(user?.name || 'U')[0].toUpperCase()}</span>
-      </div><div className="tp-profile"><span className="tp-profile-avatar">{(user?.name || 'U')[0].toUpperCase()}</span><div><strong>{user?.name || 'Account'}</strong><small>{user?.email || ''}</small></div></div><button className="tp-signout" onClick={onSignOut} aria-label="Sign out" title="Sign out"><LogOut size={17}/> <span className="tp-signout-label">Sign out</span></button></div>
+        <div className="tp-profile">
+          <span className="tp-profile-avatar">{(user?.name || 'U')[0].toUpperCase()}</span>
+          <div className="tp-profile-details">
+            <strong>{user?.name || 'Account'}</strong>
+            <small>{user?.email || 'Analyst workspace'}</small>
+          </div>
+        </div>
+        <button className="tp-signout" onClick={onSignOut} aria-label="Sign out" title="Sign out">
+          <LogOut size={17}/> <span className="tp-signout-label">Sign out</span>
+        </button>
+      </div>
     </aside>
     <main className="tp-main">
     {/* TRACEPOINT_SINGLE_NAV_V1: status and account live in primary navigation */}
 
-      <div className="tp-content"><div className={`tp-page-header ${page === 'guide' ? 'tp-page-header-guide' : ''}`}><div><h1>{title}</h1><p>{page === 'overview' ? 'Security activity and collected evidence across your workspace.' : page === 'timeline' ? 'Explore, filter and inspect security events.' : page === 'ingestion' ? 'Explore sample logs and follow them through the ingestion pipeline.' : page === 'evidence' ? 'Evidence collection and integrity records.' : page === 'graph' ? 'Explore evidence-linked authentication sequences.' : page === 'investigations' ? 'Review events and prepare incident investigations.' : page === 'guide' ? 'Follow the workflow from raw log ingestion to an incident report.' : page === 'benchmark' ? 'Measure incident triage time using the same synthetic scenario and checklist.' : 'Export collected security activity.'}</p></div><div className="tp-actions">
+      <div className="tp-content"><div className={`tp-page-header ${page === 'guide' ? 'tp-page-header-guide' : ''}`}><div><h1>{title}</h1><p>{page === 'overview' ? 'Security activity and collected evidence across your workspace.' : page === 'timeline' ? 'Explore, filter and inspect security events.' : page === 'ingestion' ? 'Explore sample logs and follow them through the ingestion pipeline.' : page === 'evidence' ? 'Evidence collection and integrity records.' : page === 'graph' ? 'Explore evidence-linked authentication sequences.' : page === 'investigations' ? 'Review events and prepare incident investigations.' : page === 'guide' ? 'Follow the workflow from raw log ingestion to an incident report.' : 'Export collected security activity.'}</p></div><div className="tp-actions">
           <Button variant="outline" className="tp-button" onClick={() => {
 {page === 'ingestion' && (
   <LazyPage name="Log Ingestion Lab">
@@ -328,8 +509,15 @@ export default function Dashboard({ user, onSignOut }) {
       {error && <div className="tp-error" role="alert">{error}</div>}
       {page === 'overview' && <>
       <div className="tp-forensic-intro">
-        <img className="tp-eye-hud-art" src="/tracepoint-eye-hud.webp" alt="" aria-hidden="true"
-          width="560" height="365" decoding="async" fetchPriority="low" />
+        {/* Replaces the decorative eye artwork. It plots nothing today, and
+            says so: see the note at the top of EvidenceGlobe.jsx. */}
+        <EvidenceGlobe
+          events={events}
+          severityOf={severity}
+          deviceOf={device}
+          isFailure={fail}
+          timestampOf={timestamp}
+        />
         <div className="tp-forensic-intro-copy">
           <span className="tp-forensic-kicker"><Activity size={14}/> LIVE EVIDENCE OVERVIEW</span>
           <strong>Follow the signal. Verify the evidence.</strong>
@@ -341,6 +529,15 @@ export default function Dashboard({ user, onSignOut }) {
           <small>Based on the current event timeline</small>
         </div>
       </div>
+      {/* Counted from the events already loaded, so the charts need no extra
+          request and cannot disagree with the table below them. */}
+      <EvidenceCharts
+        events={events}
+        timestampOf={timestamp}
+        eventTypeOf={eventType}
+        deviceOf={device}
+        isFailure={fail}
+      />
       {/* TRACEPOINT_PUBLIC_PORTAL_SERVICES_V1: functional quick-access tiles */}
       <nav className="tp-portal-services" aria-label="Quick access to TracePoint tools">
         {[
@@ -380,11 +577,12 @@ export default function Dashboard({ user, onSignOut }) {
     {/* TRACEPOINT_TIMELINE_WORKSPACE_V1 */}
     {page === 'timeline' && <div className="tp-timeline-workspace">
       <div className="tp-timeline-summary" aria-label="Timeline summary">
-        <div><span>EVENTS IN VIEW</span><strong>{filtered.length.toLocaleString()}</strong><small>of {events.length.toLocaleString()} collected</small></div>
-        <div><span>AUTHENTICATION FAILURES</span><strong>{filtered.filter(fail).length.toLocaleString()}</strong><small>matching failure indicators</small></div>
-        <div><span>SOURCE DEVICES</span><strong>{new Set(filtered.map(device).filter(d => d !== '—')).size}</strong><small>in the current results</small></div>
+        <div><span>EVENTS IN VIEW</span><strong>{timelineReady ? <AnimatedCount value={filtered.length} animationKey={timelineAnimationKey}/> : '…'}</strong><small>of {events.length.toLocaleString()} collected</small></div>
+        <div><span>AUTHENTICATION FAILURES</span><strong>{timelineReady ? <AnimatedCount value={filtered.filter(fail).length} animationKey={timelineAnimationKey}/> : '…'}</strong><small>matching failure indicators</small></div>
+        <div><span>SOURCE DEVICES</span><strong>{timelineReady ? <AnimatedCount value={new Set(filtered.map(device).filter(d => d !== '—')).size} animationKey={timelineAnimationKey}/> : '…'}</strong><small>in the current results</small></div>
         <div className="tp-timeline-summary-note"><ShieldAlert size={18}/><span>Events are investigative leads, not verified incidents. Select a row to inspect its raw evidence.</span></div>
       </div>
+      {timelineReady && <TimelineActivityChart events={events} animationKey={timelineAnimationKey}/>}
       <section className="tp-card tp-events-card tp-timeline-panel">
         <div className="tp-timeline-panel-head">
           <div><span className="tp-timeline-eyebrow">EVENT EXPLORER</span><h2>Collected event records</h2><p>Search the timeline and inspect individual source records.</p></div>
@@ -427,8 +625,6 @@ export default function Dashboard({ user, onSignOut }) {
         </div>
       </LazyPage>
     )}
-    {page === 'benchmark' && <IncidentTriageBenchmark openPage={openPage} />}
-
     {page === 'guide' && (
       <section className="tp-workflow-guide" aria-label="TracePoint workflow guide">
         <div className="tp-workflow-intro">

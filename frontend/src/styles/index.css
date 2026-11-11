@@ -1,10 +1,16 @@
 @import "tailwindcss/theme.css" layer(theme);
 @import "tailwindcss/utilities.css" layer(utilities);
 
+/* The page under everything. This used to be a light grey with near-black
+   text, which showed as a white flash on every load: App.jsx renders its
+   "Opening Tracepoint" state before the session check resolves, and that
+   state sits on the root background. The workspace and the sign-in screen
+   both paint their own near-black surface over this, so the only thing this
+   changes is what you see before either of them mounts. */
 :root {
-  font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
-  color: #202b30;
-  background: #f7f7f4;
+  font-family: 'Archivo', 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: #e7eef7;
+  background: #090c11;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;

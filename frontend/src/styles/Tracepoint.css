@@ -2030,3 +2030,224 @@
 .tp-app[data-theme="dark"] .tp-forensic-event-icon { color: #a9cbef; }
 .tp-app[data-theme="dark"] .tp-timeline-result-count { color: #a9cbef; }
 .tp-app[data-theme="dark"] .tp-evidence-stats .tp-ev-stat:nth-child(1) { border-top-color: #4a7ba8; }
+
+
+/* TRACEPOINT_TIMELINE_ACTIVITY_CHART_V1 — Timeline route only */
+
+.tp-timeline-chart {
+  background: #fff;
+  border: 1px solid #e0e3eb;
+  border-radius: 10px;
+  padding: 23px 25px 17px;
+  font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.tp-timeline-chart-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.tp-timeline-chart-heading h2 {
+  margin: 6px 0 4px;
+  color: #272d3a;
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -.4px;
+}
+
+.tp-timeline-chart-heading p {
+  margin: 0;
+  color: #737d8e;
+  font-size: 13px;
+}
+
+.tp-timeline-chart-legend {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 17px;
+  color: #697386;
+  font-size: 11px;
+}
+
+.tp-timeline-chart-legend span {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.tp-timeline-chart-legend i {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+}
+
+.tp-chart-legend-total { background: #7655ce; }
+.tp-chart-legend-failures { background: #dc7777; }
+
+.tp-timeline-chart-body {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 10px;
+  height: 205px;
+}
+
+.tp-timeline-chart-axis {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding: 0 0 25px;
+  color: #8992a1;
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+.tp-timeline-chart-plot {
+  position: relative;
+  min-width: 0;
+  height: 100%;
+}
+
+.tp-timeline-chart-grid {
+  position: absolute;
+  inset: 0 0 25px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.tp-timeline-chart-grid span {
+  width: 100%;
+  border-top: 1px dashed #e7e9ef;
+}
+
+.tp-timeline-chart-columns {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 12px;
+  height: 100%;
+}
+
+.tp-timeline-chart-column {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) 17px 16px;
+  justify-items: center;
+  min-width: 0;
+}
+
+.tp-timeline-chart-track {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.tp-timeline-chart-bar {
+  position: relative;
+  width: min(48px, 72%);
+  min-height: 0;
+  overflow: hidden;
+  border-radius: 5px 5px 2px 2px;
+  background: #7655ce;
+  transform: scaleY(0);
+  transform-origin: bottom;
+  animation: tpTimelineBarGrow 850ms cubic-bezier(.2,.7,.2,1) both;
+  animation-delay: var(--bar-delay, 0ms);
+}
+
+.tp-timeline-chart-failure {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: #dc7777;
+  border-top: 1px solid #fff8;
+}
+
+@keyframes tpTimelineBarGrow {
+  to { transform: scaleY(1); }
+}
+
+.tp-timeline-chart-day,
+.tp-timeline-chart-value {
+  color: #778193;
+  font-size: 10px;
+  line-height: 16px;
+  white-space: nowrap;
+}
+
+.tp-timeline-chart-value {
+  color: #414a5b;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+
+.tp-timeline-chart-footer {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 13px;
+  border-top: 1px solid #edf0f4;
+  color: #80899a;
+  font-size: 11px;
+}
+
+@media (max-width: 640px) {
+  .tp-timeline-chart { padding: 18px 13px 14px; }
+  .tp-timeline-chart-body { grid-template-columns: 25px minmax(0, 1fr); gap: 5px; }
+  .tp-timeline-chart-columns { gap: 4px; }
+  .tp-timeline-chart-bar { width: 65%; }
+  .tp-timeline-chart-footer { flex-direction: column; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tp-timeline-chart-bar {
+    animation: none;
+    transform: none;
+  }
+}
+
+
+/* TRACEPOINT_TIMELINE_CHART_DARK_V1 */
+
+.tp-app[data-theme="dark"] .tp-timeline-chart {
+  background: #151f2e;
+  border-color: #2b394d;
+}
+
+.tp-app[data-theme="dark"] .tp-timeline-chart-heading h2 {
+  color: #e7edf7;
+}
+
+.tp-app[data-theme="dark"] .tp-timeline-chart-heading p,
+.tp-app[data-theme="dark"] .tp-timeline-chart-legend,
+.tp-app[data-theme="dark"] .tp-timeline-chart-axis,
+.tp-app[data-theme="dark"] .tp-timeline-chart-day,
+.tp-app[data-theme="dark"] .tp-timeline-chart-footer {
+  color: #9ba9bc;
+}
+
+.tp-app[data-theme="dark"] .tp-timeline-chart-grid span {
+  border-color: #344257;
+}
+
+.tp-app[data-theme="dark"] .tp-timeline-chart-value {
+  color: #dce5f2;
+}
+
+.tp-app[data-theme="dark"] .tp-timeline-chart-footer {
+  border-color: #2b394d;
+}
+
