@@ -1,9 +1,12 @@
+import { useEvidenceTrustScores } from './useEvidenceTrustScores';
 import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Activity, AlertTriangle, ArrowRight, Fingerprint, GitBranch, RefreshCw, ShieldAlert } from 'lucide-react';
 import './styles/InvestigationGraph.css';
 import './styles/TracepointInteractionPolish.css';
-import { useEvidenceTrustScores, TrustScoreDetails } from './EvidenceTrustScore'; // GRAPH_TRUST_SCORE_V1
+
+const EMPTY_GRAPH_LIST = [];
+import { TrustScoreDetails } from './EvidenceTrustScore'; // GRAPH_TRUST_SCORE_V1
 
 
 function AnimatedMetricCount({ value }) {
@@ -37,7 +40,7 @@ export default function InvestigationGraph() {
   const pageTheme = document.querySelector('.tp-app')?.getAttribute('data-theme') || 'light'; // TRACEPOINT_GRAPH_PORTAL_THEME_V3
   const [data, setData] = useState(null);
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState(null);
   const { scores: trustScores, scoreError: trustScoreError } = useEvidenceTrustScores();
   async function load() {
@@ -57,11 +60,44 @@ export default function InvestigationGraph() {
       setLoading(false);
     }
   }
-  useEffect(() => { load(); }, []);
-  const nodes = data?.nodes || [];
-  const edges = data?.edges || [];
-  const lookup = useMemo(() => new Map(nodes.map(node => [node.id, node])), [data]);
-  const connected = useMemo(() => new Set(edges.flatMap(edge => [edge.source, edge.target])), [data]);
+  useEffect(() => {
+    let active = true;
+
+    fetch('/api/v1/graph', { credentials: 'same-origin' })
+      .then(async response => {
+        if (!response.ok) {
+          const body = await response.json().catch(() => ({}));
+          throw new Error(typeof body.detail === 'string' ? body.detail : `Unable to load graph (${response.status})`);
+        }
+        return response.json();
+      })
+      .then(body => {
+        if (active) {
+          setData({
+            nodes: Array.isArray(body.nodes) ? body.nodes : [],
+            edges: Array.isArray(body.edges) ? body.edges : [],
+            truncated: !!body.truncated
+          });
+        }
+      })
+      .catch(err => {
+        if (active) setError(err.message || 'Unable to load graph');
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+  const nodes = data?.nodes || EMPTY_GRAPH_LIST;
+  const edges = data?.edges || EMPTY_GRAPH_LIST;
+  const lookup = useMemo(
+    () => new Map(nodes.map(node => [node.id, node])),
+    [nodes]
+  );
+
   const gaps = nodes.filter(node => node.parse_status === 'partial' || !node.timestamp_utc);
   return <section className="tp-graph-root tp-graph-phase5">
     <div className="tp-graph-intro tp-card tp-graph-phase5-hero"><div><h2><GitBranch size={19}/> Investigation Graph</h2><p>Explainable correlations between collected security events. Each node references a stored evidence batch and line.</p></div><button className="tp-button" onClick={load} disabled={loading}><RefreshCw size={16} className={loading ? 'tp-spin' : ''}/> Refresh graph</button></div>

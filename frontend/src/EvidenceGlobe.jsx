@@ -98,7 +98,7 @@ export default function EvidenceGlobe({
   isFailure = () => false,
   timestampOf = e => e.timestamp,
 }) {
-  const grid = useMemo(buildGrid, []);
+  const grid = useMemo(() => buildGrid(), []);
   const [spin, setSpin] = useState(0);
   // Tilt is the second axis. Without it a drag could only ever slide the
   // globe sideways, which does not feel like holding a ball.

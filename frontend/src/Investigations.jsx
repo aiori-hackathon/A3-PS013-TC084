@@ -3,10 +3,11 @@ import { Plus, Search, X, ShieldAlert, FileText, Link2, Send, RefreshCw } from '
 import './styles/Tracepoint.css';
 import './styles/investigations.css';
 import './styles/TracepointInteractionPolish.css';
-import InvestigationScan, {
+import InvestigationScan from './InvestigationScan';
+import {
   stagesFromResult, STAGES_WORKING, STAGES_FAILED,
   CREATE_STAGES, CREATE_WORKING, CREATE_FAILED, CREATE_DONE,
-} from './InvestigationScan';
+} from './InvestigationScanConfig';
 
 const API = '/api/v1/investigations';
 const stamp = v => v ? new Date(v).toLocaleString() : '—';
@@ -123,7 +124,25 @@ export default function Investigations({ events = [] }) {
     catch (err) { setError(err.message); }
     finally { setLoading(false); }
   }
-  useEffect(() => { loadCases(); }, []);
+  useEffect(() => {
+    let active = true;
+    request(API)
+      .then(data => {
+        if (active) {
+          setCases(data.items || []);
+          setError('');
+        }
+      })
+      .catch(err => {
+        if (active) setError(err.message);
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
   useEffect(() => {
     if (!active && !creating) return;
     const onKeyDown = event => {
@@ -239,7 +258,10 @@ export default function Investigations({ events = [] }) {
 
   const visible = useMemo(() => cases.filter(c => `${c.id} ${c.title} ${c.description} ${c.status} ${c.severity}`.toLowerCase().includes(query.toLowerCase())), [cases, query]);
   const counts = { total: cases.length, open: cases.filter(c => c.status === 'open').length, investigating: cases.filter(c => c.status === 'investigating').length, resolved: cases.filter(c => c.status === 'resolved').length };
-  const linked = new Set((active?.events || []).map(e => e.event_reference));
+  const linked = useMemo(
+    () => new Set((active?.events || []).map(e => e.event_reference)),
+    [active],
+  );
   // Newest first, matching the timeline table, so the events an analyst just
   // collected are at the top of the picker instead of the bottom of it. The
   // original index travels with each entry because the Link button still reads
@@ -249,7 +271,7 @@ export default function Investigations({ events = [] }) {
       .map((e, index) => ({ e, index }))
       .filter(({ e }) => !linked.has(eventRef(e)))
       .sort((a, b) => eventTime(b.e) - eventTime(a.e)),
-    [events, active],
+    [events, linked],
   );
 
   return <div className="tp-inv tp-inv-phase5">

@@ -12,7 +12,7 @@ import {
   useRef,
   useState
 } from 'react';
-import { Wifi, WifiOff, Activity, ArrowDownToLine, ChevronRight, CircleHelp, Clock3, FileClock, FileText, Fingerprint, LayoutDashboard, LogOut, Menu, RefreshCw, Search, ShieldAlert, SlidersHorizontal, Terminal, X, GitBranch, BookOpen} from 'lucide-react';
+import { Wifi, WifiOff, Activity, ArrowDownToLine, ChevronRight, FileClock, FileText, Fingerprint, LayoutDashboard, LogOut, RefreshCw, Search, ShieldAlert, SlidersHorizontal, Terminal, X, GitBranch, BookOpen} from 'lucide-react';
 import './styles/Tracepoint.css';
 import './styles/TracepointTimelineGraphModal.css';
 import './styles/TracepointInteractionPolish.css';
@@ -59,7 +59,6 @@ const device = e => text(e.device_id || e.hostname || e.device || e.host);
 // Login" over "failed login". The eventType fallback is gone with it: a row
 // with no message should say nothing, not repeat its own title.
 const message = e => text(e.message || e.raw_log || e.raw_line || e.raw || e.description || e.details || '');
-const dateLabel = value => { const d = new Date(value); return value && !Number.isNaN(d.getTime()) ? d.toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : text(value); };
 const fullDate = value => { const d = new Date(value); return value && !Number.isNaN(d.getTime()) ? d.toLocaleString(undefined, { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', second: '2-digit', timeZoneName: 'short' }) : text(value); };
 const unpack = data => Array.isArray(data) ? data : (data?.events || data?.timeline || data?.items || data?.data?.events || []);
 const csvValue = value => '"' + String(value ?? '').replaceAll('"', '""') + '"';
@@ -163,7 +162,173 @@ function EventTable({ rows, loading, onSelect }) {
 }
 
 
-function AnimatedCount({ value, animationKey }) {
+// Timeline-only hierarchy. EventTable remains unchanged for Overview.
+const loginKind = event => {
+  const kind = eventType(event).toLowerCase().replace(/[_-]+/g, ' ').replace(/\s+/g, ' ').trim();
+  if (kind === 'failed login') return 'failed';
+  if (kind === 'successful login') return 'successful';
+  return null;
+};
+
+function GroupedTimeline({ rows, loading, onSelect }) {
+  const groups = useMemo(() => {
+    const devices = new Map();
+
+    rows.forEach(event => {
+      const deviceName = device(event) === '—' ? 'Unknown device' : device(event);
+      const userName = text(event.username) === '—' ? 'Unknown user' : text(event.username);
+      const rawTime = timestamp(event);
+      const parsedTime = Date.parse(rawTime);
+      const date = Number.isNaN(parsedTime) ? null : new Date(parsedTime);
+
+      const dateKey = date
+        ? `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+        : 'unavailable';
+
+      const dateName = date
+        ? date.toLocaleDateString(undefined, {
+            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+          })
+        : 'Date unavailable';
+
+      if (!devices.has(deviceName)) devices.set(deviceName, new Map());
+      const users = devices.get(deviceName);
+
+      if (!users.has(userName)) users.set(userName, new Map());
+      const dates = users.get(userName);
+
+      if (!dates.has(dateKey)) {
+        dates.set(dateKey, { key: dateKey, label: dateName, events: [] });
+      }
+
+      dates.get(dateKey).events.push(event);
+    });
+
+    return [...devices.entries()]
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([name, users]) => ({
+        name,
+        users: [...users.entries()]
+          .sort(([a], [b]) => a.localeCompare(b))
+          .map(([user, dates]) => ({
+            name: user,
+            dates: [...dates.values()]
+              .sort((a, b) => {
+                if (a.key === 'unavailable') return 1;
+                if (b.key === 'unavailable') return -1;
+                return b.key.localeCompare(a.key);
+              })
+              .map(day => {
+                day.events.sort((a, b) => {
+                  const first = Date.parse(timestamp(a));
+                  const second = Date.parse(timestamp(b));
+                  if (Number.isNaN(first)) return Number.isNaN(second) ? 0 : 1;
+                  if (Number.isNaN(second)) return -1;
+                  return first - second;
+                });
+
+                const failed = day.events.filter(event => loginKind(event) === 'failed').length;
+                const successful = day.events.filter(event => loginKind(event) === 'successful').length;
+
+                return {
+                  ...day,
+                  failed,
+                  successful,
+                  attempts: failed + successful
+                };
+              })
+          }))
+      }));
+  }, [rows]);
+
+  if (loading) return <div className="tp-empty">Loading events…</div>;
+
+  if (!rows.length) {
+    return <div className="tp-empty">No events to display. Check your agent connection or adjust the filters.</div>;
+  }
+
+  return <div className="tp-grouped-timeline">
+    {groups.map((deviceGroup, deviceIndex) => (
+      <details className="tp-timeline-device-group" key={deviceGroup.name} open={deviceIndex === 0}>
+        <summary className="tp-timeline-device-heading">
+          <span className="tp-timeline-group-name">{deviceGroup.name}</span>
+          <span className="tp-timeline-group-meta">
+            {deviceGroup.users.reduce((sum, user) =>
+              sum + user.dates.reduce((n, day) => n + day.events.length, 0), 0
+            )} events · {deviceGroup.users.length} {deviceGroup.users.length === 1 ? 'user' : 'users'}
+          </span>
+        </summary>
+
+        <div className="tp-timeline-device-content">
+          {deviceGroup.users.map((userGroup, userIndex) => (
+            <details className="tp-timeline-user-group" key={userGroup.name}
+              open={deviceIndex === 0 && userIndex === 0}>
+              <summary className="tp-timeline-user-heading">
+                <span>{userGroup.name}</span>
+                <span className="tp-timeline-group-meta">
+                  {userGroup.dates.reduce((sum, day) => sum + day.events.length, 0)} events ·
+                  {' '}{userGroup.dates.length} {userGroup.dates.length === 1 ? 'day' : 'days'}
+                </span>
+              </summary>
+
+              <div className="tp-timeline-user-content">
+                {userGroup.dates.map((day, dayIndex) => (
+                  <details className="tp-timeline-date-group" key={day.key}
+                    open={deviceIndex === 0 && userIndex === 0 && dayIndex === 0}>
+                    <summary className="tp-timeline-date-heading">
+                      <span className="tp-timeline-date-label">{day.label}</span>
+                      <span className="tp-timeline-date-counts">
+                        <span>{day.events.length} events</span>
+                        <span>{day.attempts} login {day.attempts === 1 ? 'attempt' : 'attempts'}</span>
+                        <span className="is-failed">{day.failed} failed</span>
+                        <span className="is-successful">{day.successful} successful</span>
+                      </span>
+                    </summary>
+
+                    <div className="tp-timeline-event-list">
+                      {day.events.map((event, index) => {
+                        const when = eventDateParts(timestamp(event));
+                        const level = severity(event);
+
+                        return <button
+                          type="button"
+                          className="tp-timeline-event-row"
+                          key={`${event.id || event.event_id || timestamp(event)}-${index}`}
+                          onClick={() => onSelect(event)}
+                        >
+                          <time className="tp-timeline-event-time"
+                            dateTime={timestamp(event) || undefined}>
+                            <span>{when.time || 'Time unavailable'}</span>
+                          </time>
+
+                          <span className="tp-timeline-event-description">
+                            <strong>{eventType(event)}</strong>
+                            {message(event) !== '—' &&
+                              <small title={message(event)}>{message(event)}</small>}
+                          </span>
+
+                          <Badge variant="outline"
+                            className={`tp-severity ${severityClass(level)}`}>
+                            {level}
+                          </Badge>
+
+                          <ChevronRight size={16} aria-hidden="true" />
+                        </button>;
+                      })}
+                    </div>
+                  </details>
+                ))}
+              </div>
+            </details>
+          ))}
+        </div>
+      </details>
+    ))}
+  </div>;
+}
+
+
+function AnimatedCount({ value }) {
   const [shown, setShown] = useState(0);
 
   useEffect(() => {
@@ -185,12 +350,12 @@ function AnimatedCount({ value, animationKey }) {
 
     frame = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(frame);
-  }, [value, animationKey]);
+  }, [value]);
 
   return <>{shown.toLocaleString()}</>;
 }
 
-function TimelineActivityChart({ events, animationKey }) {
+function TimelineActivityChart({ events }) {
   const buckets = useMemo(() => {
     const days = Array.from({ length: 7 }, (_, index) => {
       const date = new Date();
@@ -307,8 +472,6 @@ export default function Dashboard({ user, onSignOut }) {
   const [events, setEvents] = useState([]);
   const initialPageRef = useRef(page);
   const initialTimelineLoadRef = useRef(null);
-  const [timelineReady, setTimelineReady] = useState(false);
-  const [timelineAnimationKey, setTimelineAnimationKey] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');
@@ -356,7 +519,7 @@ export default function Dashboard({ user, onSignOut }) {
     } catch (err) { setError(err.message); } finally { if (!quiet) setLoading(false); }
   }, []);
   useEffect(() => {
-    const request = refresh();
+    const request = Promise.resolve().then(() => refresh());
     if (initialPageRef.current === 'timeline') {
       initialTimelineLoadRef.current = request;
     }
@@ -364,39 +527,27 @@ export default function Dashboard({ user, onSignOut }) {
 
   // Fetch fresh records once on each entry to Event Timeline.
   useEffect(() => {
-    if (page !== 'timeline') {
-      setTimelineReady(false);
-      return;
-    }
-
-    let active = true;
-
-    // Start the counters immediately; fetch fresh records in parallel.
-    setTimelineReady(true);
-    setTimelineAnimationKey(key => key + 1);
+    if (page !== 'timeline') return;
 
     const isInitialTimeline = initialPageRef.current === 'timeline';
     initialPageRef.current = null;
 
     const request = isInitialTimeline
-      ? (initialTimelineLoadRef.current || refresh({ quiet: true }))
-      : refresh({ quiet: true });
+      ? (initialTimelineLoadRef.current || Promise.resolve().then(() => refresh({ quiet: true })))
+      : Promise.resolve().then(() => refresh({ quiet: true }));
 
-    Promise.resolve(request).catch(() => {
+    request.catch(() => {
       // refresh() already handles and displays its own errors.
     });
-
-    return () => {
-      active = false;
-    };
   }, [page, refresh]);
 
   // TRACEPOINT_REFRESH_ON_RETURN_V1: log collection happens in a terminal while
   // the browser sits in the background, so coming back to the tab re-reads the
   // timeline and the evidence library. This refetches data rather than reloading
   // the document, which would throw away the open case, filters and scroll.
-  const lastRefreshRef = useRef(Date.now());
+  const lastRefreshRef = useRef(0);
   useEffect(() => {
+    lastRefreshRef.current = Date.now();
     const MIN_GAP_MS = 3000;
     const refetch = () => {
       if (document.visibilityState !== 'visible') return;
@@ -577,12 +728,12 @@ export default function Dashboard({ user, onSignOut }) {
     {/* TRACEPOINT_TIMELINE_WORKSPACE_V1 */}
     {page === 'timeline' && <div className="tp-timeline-workspace">
       <div className="tp-timeline-summary" aria-label="Timeline summary">
-        <div><span>EVENTS IN VIEW</span><strong>{timelineReady ? <AnimatedCount value={filtered.length} animationKey={timelineAnimationKey}/> : '…'}</strong><small>of {events.length.toLocaleString()} collected</small></div>
-        <div><span>AUTHENTICATION FAILURES</span><strong>{timelineReady ? <AnimatedCount value={filtered.filter(fail).length} animationKey={timelineAnimationKey}/> : '…'}</strong><small>matching failure indicators</small></div>
-        <div><span>SOURCE DEVICES</span><strong>{timelineReady ? <AnimatedCount value={new Set(filtered.map(device).filter(d => d !== '—')).size} animationKey={timelineAnimationKey}/> : '…'}</strong><small>in the current results</small></div>
+        <div><span>EVENTS IN VIEW</span><strong><AnimatedCount value={filtered.length}/></strong><small>of {events.length.toLocaleString()} collected</small></div>
+        <div><span>FAILED LOGIN ATTEMPTS</span><strong><AnimatedCount value={filtered.filter(e => loginKind(e) === 'failed').length}/></strong><small>parser-classified failed logins</small></div>
+        <div><span>SOURCE DEVICES</span><strong><AnimatedCount value={new Set(filtered.map(device).filter(d => d !== '—')).size}/></strong><small>in the current results</small></div>
         <div className="tp-timeline-summary-note"><ShieldAlert size={18}/><span>Events are investigative leads, not verified incidents. Select a row to inspect its raw evidence.</span></div>
       </div>
-      {timelineReady && <TimelineActivityChart events={events} animationKey={timelineAnimationKey}/>}
+      <TimelineActivityChart events={events}/>
       <section className="tp-card tp-events-card tp-timeline-panel">
         <div className="tp-timeline-panel-head">
           <div><span className="tp-timeline-eyebrow">EVENT EXPLORER</span><h2>Collected event records</h2><p>Search the timeline and inspect individual source records.</p></div>
@@ -593,8 +744,8 @@ export default function Dashboard({ user, onSignOut }) {
           <label className="tp-timeline-select"><SlidersHorizontal size={17}/><select aria-label="Filter by severity" value={level} onChange={e => setLevel(e.target.value)}><option value="all">All severities</option>{levels.map(v => <option value={v} key={v}>{v}</option>)}</select></label>
           {(search || level !== 'all') && <Button variant="ghost" className="tp-timeline-clear" onClick={() => { setSearch(''); setLevel('all'); }}>Clear filters</Button>}
         </div>
-        <div className="tp-timeline-table-caption"><span>Showing {filtered.length} matching events</span><span>Newest first · Click any row to inspect</span></div>
-        <EventTable rows={filtered} loading={loading} onSelect={setSelected}/>
+        <div className="tp-timeline-table-caption"><span>Showing {filtered.length} matching events</span><span>Grouped by device, user and date · Select an event to inspect</span></div>
+        <GroupedTimeline rows={filtered} loading={loading} onSelect={setSelected}/>
       </section>
     </div>}
     {page === 'evidence' && (

@@ -90,9 +90,7 @@ const PACKED =
   + 'AAAAAAAAAAAA';
 
 const BITS = (() => {
-  const bin = typeof atob === 'function'
-    ? atob(PACKED)
-    : Buffer.from(PACKED, 'base64').toString('binary');
+  const bin = atob(PACKED);
   const out = new Uint8Array(bin.length);
   for (let i = 0; i < bin.length; i += 1) out[i] = bin.charCodeAt(i);
   return out;

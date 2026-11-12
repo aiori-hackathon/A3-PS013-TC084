@@ -25,7 +25,7 @@ const longDay = iso => asDate(iso).toLocaleDateString(undefined, {
    "day month" string, which in a month-first locale is the month - so all
    fourteen columns read "Nov". It is the date now, with the month shown only
    where the series crosses into one, which is the one place it is ambiguous. */
-const columnLabel = (iso, index, days) => {
+const columnLabel = (iso, index) => {
   const d = asDate(iso);
   const date = d.getUTCDate();
   const isFirstOfMonth = date === 1;
