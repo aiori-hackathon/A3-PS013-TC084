@@ -8,7 +8,7 @@
    both paint their own near-black surface over this, so the only thing this
    changes is what you see before either of them mounts. */
 :root {
-  font-family: 'Archivo', 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Inter', 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
   color: #e7eef7;
   background: #090c11;
   font-synthesis: none;

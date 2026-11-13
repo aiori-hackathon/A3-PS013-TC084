@@ -105,7 +105,7 @@ html .tp-app.tp-app[data-theme='forensic'] {
   --fx-row-h:         34px;   /* table row: dense enough to fit a shift's work */
 
   /* --- type -------------------------------------------------------------- */
-  /* Archivo for the interface, JetBrains Mono for anything a machine wrote.
+  /* Inter for the interface, JetBrains Mono for anything a machine wrote.
      IBM Plex Sans Condensed used to carry every label here, and the condensed
      width was the single biggest reason the app read as cramped: at 11px a
      narrowed uppercase label is hard work, and uppercase-condensed-tracked
@@ -114,8 +114,8 @@ html .tp-app.tp-app[data-theme='forensic'] {
      rules that reference it simply get normal widths. JetBrains Mono was
      drawn for reading code at small sizes and separates 0/O and 1/l/I even
      more clearly than Plex Mono did, which is what a log line needs. */
-  --fx-sans:          'Archivo', system-ui, sans-serif;
-  --fx-cond:          'Archivo', system-ui, sans-serif;
+  --fx-sans:          'Inter', system-ui, sans-serif;
+  --fx-cond:          'Inter', system-ui, sans-serif;
   --fx-mono:          'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
 
   /* The scale was built around 11-13px. Everything steps up roughly one
@@ -128,7 +128,7 @@ html .tp-app.tp-app[data-theme='forensic'] {
   background: var(--fx-bg) !important;        /* LEGACY-OVERRIDE */
   color: var(--fx-text) !important;           /* LEGACY-OVERRIDE */
   font-family: var(--fx-sans) !important;     /* LEGACY-OVERRIDE */
-  font-feature-settings: 'cv05' 1, 'ss01' 1;
+  font-feature-settings: 'cv05' 1, 'cv08' 1;
 }
 
 /* ---------------------------------------------------------------------------
@@ -2745,7 +2745,7 @@ html .tp-overlay.tp-overlay.tp-graph-modal-overlay[data-theme='forensic'] .tp-dr
   color: var(--fx-text, #e7eef7) !important;
   border-left: 1px solid var(--fx-line-strong, #2b3744) !important;
   box-shadow: -12px 0 40px rgba(0, 0, 0, 0.5) !important;
-  font-family: var(--fx-sans, 'Archivo', system-ui, sans-serif) !important;
+  font-family: var(--fx-sans, 'Inter', system-ui, sans-serif) !important;
 }
 
 html .tp-overlay.tp-overlay.tp-graph-modal-overlay[data-theme='forensic'] .tp-drawer-header {
@@ -2845,7 +2845,7 @@ html .tp-overlay.tp-overlay.tp-graph-modal-overlay[data-theme='forensic'] {
   --fx-text-dim: #93a4b8;
   --fx-signal: #c3f04a;
   --fx-r-sm: 2px;
-  --fx-sans: 'Archivo', system-ui, sans-serif;
+  --fx-sans: 'Inter', system-ui, sans-serif;
   --fx-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
 }
 
@@ -3163,3 +3163,954 @@ html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-event-row > svg {
     grid-column: 1;
   }
 }
+
+/* =========================================================
+   TRACEPOINT — FORENSIC ACTIVITY STREAM
+   Stronger device / user / date hierarchy and event rail.
+   Existing grouping, data and interactions are unchanged.
+   ========================================================= */
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-grouped-timeline {
+  gap: 14px;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-device-group {
+  border: 1px solid #293747;
+  border-left: 3px solid #c3f04a;
+  border-radius: 9px;
+  background: #0b1118;
+  box-shadow: 0 5px 18px rgb(0 0 0 / 12%);
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-device-heading {
+  min-height: 58px;
+  padding: 15px 18px;
+  gap: 12px;
+  background: linear-gradient(100deg, #18232b 0%, #111923 72%);
+  border-bottom-color: #293747;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-device-heading::before {
+  width: 8px;
+  height: 8px;
+  flex-basis: 8px;
+  border-color: #c3f04a;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-group-name {
+  color: #f0f5fa;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .2px;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-device-heading .tp-timeline-group-meta {
+  margin-left: auto;
+  padding: 5px 9px;
+  border: 1px solid #2b3948;
+  border-radius: 5px;
+  background: #0c141c;
+  color: #a6b5c5;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-device-content {
+  gap: 0;
+  padding: 12px 14px 14px 19px;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-user-group {
+  position: relative;
+  margin-left: 5px;
+  border: 0;
+  border-left: 1px solid #344454;
+  border-radius: 0;
+  background: transparent;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-user-heading {
+  min-height: 43px;
+  padding: 10px 13px 10px 17px;
+  gap: 10px;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-user-heading::before {
+  width: 6px;
+  height: 6px;
+  flex-basis: 6px;
+  border-color: #7f95a9;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-user-heading > span:first-of-type {
+  color: #dce7f1;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-user-heading .tp-timeline-group-meta {
+  margin-left: auto;
+  color: #7f94a8;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-user-content {
+  gap: 9px;
+  padding: 5px 0 12px 17px;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-date-group {
+  overflow: hidden;
+  border: 1px solid #253342;
+  border-radius: 7px;
+  background: #0d141c;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-date-heading {
+  min-height: 43px;
+  padding: 10px 13px;
+  background: #121c26;
+  gap: 9px 16px;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-date-label {
+  color: #e6eef6;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .15px;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-date-counts {
+  gap: 6px 12px;
+  font-size: 9px;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-date-counts > span {
+  white-space: nowrap;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-date-counts .is-failed {
+  color: #ff9b63;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-date-counts .is-successful {
+  color: #63d9b0;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-event-list {
+  padding: 5px 0;
+  border-top: 1px solid #202d39;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-event-row {
+  position: relative;
+  grid-template-columns: minmax(104px, 122px) minmax(0, 1fr) auto 16px;
+  gap: 13px;
+  min-height: 54px;
+  padding: 9px 14px;
+  border-bottom-color: #1b2732;
+  background: transparent;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-event-row:hover {
+  background: #15212a;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-event-time {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 30px;
+  padding-left: 20px;
+  color: #a0b2c4;
+  font-size: 10px;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-event-time::before {
+  position: absolute;
+  left: 2px;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  border: 1px solid #9db5c7;
+  border-radius: 50%;
+  background: #101923;
+  content: '';
+  transform: translateY(-50%);
+  z-index: 1;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-event-time::after {
+  position: absolute;
+  left: 5px;
+  top: calc(50% + 5px);
+  bottom: -17px;
+  width: 1px;
+  background: #344453;
+  content: '';
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-event-row:last-child .tp-timeline-event-time::after {
+  display: none;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-event-description {
+  gap: 4px;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-event-description strong {
+  color: #e4edf5;
+  font-size: 11px;
+  font-weight: 650;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-event-description small {
+  color: #8fa1b3;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-event-row > svg {
+  color: #70879b;
+  transition: transform 120ms ease, color 120ms ease;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-event-row:hover > svg {
+  color: #c3f04a;
+  transform: translateX(2px);
+}
+
+@media (max-width: 680px) {
+  html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-device-content {
+    padding: 8px;
+  }
+
+  html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-user-content {
+    padding-left: 10px;
+  }
+
+  html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-date-heading {
+    padding: 10px;
+  }
+
+  html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-date-counts {
+    padding-left: 17px;
+  }
+
+  html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-event-row {
+    grid-template-columns: minmax(0, 1fr) auto 14px;
+    gap: 7px;
+    padding: 10px;
+  }
+
+  html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-event-time {
+    grid-column: 1 / -1;
+    min-height: 20px;
+    padding-left: 17px;
+  }
+
+  html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-event-time::after {
+    bottom: -35px;
+  }
+
+  html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-event-description {
+    grid-column: 1;
+  }
+}
+
+/* TRACEPOINT — TWO-PANEL FORENSIC TIMELINE
+   Type scale: 14px event titles, 12px raw-log lines, 13px timestamps and names,
+   10.5-11px small labels. Machine data uses var(--fx-mono) (JetBrains Mono).
+   Labels are sentence-weight with light tracking; no condensed faces. */
+.tp-forensic-workspace {
+  display: grid;
+  grid-template-columns: minmax(230px, 280px) minmax(0, 1fr);
+  min-height: 620px;
+  background: #0b1118;
+  border: 1px solid #263544;
+  border-radius: 12px;
+  overflow: hidden;
+  font-family: var(--fx-sans);
+}
+.tp-workspace-nav {
+  min-width: 0;
+  padding: 18px 12px;
+  background: #0d141d;
+  border-right: 1px solid #263544;
+}
+.tp-workspace-nav-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 8px 14px;
+  color: #9aabba;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .06em;
+}
+.tp-workspace-nav-heading span:last-child {
+  color: #7f93a6;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+.tp-workspace-device { margin-bottom: 7px; }
+.tp-workspace-device-button,
+.tp-workspace-user-button {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  gap: 10px;
+  padding: 11px 10px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  color: #c8d3df;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+}
+.tp-workspace-device-button:hover,
+.tp-workspace-user-button:hover { background: #15212c; }
+.tp-workspace-device-button.is-active {
+  color: #d8ff55;
+  background: #18241f;
+  border-color: #354b35;
+}
+.tp-workspace-device-dot {
+  flex: 0 0 7px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #9fce3b;
+  box-shadow: 0 0 9px #9fce3b55;
+}
+.tp-workspace-nav-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 600;
+}
+.tp-workspace-nav-count {
+  color: #8fa1b3;
+  font-family: var(--fx-mono);
+  font-size: 11.5px;
+  white-space: nowrap;
+}
+.tp-workspace-users {
+  margin: 4px 0 9px 15px;
+  padding-left: 8px;
+  border-left: 1px solid #304354;
+}
+.tp-workspace-user-button { padding: 9px 8px; }
+.tp-workspace-user-button.is-active {
+  color: #d8ff55;
+  background: #17221f;
+}
+.tp-workspace-user-marker { color: #748a9d; }
+.tp-workspace-nav-note {
+  margin: 22px 8px 0;
+  color: #8294a6;
+  font-size: 12px;
+  line-height: 1.6;
+}
+.tp-workspace-activity { min-width: 0; }
+.tp-workspace-activity-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid #263544;
+}
+.tp-workspace-eyebrow {
+  color: #b7e642;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+}
+.tp-workspace-activity-header h3 {
+  margin: 6px 0 4px;
+  color: #e4ebf2;
+  font-weight: 600;
+}
+.tp-workspace-activity-header p {
+  margin: 0;
+  color: #9fb0c0;
+}
+.tp-workspace-activity-header p span { padding: 0 5px; color: #607487; }
+/* The global `p` rule is !important, so this one has to be too. */
+html .tp-app.tp-app[data-theme='forensic'] .tp-workspace-activity-header p { font-size: 13px !important; }
+.tp-workspace-total { text-align: right; }
+.tp-workspace-total strong {
+  display: block;
+  color: #d9ff59;
+  font-family: var(--fx-mono);
+  font-size: 24px;
+  font-weight: 600;
+}
+.tp-workspace-total span { color: #8fa1b3; font-size: 11px; }
+.tp-workspace-day-tabs {
+  display: flex;
+  gap: 7px;
+  padding: 12px 18px;
+  overflow-x: auto;
+  border-bottom: 1px solid #263544;
+}
+.tp-workspace-day-tab {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 0 0 auto;
+  padding: 9px 13px;
+  border: 1px solid #2a3b4b;
+  border-radius: 7px;
+  background: #101923;
+  color: #aebdca;
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+}
+.tp-workspace-day-tab span { font-size: 12.5px; font-weight: 600; }
+.tp-workspace-day-tab small { color: #8fa1b3; font-size: 11px; }
+.tp-workspace-day-tab.is-active {
+  border-color: #a6d63e;
+  background: #1a281e;
+  color: #e0ff85;
+}
+.tp-workspace-day-tab.is-active small { color: #b4d083; }
+.tp-workspace-day-summary {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  flex-wrap: wrap;
+  padding: 12px 24px;
+  background: #101923;
+  border-bottom: 1px solid #263544;
+}
+.tp-workspace-day-summary > div { display: flex; flex-direction: column; gap: 3px; }
+.tp-workspace-summary-label {
+  color: #8fa1b3;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .06em;
+}
+.tp-workspace-day-summary strong {
+  color: #e1e9f1;
+  font-family: var(--fx-mono);
+  font-size: 18px;
+  font-weight: 600;
+}
+.tp-workspace-day-summary .is-failed strong { color: #ff9a67; }
+.tp-workspace-day-summary .is-successful strong { color: #5cdaa4; }
+.tp-workspace-summary-date {
+  margin-left: auto;
+  color: #9fb0c0;
+  font-size: 12px;
+}
+.tp-workspace-event-stream { padding: 4px 16px 12px; }
+.tp-workspace-event {
+  display: grid;
+  grid-template-columns: 88px 14px minmax(0, 1fr) auto 16px;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 14px 10px;
+  border: 0;
+  border-bottom: 1px solid #2a3b4b;
+  background: transparent;
+  color: #dce5ee;
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+}
+.tp-workspace-event:hover { background: #15212c; }
+.tp-workspace-event-clock {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  color: #c3d0dc;
+  font-family: var(--fx-mono);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+.tp-workspace-event-clock span { color: #8196aa; font-size: 10.5px; }
+.tp-workspace-event-marker {
+  width: 9px;
+  height: 9px;
+  border: 2px solid #8198a9;
+  border-radius: 50%;
+  background: #0b1118;
+}
+.tp-workspace-event.is-failed .tp-workspace-event-marker {
+  border-color: #ff985f;
+  background: #ff985f;
+  box-shadow: 0 0 8px #ff985f55;
+}
+.tp-workspace-event.is-successful .tp-workspace-event-marker {
+  border-color: #50d49b;
+  background: #50d49b;
+  box-shadow: 0 0 8px #50d49b55;
+}
+.tp-workspace-event-body { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.tp-workspace-event-body strong {
+  color: #e6edf4;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+.tp-workspace-event-body small {
+  overflow: hidden;
+  color: #93a6b8;
+  font-family: var(--fx-mono);
+  font-size: 12px;
+  line-height: 1.5;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tp-workspace-event-tags {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.tp-workspace-login-tag {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.tp-workspace-login-tag.is-failed { color: #ffad7e; background: #48291f; }
+.tp-workspace-login-tag.is-successful { color: #70e2ad; background: #173c30; }
+.tp-workspace-event > svg { color: #75899b; }
+.tp-workspace-footnote {
+  margin: 0;
+  padding: 12px 24px 17px;
+  color: #8497aa;
+  font-size: 11.5px;
+  line-height: 1.6;
+}
+@media (max-width: 900px) {
+  .tp-forensic-workspace { grid-template-columns: 215px minmax(0, 1fr); }
+  .tp-workspace-event { grid-template-columns: 72px 10px minmax(0, 1fr) auto 14px; gap: 10px; }
+  .tp-workspace-login-tag { display: none; }
+}
+@media (max-width: 650px) {
+  .tp-forensic-workspace { grid-template-columns: 1fr; }
+  .tp-workspace-nav { border-right: 0; border-bottom: 1px solid #263544; }
+  .tp-workspace-nav-note { display: none; }
+  .tp-workspace-users { display: flex; flex-wrap: wrap; margin-left: 8px; }
+  .tp-workspace-user-button { width: auto; }
+  .tp-workspace-event { grid-template-columns: 64px 9px minmax(0, 1fr) 14px; }
+  .tp-workspace-event-tags { display: none; }
+  .tp-workspace-activity-header { padding: 17px; }
+  .tp-workspace-day-summary { gap: 15px; padding: 12px 17px; }
+}
+
+
+/* TRACEPOINT TIMELINE USABILITY PATCH V1 */
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-workspace-nav {
+  max-height: 720px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #405568 #0d141d;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-workspace-event-stream {
+  max-height: min(62vh, 680px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #405568 #0b1118;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-workspace-event {
+  grid-template-columns: 150px 14px minmax(0, 1fr) auto 16px;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-chart-body {
+  height: 155px;
+}
+
+@media (max-width: 900px) {
+  html .tp-app.tp-app[data-theme='forensic'] .tp-workspace-event {
+    grid-template-columns: 132px 10px minmax(0, 1fr) auto 14px;
+  }
+}
+
+@media (max-width: 650px) {
+  html .tp-app.tp-app[data-theme='forensic'] .tp-workspace-nav {
+    max-height: 300px;
+  }
+
+  html .tp-app.tp-app[data-theme='forensic'] .tp-workspace-event {
+    grid-template-columns: 118px 9px minmax(0, 1fr) 14px;
+  }
+
+  html .tp-app.tp-app[data-theme='forensic'] .tp-workspace-event-stream {
+    max-height: 55vh;
+  }
+}
+
+
+
+/* TRACEPOINT: THREE-PANEL FORENSIC TIMELINE */
+html .tp-app.tp-app[data-theme='forensic'] .tp-forensic-workspace {
+  grid-template-columns: minmax(190px, 225px) minmax(0, 1fr) minmax(260px, 310px);
+  align-items: stretch;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-workspace-activity {
+  min-width: 0;
+  border-right: 1px solid #263544;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-workspace-inspector {
+  min-width: 0;
+  max-height: 720px;
+  overflow: auto;
+  padding: 19px 17px;
+  background: #0d151b;
+  color: #e4edf0;
+  scrollbar-width: thin;
+  scrollbar-color: #405568 #0d141d;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-inspector-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #263544;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-inspector-kicker,
+html .tp-app.tp-app[data-theme='forensic'] .tp-inspector-label {
+  color: #b7e642;
+  font: 700 10px/1.5 var(--fx-mono);
+  letter-spacing: .09em;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-inspector-heading h3 {
+  margin: 6px 0 0;
+  color: #e4ebf2;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-inspector-severity {
+  flex: 0 0 auto;
+  color: #d9ff59;
+  font: 600 10px var(--fx-mono);
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-inspector-primary {
+  padding: 17px 0;
+  border-bottom: 1px solid #263544;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-inspector-primary p {
+  margin: 9px 0;
+  color: #e4ebf2;
+  font-size: 13px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-inspector-primary time {
+  color: #8fa1b3;
+  font: 11px/1.6 var(--fx-mono);
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-inspector-fields {
+  display: grid;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-inspector-fields > div {
+  display: grid;
+  gap: 5px;
+  padding: 11px 0;
+  border-bottom: 1px solid #202e3a;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-inspector-fields span {
+  color: #8fa1b3;
+  font-size: 11px;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-inspector-fields strong {
+  color: #dce5ee;
+  font-size: 12px;
+  font-weight: 550;
+  overflow-wrap: anywhere;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-inspector-raw {
+  margin-top: 16px;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-inspector-raw summary {
+  color: #b7e642;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-inspector-raw pre {
+  max-height: 300px;
+  overflow: auto;
+  padding: 11px;
+  border: 1px solid #263544;
+  border-radius: 6px;
+  background: #080e13;
+  color: #b9d6c7;
+  font: 10px/1.6 var(--fx-mono);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-inspector-empty {
+  padding: 30px 4px;
+  color: #8fa1b3;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-inspector-empty span {
+  color: #b7e642;
+  font: 700 10px var(--fx-mono);
+}
+
+@media (max-width: 1100px) {
+  html .tp-app.tp-app[data-theme='forensic'] .tp-forensic-workspace {
+    grid-template-columns: minmax(190px, 225px) minmax(0, 1fr);
+  }
+
+  html .tp-app.tp-app[data-theme='forensic'] .tp-workspace-inspector {
+    grid-column: 1 / -1;
+    max-height: 460px;
+    border-top: 1px solid #263544;
+  }
+
+  html .tp-app.tp-app[data-theme='forensic'] .tp-workspace-activity {
+    border-right: 0;
+  }
+}
+
+@media (max-width: 650px) {
+  html .tp-app.tp-app[data-theme='forensic'] .tp-forensic-workspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  html .tp-app.tp-app[data-theme='forensic'] .tp-workspace-inspector {
+    grid-column: auto;
+    max-height: none;
+  }
+}
+
+
+/* TRACEPOINT TIMELINE REDESIGN V2 — scoped to the timeline page only */
+.tp-timeline-redesign-v2 { display:flex; flex-direction:column; gap:14px; min-width:0; }
+.tp-timeline-redesign-v2 .tp-timeline-toolbar { display:flex; align-items:center; gap:10px; flex-wrap:wrap; padding:12px 14px; border:1px solid var(--tp-border, #26332f); border-radius:12px; background:var(--tp-panel, #101714); }
+.tp-timeline-live-state { display:flex; align-items:center; gap:8px; color:var(--tp-muted, #9aa9a2); font-size:12px; font-weight:650; white-space:nowrap; }
+.tp-timeline-redesign-v2 .tp-timeline-search { flex:1 1 280px; min-width:180px; }
+.tp-timeline-redesign-v2 .tp-timeline-select { flex:0 1 180px; }
+.tp-timeline-toolbar-count { margin-left:auto; color:var(--tp-muted, #9aa9a2); font-size:12px; white-space:nowrap; }
+.tp-timeline-chart-compact .tp-chart-card { padding:12px 16px !important; }
+.tp-timeline-chart-compact .tp-card-head { margin-bottom:4px !important; }
+.tp-timeline-chart-compact .tp-card-head h2 { font-size:14px !important; }
+.tp-timeline-chart-compact .tp-card-head p, .tp-timeline-chart-compact .tp-period { font-size:11px !important; }
+.tp-timeline-chart-compact .tp-chart { height:94px !important; min-height:94px !important; padding-top:4px !important; }
+.tp-timeline-chart-compact .tp-bar-track { height:65px !important; }
+.tp-timeline-chart-compact .tp-legend { margin-top:4px !important; font-size:10px !important; }
+.tp-timeline-three-panel { display:grid; grid-template-columns:minmax(0, 1.2fr) minmax(260px, .9fr) minmax(220px, .72fr); gap:14px; align-items:start; min-width:0; }
+.tp-timeline-surface { min-width:0; border:1px solid var(--tp-border, #26332f); border-radius:12px; background:var(--tp-panel, #101714); overflow:hidden; }
+.tp-timeline-event-list { display:flex; flex-direction:column; max-height:720px; }
+.tp-timeline-panel-title { display:flex; justify-content:space-between; align-items:center; gap:10px; padding:16px; border-bottom:1px solid var(--tp-border, #26332f); }
+.tp-timeline-panel-title h2 { margin:3px 0 0; font-size:17px; color:var(--tp-text, #edf4ef); }
+.tp-timeline-date-groups { overflow:auto; min-height:120px; }
+.tp-timeline-date-group + .tp-timeline-date-group { border-top:1px solid var(--tp-border, #26332f); }
+.tp-timeline-date-heading { display:flex; justify-content:space-between; gap:8px; padding:11px 14px 7px; color:var(--tp-text, #edf4ef); font-size:12px; }
+.tp-timeline-date-heading span { color:var(--tp-muted, #9aa9a2); font-size:11px; white-space:nowrap; }
+.tp-timeline-event-row { display:grid; grid-template-columns:82px minmax(0,1fr) auto; align-items:center; gap:9px; width:100%; padding:10px 12px; border:0; border-left:2px solid transparent; background:transparent; color:inherit; text-align:left; cursor:pointer; }
+.tp-timeline-event-row:hover { background:rgba(120,160,140,.07); }
+.tp-timeline-event-row.is-selected { border-left-color:#70d6a0; background:rgba(70,190,125,.09); }
+.tp-timeline-event-row time { color:var(--tp-muted, #9aa9a2); font-size:10px; font-variant-numeric:tabular-nums; }
+.tp-timeline-event-copy { display:flex; flex-direction:column; min-width:0; gap:3px; }
+.tp-timeline-event-copy strong { color:var(--tp-text, #edf4ef); font-size:12px; font-weight:650; }
+.tp-timeline-event-copy small { overflow:hidden; color:var(--tp-muted, #9aa9a2); font-size:10px; text-overflow:ellipsis; white-space:nowrap; }
+.tp-timeline-event-severity { padding:3px 6px; border:1px solid var(--tp-border, #34443d); border-radius:5px; color:var(--tp-muted, #9aa9a2); font-size:9px; text-transform:uppercase; }
+.tp-timeline-event-severity.sev-critical,.tp-timeline-event-severity.sev-high { color:#ff9b8e; border-color:rgba(255,120,100,.35); }
+.tp-timeline-event-severity.sev-medium,.tp-timeline-event-severity.sev-warning { color:#e9c47b; }
+.tp-timeline-forensic-note { margin:0; padding:12px 14px; border-top:1px solid var(--tp-border, #26332f); color:var(--tp-muted, #9aa9a2); font-size:10px; line-height:1.55; }
+.tp-timeline-inspector-panel,.tp-timeline-activity-summary { padding:0; }
+.tp-timeline-inspector-panel .tp-inspector-heading { padding:16px; }
+.tp-timeline-inspector-panel .tp-inspector-primary,.tp-timeline-inspector-panel .tp-inspector-fields,.tp-timeline-inspector-panel .tp-inspector-raw { margin-left:16px; margin-right:16px; }
+.tp-timeline-inspector-panel .tp-inspector-raw { margin-bottom:16px; }
+.tp-timeline-inspector-panel .tp-inspector-raw pre { max-height:260px; overflow:auto; white-space:pre-wrap; overflow-wrap:anywhere; }
+.tp-timeline-stat-primary { display:flex; flex-direction:column; gap:5px; margin:16px; padding:16px; border:1px solid rgba(91,190,137,.25); border-radius:10px; background:rgba(67,155,105,.07); }
+.tp-timeline-stat-primary span,.tp-timeline-stat-grid span { color:var(--tp-muted, #9aa9a2); font-size:11px; }
+.tp-timeline-stat-primary strong { color:var(--tp-text, #edf4ef); font-size:32px; line-height:1.1; font-variant-numeric:tabular-nums; }
+.tp-timeline-stat-primary small { color:var(--tp-muted, #9aa9a2); font-size:10px; }
+.tp-timeline-stat-grid { display:grid; grid-template-columns:1fr 1fr; gap:0; padding:0 16px; }
+.tp-timeline-stat-grid > div { display:flex; flex-direction:column; gap:5px; padding:12px 8px; border-bottom:1px solid var(--tp-border, #26332f); }
+.tp-timeline-stat-grid strong { color:var(--tp-text, #edf4ef); font-size:21px; font-variant-numeric:tabular-nums; }
+.tp-timeline-stat-grid strong.is-alert { color:#f08e7e; }
+.tp-timeline-summary-foot { display:flex; align-items:center; gap:8px; margin:16px; color:var(--tp-muted, #9aa9a2); font-size:10px; }
+@media (max-width:1180px) { .tp-timeline-three-panel { grid-template-columns:minmax(0,1fr) minmax(260px,.8fr); } .tp-timeline-activity-summary { grid-column:1 / -1; } .tp-timeline-stat-grid { grid-template-columns:repeat(3,1fr); } }
+@media (max-width:760px) { .tp-timeline-three-panel { grid-template-columns:minmax(0,1fr); } .tp-timeline-activity-summary { grid-column:auto; } .tp-timeline-stat-grid { grid-template-columns:1fr 1fr; } .tp-timeline-event-list { max-height:560px; } .tp-timeline-toolbar-count { margin-left:0; } .tp-timeline-redesign-v2 .tp-timeline-select { flex:1 1 150px; } }
+
+
+/* TRACEPOINT INVESTIGATION GRAPH TYPOGRAPHY REFINEMENT V1 */
+/* Typography only. No layout, spacing, colour, or behaviour changes. */
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-graph-root {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-graph-root .tp-graph-intro h2 {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.025em;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-graph-root .tp-graph-intro p,
+html .tp-app.tp-app[data-theme='forensic'] .tp-graph-root .tp-graph-panel-head p,
+html .tp-app.tp-app[data-theme='forensic'] .tp-graph-root .tp-graph-empty p,
+html .tp-app.tp-app[data-theme='forensic'] .tp-graph-root .tp-graph-gaps > p {
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.65;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-graph-root .tp-graph-stats strong {
+  font-size: 27px;
+  font-weight: 700;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.035em;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-graph-root .tp-graph-stats span {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-graph-root .tp-graph-panel-head h3,
+html .tp-app.tp-app[data-theme='forensic'] .tp-graph-root .tp-graph-gaps h3 {
+  font-size: 16px;
+  font-weight: 650;
+  line-height: 1.4;
+  letter-spacing: -0.015em;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-graph-root .tp-graph-legend,
+html .tp-app.tp-app[data-theme='forensic'] .tp-graph-root .tp-graph-edge span {
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-graph-root .tp-graph-node span {
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0.025em;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-graph-root .tp-graph-node strong {
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-graph-root .tp-graph-node small {
+  font-size: 11px;
+  font-weight: 450;
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-graph-root .tp-graph-reason,
+html .tp-app.tp-app[data-theme='forensic'] .tp-graph-root .tp-graph-gaps button span,
+html .tp-app.tp-app[data-theme='forensic'] .tp-graph-root .tp-graph-gaps button small {
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-graph-root .tp-graph-gaps button span {
+  font-weight: 600;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-graph-root .tp-graph-gaps button small {
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-graph-root .tp-graph-empty strong {
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 1.5;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-graph-root .tp-graph-caution {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.6;
+}
+
+/* The event details drawer is portalled outside the graph root. */
+html .tp-overlay.tp-overlay.tp-graph-modal-overlay[data-theme='forensic'] {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+html .tp-overlay.tp-overlay.tp-graph-modal-overlay .tp-drawer-header > div > span {
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0.045em;
+}
+
+html .tp-overlay.tp-overlay.tp-graph-modal-overlay .tp-drawer-header h2 {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: -0.02em;
+}
+
+html .tp-overlay.tp-overlay.tp-graph-modal-overlay .tp-drawer-body h3 {
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 1.45;
+}
+
+html .tp-overlay.tp-overlay.tp-graph-modal-overlay .tp-drawer-body .tp-detail span {
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+html .tp-overlay.tp-overlay.tp-graph-modal-overlay .tp-drawer-body .tp-detail strong {
+  font-size: 12px;
+  font-weight: 550;
+  line-height: 1.55;
+  font-variant-numeric: tabular-nums;
+}
+
+html .tp-overlay.tp-overlay.tp-graph-modal-overlay .tp-drawer-body pre {
+  font-size: 12px;
+  line-height: 1.65;
+  font-variant-numeric: tabular-nums;
+}
+
+/* END TRACEPOINT INVESTIGATION GRAPH TYPOGRAPHY REFINEMENT V1 */

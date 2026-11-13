@@ -116,7 +116,13 @@ const eventDateParts = value => {
   if (!value || Number.isNaN(d.getTime())) return { date: text(value), time: '' };
   return {
     date: d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }),
-    time: d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }),
+    time: d.toLocaleTimeString(undefined, {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hourCycle: 'h23',
+      timeZoneName: 'short'
+    }),
   };
 };
 function EventTable({ rows, loading, onSelect }) {
@@ -170,163 +176,103 @@ const loginKind = event => {
   return null;
 };
 
-function GroupedTimeline({ rows, loading, onSelect }) {
-  const groups = useMemo(() => {
-    const devices = new Map();
+function GroupedTimeline({ rows, loading, onSelect, selected }) {
+  const ordered = useMemo(() => [...rows].sort((a, b) => {
+    const ta = Date.parse(timestamp(a));
+    const tb = Date.parse(timestamp(b));
+    if (Number.isNaN(ta) && Number.isNaN(tb)) return 0;
+    if (Number.isNaN(ta)) return 1;
+    if (Number.isNaN(tb)) return -1;
+    return tb - ta;
+  }), [rows]);
 
-    rows.forEach(event => {
-      const deviceName = device(event) === '—' ? 'Unknown device' : device(event);
-      const userName = text(event.username) === '—' ? 'Unknown user' : text(event.username);
-      const rawTime = timestamp(event);
-      const parsedTime = Date.parse(rawTime);
-      const date = Number.isNaN(parsedTime) ? null : new Date(parsedTime);
-
-      const dateKey = date
+  const days = useMemo(() => {
+    const map = new Map();
+    ordered.forEach(event => {
+      const raw = timestamp(event);
+      const parsed = Date.parse(raw);
+      const date = Number.isNaN(parsed) ? null : new Date(parsed);
+      const key = date
         ? `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
         : 'unavailable';
-
-      const dateName = date
-        ? date.toLocaleDateString(undefined, {
-            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-          })
-        : 'Date unavailable';
-
-      if (!devices.has(deviceName)) devices.set(deviceName, new Map());
-      const users = devices.get(deviceName);
-
-      if (!users.has(userName)) users.set(userName, new Map());
-      const dates = users.get(userName);
-
-      if (!dates.has(dateKey)) {
-        dates.set(dateKey, { key: dateKey, label: dateName, events: [] });
-      }
-
-      dates.get(dateKey).events.push(event);
+      if (!map.has(key)) map.set(key, {
+        key,
+        label: date ? date.toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) : 'Date unavailable',
+        events: []
+      });
+      map.get(key).events.push(event);
     });
+    return [...map.values()];
+  }, [ordered]);
 
-    return [...devices.entries()]
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([name, users]) => ({
-        name,
-        users: [...users.entries()]
-          .sort(([a], [b]) => a.localeCompare(b))
-          .map(([user, dates]) => ({
-            name: user,
-            dates: [...dates.values()]
-              .sort((a, b) => {
-                if (a.key === 'unavailable') return 1;
-                if (b.key === 'unavailable') return -1;
-                return b.key.localeCompare(a.key);
-              })
-              .map(day => {
-                day.events.sort((a, b) => {
-                  const first = Date.parse(timestamp(a));
-                  const second = Date.parse(timestamp(b));
-                  if (Number.isNaN(first)) return Number.isNaN(second) ? 0 : 1;
-                  if (Number.isNaN(second)) return -1;
-                  return first - second;
-                });
+  const inspectedEvent = selected && ordered.includes(selected) ? selected : (ordered[0] || null);
+  const failed = ordered.filter(fail).length;
+  const successful = ordered.filter(e => loginKind(e) === 'successful').length;
+  const deviceCount = new Set(ordered.map(device).filter(v => v !== '—')).size;
+  const userCount = new Set(ordered.map(e => text(e.username)).filter(v => v !== '—')).size;
+  const critical = ordered.filter(e => ['critical', 'high'].includes(severity(e))).length;
 
-                const failed = day.events.filter(event => loginKind(event) === 'failed').length;
-                const successful = day.events.filter(event => loginKind(event) === 'successful').length;
+  return <div className="tp-timeline-three-panel">
+    <section className="tp-timeline-event-list tp-timeline-surface" aria-label="Events grouped by date">
+      <header className="tp-timeline-panel-title">
+        <div><span className="tp-timeline-eyebrow">EVIDENCE STREAM</span><h2>All events</h2></div>
+        <span className="tp-timeline-result-count">{ordered.length.toLocaleString()} records</span>
+      </header>
+      <div className="tp-timeline-date-groups">
+        {days.map(day => <section className="tp-timeline-date-group" key={day.key}>
+          <div className="tp-timeline-date-heading"><strong>{day.label}</strong><span>{day.events.length} events</span></div>
+          {day.events.map((event, index) => {
+            const when = eventDateParts(timestamp(event));
+            const kind = loginKind(event);
+            const active = inspectedEvent === event;
+            return <button type="button" key={`${event.id || event.event_id || timestamp(event)}-${index}`}
+              className={`tp-timeline-event-row ${active ? 'is-selected' : ''} ${fail(event) ? 'is-failure' : ''}`}
+              onClick={() => onSelect(event)} aria-pressed={active}>
+              <time>{when.time || 'Time unavailable'}</time>
+              <span className="tp-timeline-event-copy"><strong>{eventType(event)}</strong><small>{message(event) !== '—' ? message(event) : `${device(event)} · ${text(event.username)}`}</small></span>
+              <span className={`tp-timeline-event-severity ${severityClass(severity(event))}`}>{severity(event)}</span>
+            </button>;
+          })}
+        </section>)}
+      </div>
+      {loading && <div className="tp-empty">Loading events…</div>}
+      {!loading && !ordered.length && <div className="tp-empty">No matching events. Check the agent connection or clear the filters.</div>}
+      <p className="tp-timeline-forensic-note">Collected records are evidence. Patterns are investigative leads, not confirmed incidents.</p>
+    </section>
 
-                return {
-                  ...day,
-                  failed,
-                  successful,
-                  attempts: failed + successful
-                };
-              })
-          }))
-      }));
-  }, [rows]);
-
-  if (loading) return <div className="tp-empty">Loading events…</div>;
-
-  if (!rows.length) {
-    return <div className="tp-empty">No events to display. Check your agent connection or adjust the filters.</div>;
-  }
-
-  return <div className="tp-grouped-timeline">
-    {groups.map((deviceGroup, deviceIndex) => (
-      <details className="tp-timeline-device-group" key={deviceGroup.name} open={deviceIndex === 0}>
-        <summary className="tp-timeline-device-heading">
-          <span className="tp-timeline-group-name">{deviceGroup.name}</span>
-          <span className="tp-timeline-group-meta">
-            {deviceGroup.users.reduce((sum, user) =>
-              sum + user.dates.reduce((n, day) => n + day.events.length, 0), 0
-            )} events · {deviceGroup.users.length} {deviceGroup.users.length === 1 ? 'user' : 'users'}
-          </span>
-        </summary>
-
-        <div className="tp-timeline-device-content">
-          {deviceGroup.users.map((userGroup, userIndex) => (
-            <details className="tp-timeline-user-group" key={userGroup.name}
-              open={deviceIndex === 0 && userIndex === 0}>
-              <summary className="tp-timeline-user-heading">
-                <span>{userGroup.name}</span>
-                <span className="tp-timeline-group-meta">
-                  {userGroup.dates.reduce((sum, day) => sum + day.events.length, 0)} events ·
-                  {' '}{userGroup.dates.length} {userGroup.dates.length === 1 ? 'day' : 'days'}
-                </span>
-              </summary>
-
-              <div className="tp-timeline-user-content">
-                {userGroup.dates.map((day, dayIndex) => (
-                  <details className="tp-timeline-date-group" key={day.key}
-                    open={deviceIndex === 0 && userIndex === 0 && dayIndex === 0}>
-                    <summary className="tp-timeline-date-heading">
-                      <span className="tp-timeline-date-label">{day.label}</span>
-                      <span className="tp-timeline-date-counts">
-                        <span>{day.events.length} events</span>
-                        <span>{day.attempts} login {day.attempts === 1 ? 'attempt' : 'attempts'}</span>
-                        <span className="is-failed">{day.failed} failed</span>
-                        <span className="is-successful">{day.successful} successful</span>
-                      </span>
-                    </summary>
-
-                    <div className="tp-timeline-event-list">
-                      {day.events.map((event, index) => {
-                        const when = eventDateParts(timestamp(event));
-                        const level = severity(event);
-
-                        return <button
-                          type="button"
-                          className="tp-timeline-event-row"
-                          key={`${event.id || event.event_id || timestamp(event)}-${index}`}
-                          onClick={() => onSelect(event)}
-                        >
-                          <time className="tp-timeline-event-time"
-                            dateTime={timestamp(event) || undefined}>
-                            <span>{when.time || 'Time unavailable'}</span>
-                          </time>
-
-                          <span className="tp-timeline-event-description">
-                            <strong>{eventType(event)}</strong>
-                            {message(event) !== '—' &&
-                              <small title={message(event)}>{message(event)}</small>}
-                          </span>
-
-                          <Badge variant="outline"
-                            className={`tp-severity ${severityClass(level)}`}>
-                            {level}
-                          </Badge>
-
-                          <ChevronRight size={16} aria-hidden="true" />
-                        </button>;
-                      })}
-                    </div>
-                  </details>
-                ))}
-              </div>
-            </details>
-          ))}
+    <aside className="tp-timeline-inspector-panel tp-timeline-surface" aria-label="Selected event details">
+      <div className="tp-inspector-heading"><div><span className="tp-inspector-kicker">EVIDENCE INSPECTOR</span><h3>Event details</h3></div>
+        {inspectedEvent && <span className={`tp-inspector-severity ${severityClass(severity(inspectedEvent))}`}>{severity(inspectedEvent)}</span>}
+      </div>
+      {inspectedEvent ? <>
+        <div className="tp-inspector-primary"><span className="tp-inspector-label">EVENT MESSAGE</span><p>{message(inspectedEvent) !== '—' ? message(inspectedEvent) : 'No message recorded'}</p><time>{fullDate(timestamp(inspectedEvent))}</time></div>
+        <div className="tp-inspector-fields">
+          <div><span>Source device</span><strong>{device(inspectedEvent)}</strong></div>
+          <div><span>Username</span><strong>{text(inspectedEvent.username)}</strong></div>
+          <div><span>Event type</span><strong>{eventType(inspectedEvent)}</strong></div>
+          <div><span>Severity</span><strong>{severity(inspectedEvent)}</strong></div>
+          <div><span>Clock check</span><strong>{clockLabel(inspectedEvent)}</strong></div>
         </div>
-      </details>
-    ))}
+        <details className="tp-inspector-raw" open><summary>Raw evidence record</summary><pre>{JSON.stringify(inspectedEvent, null, 2)}</pre></details>
+      </> : <div className="tp-inspector-empty"><span>NO EVENT AVAILABLE</span><p>Select an event to inspect its source record.</p></div>}
+    </aside>
+
+    <aside className="tp-timeline-activity-summary tp-timeline-surface" aria-label="Activity summary">
+      <header className="tp-timeline-panel-title"><div><span className="tp-timeline-eyebrow">COLLECTION INTELLIGENCE</span><h2>Activity summary</h2></div></header>
+      <div className="tp-timeline-stat-primary"><span>Events in view</span><strong>{ordered.length.toLocaleString()}</strong><small>Current filtered results</small></div>
+      <div className="tp-timeline-stat-grid">
+        <div><span>Failed events</span><strong className="is-alert">{failed.toLocaleString()}</strong></div>
+        <div><span>Successful logins</span><strong>{successful.toLocaleString()}</strong></div>
+        <div><span>Source devices</span><strong>{deviceCount.toLocaleString()}</strong></div>
+        <div><span>Users observed</span><strong>{userCount.toLocaleString()}</strong></div>
+        <div><span>High / critical</span><strong className="is-alert">{critical.toLocaleString()}</strong></div>
+        <div><span>Dates represented</span><strong>{days.length.toLocaleString()}</strong></div>
+      </div>
+      <div className="tp-timeline-summary-foot"><span className={`tp-public-utility-dot ${loading ? '' : 'is-online'}`} />{loading ? 'Updating collected evidence' : 'Counts reflect loaded event records'}</div>
+      <p className="tp-timeline-forensic-note">Counts are calculated from the events currently loaded and filtered. They do not independently establish an incident.</p>
+    </aside>
   </div>;
 }
-
 
 function AnimatedCount({ value }) {
   const [shown, setShown] = useState(0);
@@ -726,28 +672,18 @@ export default function Dashboard({ user, onSignOut }) {
       <section className="tp-card tp-events-card tp-forensic-events"><EventTable rows={sorted.slice(0, 6)} loading={loading} onSelect={setSelected}/></section>
     </>}
     {/* TRACEPOINT_TIMELINE_WORKSPACE_V1 */}
-    {page === 'timeline' && <div className="tp-timeline-workspace">
-      <div className="tp-timeline-summary" aria-label="Timeline summary">
-        <div><span>EVENTS IN VIEW</span><strong><AnimatedCount value={filtered.length}/></strong><small>of {events.length.toLocaleString()} collected</small></div>
-        <div><span>FAILED LOGIN ATTEMPTS</span><strong><AnimatedCount value={filtered.filter(e => loginKind(e) === 'failed').length}/></strong><small>parser-classified failed logins</small></div>
-        <div><span>SOURCE DEVICES</span><strong><AnimatedCount value={new Set(filtered.map(device).filter(d => d !== '—')).size}/></strong><small>in the current results</small></div>
-        <div className="tp-timeline-summary-note"><ShieldAlert size={18}/><span>Events are investigative leads, not verified incidents. Select a row to inspect its raw evidence.</span></div>
+    {page === 'timeline' && <div className="tp-timeline-workspace tp-timeline-redesign-v2">
+      <div className="tp-timeline-toolbar">
+        <div className="tp-timeline-live-state" role="status"><span className={`tp-public-utility-dot ${apiStatus === 'online' ? 'is-online' : apiStatus === 'offline' ? 'is-offline' : ''}`} />{apiStatus === 'online' ? 'Live connection' : apiStatus === 'offline' ? 'Connection offline' : 'Checking connection'}</div>
+        <label className="tp-timeline-search"><Search size={18}/><input aria-label="Search events" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search events, devices, users or log content"/></label>
+        <label className="tp-timeline-select"><SlidersHorizontal size={17}/><select aria-label="Filter by severity" value={level} onChange={e => setLevel(e.target.value)}><option value="all">All severities</option>{levels.map(v => <option value={v} key={v}>{v}</option>)}</select></label>
+        {(search || level !== 'all') && <Button variant="ghost" className="tp-timeline-clear" onClick={() => { setSearch(''); setLevel('all'); }}>Clear filters</Button>}
+        <span className="tp-timeline-toolbar-count">{filtered.length.toLocaleString()} matching records</span>
       </div>
-      <TimelineActivityChart events={events}/>
-      <section className="tp-card tp-events-card tp-timeline-panel">
-        <div className="tp-timeline-panel-head">
-          <div><span className="tp-timeline-eyebrow">EVENT EXPLORER</span><h2>Collected event records</h2><p>Search the timeline and inspect individual source records.</p></div>
-          <span className="tp-timeline-result-count">{filtered.length} results</span>
-        </div>
-        <div className="tp-timeline-controls">
-          <label className="tp-timeline-search"><Search size={18}/><input aria-label="Search events" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search events, devices, users or log content"/></label>
-          <label className="tp-timeline-select"><SlidersHorizontal size={17}/><select aria-label="Filter by severity" value={level} onChange={e => setLevel(e.target.value)}><option value="all">All severities</option>{levels.map(v => <option value={v} key={v}>{v}</option>)}</select></label>
-          {(search || level !== 'all') && <Button variant="ghost" className="tp-timeline-clear" onClick={() => { setSearch(''); setLevel('all'); }}>Clear filters</Button>}
-        </div>
-        <div className="tp-timeline-table-caption"><span>Showing {filtered.length} matching events</span><span>Grouped by device, user and date · Select an event to inspect</span></div>
-        <GroupedTimeline rows={filtered} loading={loading} onSelect={setSelected}/>
-      </section>
+      <div className="tp-timeline-chart-compact"><TimelineActivityChart events={events}/></div>
+      <GroupedTimeline rows={filtered} loading={loading} onSelect={setSelected} selected={selected}/>
     </div>}
+
     {page === 'evidence' && (
       <LazyPage name="Evidence Library">
         <EvidenceLibrary refreshSignal={evidenceRefresh} />
@@ -872,6 +808,6 @@ export default function Dashboard({ user, onSignOut }) {
       </footer>
 
     </main>
-    {selected && <div className="tp-overlay tp-timeline-event-overlay" onMouseDown={() => setSelected(null)}><aside className="tp-drawer tp-timeline-event-modal" onMouseDown={e => e.stopPropagation()} role="dialog" aria-modal="true" aria-label="Event details"><div className="tp-drawer-header"><div><span>Event inspection</span><h2>{eventType(selected)}</h2><div className={`tp-severity ${severityClass(severity(selected))}`}>{severity(selected)}</div></div><button onClick={() => setSelected(null)} aria-label="Close event details"><X size={21}/></button></div><div className="tp-drawer-body"><h3>Event information</h3>{[['Timestamp', fullDate(timestamp(selected))], ['Source device', device(selected)], ['Username', selected.username], ['Event type', eventType(selected)], ['Severity', severity(selected)], ['Message', message(selected)], ['Clock check', clockLabel(selected)]].map(([label, value]) => <div className="tp-detail" key={label}><span>{label}</span><strong>{text(value)}</strong></div>)}<h3>Raw event data</h3><pre>{JSON.stringify(selected, null, 2)}</pre></div></aside></div>}
+    {selected && page !== 'timeline' && <div className="tp-overlay tp-timeline-event-overlay" onMouseDown={() => setSelected(null)}><aside className="tp-drawer tp-timeline-event-modal" onMouseDown={e => e.stopPropagation()} role="dialog" aria-modal="true" aria-label="Event details"><div className="tp-drawer-header"><div><span>Event inspection</span><h2>{eventType(selected)}</h2><div className={`tp-severity ${severityClass(severity(selected))}`}>{severity(selected)}</div></div><button onClick={() => setSelected(null)} aria-label="Close event details"><X size={21}/></button></div><div className="tp-drawer-body"><h3>Event information</h3>{[['Timestamp', fullDate(timestamp(selected))], ['Source device', device(selected)], ['Username', selected.username], ['Event type', eventType(selected)], ['Severity', severity(selected)], ['Message', message(selected)], ['Clock check', clockLabel(selected)]].map(([label, value]) => <div className="tp-detail" key={label}><span>{label}</span><strong>{text(value)}</strong></div>)}<h3>Raw event data</h3><pre>{JSON.stringify(selected, null, 2)}</pre></div></aside></div>}
   </div>;
 }
