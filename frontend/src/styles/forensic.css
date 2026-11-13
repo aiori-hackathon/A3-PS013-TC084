@@ -4023,3 +4023,153 @@ html .tp-app.tp-app[data-theme='forensic'] .tp-investigation-modal .tp-button.pr
 html .tp-app.tp-app[data-theme='forensic'] .tp-investigation-modal .tp-button.primary svg {
   color: var(--fx-on-signal) !important;
 }
+
+/* TRACEPOINT INVESTIGATION GRAPH TYPOGRAPHY REFINEMENT V1 */
+/* Typography only. No layout, spacing, colour, or behaviour changes. */
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-graph-root {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-graph-root .tp-graph-intro h2 {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.025em;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-graph-root .tp-graph-intro p,
+html .tp-app.tp-app[data-theme='forensic'] .tp-graph-root .tp-graph-panel-head p,
+html .tp-app.tp-app[data-theme='forensic'] .tp-graph-root .tp-graph-empty p,
+html .tp-app.tp-app[data-theme='forensic'] .tp-graph-root .tp-graph-gaps > p {
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.65;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-graph-root .tp-graph-stats strong {
+  font-size: 27px;
+  font-weight: 700;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.035em;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-graph-root .tp-graph-stats span {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-graph-root .tp-graph-panel-head h3,
+html .tp-app.tp-app[data-theme='forensic'] .tp-graph-root .tp-graph-gaps h3 {
+  font-size: 16px;
+  font-weight: 650;
+  line-height: 1.4;
+  letter-spacing: -0.015em;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-graph-root .tp-graph-legend,
+html .tp-app.tp-app[data-theme='forensic'] .tp-graph-root .tp-graph-edge span {
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-graph-root .tp-graph-node span {
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0.025em;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-graph-root .tp-graph-node strong {
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-graph-root .tp-graph-node small {
+  font-size: 11px;
+  font-weight: 450;
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-graph-root .tp-graph-reason,
+html .tp-app.tp-app[data-theme='forensic'] .tp-graph-root .tp-graph-gaps button span,
+html .tp-app.tp-app[data-theme='forensic'] .tp-graph-root .tp-graph-gaps button small {
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-graph-root .tp-graph-gaps button span {
+  font-weight: 600;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-graph-root .tp-graph-gaps button small {
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-graph-root .tp-graph-empty strong {
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 1.5;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-graph-root .tp-graph-caution {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.6;
+}
+
+/* The event details drawer is portalled outside the graph root. */
+html .tp-overlay.tp-overlay.tp-graph-modal-overlay[data-theme='forensic'] {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+html .tp-overlay.tp-overlay.tp-graph-modal-overlay .tp-drawer-header > div > span {
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0.045em;
+}
+
+html .tp-overlay.tp-overlay.tp-graph-modal-overlay .tp-drawer-header h2 {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: -0.02em;
+}
+
+html .tp-overlay.tp-overlay.tp-graph-modal-overlay .tp-drawer-body h3 {
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 1.45;
+}
+
+html .tp-overlay.tp-overlay.tp-graph-modal-overlay .tp-drawer-body .tp-detail span {
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+html .tp-overlay.tp-overlay.tp-graph-modal-overlay .tp-drawer-body .tp-detail strong {
+  font-size: 12px;
+  font-weight: 550;
+  line-height: 1.55;
+  font-variant-numeric: tabular-nums;
+}
+
+html .tp-overlay.tp-overlay.tp-graph-modal-overlay .tp-drawer-body pre {
+  font-size: 12px;
+  line-height: 1.65;
+  font-variant-numeric: tabular-nums;
+}
+
+/* END TRACEPOINT INVESTIGATION GRAPH TYPOGRAPHY REFINEMENT V1 */

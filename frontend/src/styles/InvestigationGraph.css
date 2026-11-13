@@ -420,3 +420,135 @@
 .tp-app[data-theme="dark"] .tp-graph-phase5 .tp-graph-stats > .tp-card:nth-child(1) { border-top-color: #4a7ba8 !important; }
 .tp-app[data-theme="dark"] .tp-graph-legend i { border-top-color: #8fb0cc !important; }
 .tp-app[data-theme="dark"] .tp-graph-edge.tentative { color: #9fc2e4 !important; }
+
+
+/* TRACEPOINT_GRAPH_TYPOGRAPHY_FINAL_V2
+   Investigation Graph only — typography and text readability.
+   Does not change layout, spacing, graph structure, or other pages.
+*/
+
+.tp-app[data-theme="forensic"] .tp-graph-root.tp-graph-phase5 {
+  font-family: var(--fx-sans, 'Inter', system-ui, -apple-system, sans-serif) !important;
+  color: #273044 !important;
+}
+
+.tp-app[data-theme="forensic"] .tp-graph-root.tp-graph-phase5 *:not(svg):not(path):not(pre):not(code) {
+  font-family: var(--fx-sans, 'Inter', system-ui, -apple-system, sans-serif) !important;
+}
+
+.tp-app[data-theme="forensic"] .tp-graph-root.tp-graph-phase5 .tp-graph-phase5-hero h2 {
+  font-size: 24px !important;
+  font-weight: 750 !important;
+  line-height: 1.3 !important;
+  letter-spacing: -0.5px !important;
+  color: #ffffff !important;
+}
+
+.tp-app[data-theme="forensic"] .tp-graph-root.tp-graph-phase5 .tp-graph-phase5-hero p {
+  font-size: 14px !important;
+  font-weight: 450 !important;
+  line-height: 1.65 !important;
+  color: #d1d5e0 !important;
+}
+
+.tp-app[data-theme="forensic"] .tp-graph-root.tp-graph-phase5 .tp-graph-stats strong {
+  font-size: 32px !important;
+  font-weight: 750 !important;
+  line-height: 1.2 !important;
+  letter-spacing: -0.6px !important;
+  color: #273044 !important;
+}
+
+.tp-app[data-theme="forensic"] .tp-graph-root.tp-graph-phase5 .tp-graph-stats span {
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  line-height: 1.5 !important;
+  color: #59677d !important;
+}
+
+.tp-app[data-theme="forensic"] .tp-graph-root.tp-graph-phase5 .tp-graph-panel-head h3,
+.tp-app[data-theme="forensic"] .tp-graph-root.tp-graph-phase5 .tp-graph-gaps h3 {
+  font-size: 19px !important;
+  font-weight: 700 !important;
+  line-height: 1.4 !important;
+  letter-spacing: -0.25px !important;
+  color: #283148 !important;
+}
+
+.tp-app[data-theme="forensic"] .tp-graph-root.tp-graph-phase5 .tp-graph-panel-head p,
+.tp-app[data-theme="forensic"] .tp-graph-root.tp-graph-phase5 .tp-graph-gaps > p {
+  font-size: 14px !important;
+  font-weight: 450 !important;
+  line-height: 1.65 !important;
+  color: #657187 !important;
+}
+
+.tp-app[data-theme="forensic"] .tp-graph-root.tp-graph-phase5 .tp-graph-legend {
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  line-height: 1.5 !important;
+  color: #59677d !important;
+}
+
+.tp-app[data-theme="forensic"] .tp-graph-root.tp-graph-phase5 .tp-graph-node span {
+  font-size: 12px !important;
+  font-weight: 650 !important;
+  line-height: 1.5 !important;
+}
+
+.tp-app[data-theme="forensic"] .tp-graph-root.tp-graph-phase5 .tp-graph-node strong {
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  line-height: 1.4 !important;
+  color: #273044 !important;
+}
+
+.tp-app[data-theme="forensic"] .tp-graph-root.tp-graph-phase5 .tp-graph-node small {
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  line-height: 1.6 !important;
+  color: #647187 !important;
+}
+
+.tp-app[data-theme="forensic"] .tp-graph-root.tp-graph-phase5 .tp-graph-edge {
+  font-size: 11px !important;
+  font-weight: 650 !important;
+}
+
+.tp-app[data-theme="forensic"] .tp-graph-root.tp-graph-phase5 .tp-graph-reason {
+  font-size: 13px !important;
+  font-weight: 450 !important;
+  line-height: 1.65 !important;
+  color: #58667c !important;
+}
+
+.tp-app[data-theme="forensic"] .tp-graph-root.tp-graph-phase5 .tp-graph-gaps > button span {
+  font-size: 13px !important;
+  font-weight: 650 !important;
+  line-height: 1.5 !important;
+  color: #303b50 !important;
+}
+
+.tp-app[data-theme="forensic"] .tp-graph-root.tp-graph-phase5 .tp-graph-gaps > button small {
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  line-height: 1.5 !important;
+}
+
+.tp-app[data-theme="forensic"] .tp-graph-root.tp-graph-phase5 .tp-graph-empty strong {
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  line-height: 1.5 !important;
+  color: #303b50 !important;
+}
+
+.tp-app[data-theme="forensic"] .tp-graph-root.tp-graph-phase5 .tp-graph-empty p,
+.tp-app[data-theme="forensic"] .tp-graph-root.tp-graph-phase5 .tp-graph-no-gaps,
+.tp-app[data-theme="forensic"] .tp-graph-root.tp-graph-phase5 .tp-graph-caution {
+  font-size: 13px !important;
+  font-weight: 450 !important;
+  line-height: 1.65 !important;
+  color: #657187 !important;
+}
+
+/* END TRACEPOINT_GRAPH_TYPOGRAPHY_FINAL_V2 */

@@ -1,3 +1,4 @@
+import { useEvidenceTrustScores } from './useEvidenceTrustScores';
 // TRACEPOINT_EVIDENCE_PHASE4
 
 import { useEffect, useState } from "react";
@@ -15,7 +16,7 @@ import {
 import "./styles/Tracepoint.css";
 import "./styles/Custody.css";
 // TRACEPOINT_TRUST_SCORE_V1
-import { useEvidenceTrustScores, TrustScoreBadge, TrustScoreDetails } from "./EvidenceTrustScore";
+import { TrustScoreBadge, TrustScoreDetails } from "./EvidenceTrustScore";
 
 const formatDate = (value) => {
   if (!value) return "—";
@@ -343,8 +344,10 @@ export default function EvidenceLibrary({ refreshSignal = 0 }) {
             <p className="tp-custody-detail">{custody.chain?.detail}</p>
             <ol className="tp-custody-list">
               {custody.items.map((entry) => {
-                let detail = {};
-                try { detail = JSON.parse(entry.detail || "{}"); } catch { detail = {}; }
+                const detail = (() => {
+                  try { return JSON.parse(entry.detail || "{}") || {}; }
+                  catch { return {}; }
+                })();
                 const target = entry.batch_id
                   ? `${entry.device_id || "unknown device"} · ${entry.batch_id.slice(0, 8)}…`
                   : entry.case_id ? `case TP-${String(entry.case_id).padStart(4, "0")}` : "—";

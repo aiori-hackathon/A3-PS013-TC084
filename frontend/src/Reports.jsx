@@ -39,7 +39,26 @@ export default function Reports({ onExportCsv }) {
   }
 
   useEffect(() => {
-    loadReports();
+    let active = true;
+
+    fetch(API, { credentials: 'same-origin' })
+      .then(response => {
+        if (!response.ok) throw new Error(`Request failed (${response.status})`);
+        return response.json();
+      })
+      .then(data => {
+        if (active) setCases(data.items || []);
+      })
+      .catch(err => {
+        if (active) setError(err.message);
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
   }, []);
 
   const filtered = useMemo(() => {

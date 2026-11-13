@@ -1,4 +1,5 @@
 import './styles/InvestigationScan.css';
+import { SCAN_STAGES, STAGES_WORKING } from './InvestigationScanConfig';
 
 /* The four stages are not decoration. They name operations that
    ask_about_investigation in backend/app/assistant.py genuinely performs, in
@@ -14,32 +15,6 @@ import './styles/InvestigationScan.css';
    one by one. That is why nothing here reports a stage as complete while the
    request is still in flight: a stage reads "working" until the response comes
    back, and only then resolves to what the response actually confirms. */
-export const SCAN_STAGES = [
-  { id: 'collect', slot: 'tl', label: 'Collecting related events' },
-  { id: 'correlate', slot: 'tr', label: 'Correlating timestamps' },
-  { id: 'integrity', slot: 'bl', label: 'Checking evidence integrity' },
-  { id: 'timeline', slot: 'br', label: 'Building incident timeline' },
-];
-
-/* Opening a case is a different piece of work, so it gets its own stages
-   rather than borrowing the assistant's. These four are what
-   create_investigation in backend/app/investigations.py actually does, in the
-   order it does them:
-
-     current_user_id(request)   resolves the session to an account
-     CreateInvestigation(...)   validates title, description and severity
-     INSERT INTO investigations writes the case row
-     get_owned_case(...)        reads it back, scoped to the owner
-
-   It is a short operation - a single insert - so this is on screen briefly.
-   It is not padded to look like more work than it is. */
-export const CREATE_STAGES = [
-  { id: 'auth', slot: 'tl', label: 'Authenticating analyst' },
-  { id: 'validate', slot: 'tr', label: 'Validating case details' },
-  { id: 'record', slot: 'bl', label: 'Opening case record' },
-  { id: 'confirm', slot: 'br', label: 'Confirming ownership' },
-];
-
 const NOTE = {
   working: 'working',
   done: 'confirmed',
@@ -51,24 +26,6 @@ const NOTE = {
    only when linked references resolved against stored evidence, so an empty
    sources array means the first three stages found nothing to work on - it
    does not mean they succeeded quietly. */
-export function stagesFromResult(result) {
-  const resolved = (result?.sources || []).length > 0;
-  const answered = Boolean(result?.answer);
-  const found = resolved ? 'done' : 'empty';
-  return {
-    collect: found,
-    correlate: found,
-    integrity: found,
-    timeline: answered ? 'done' : 'failed',
-  };
-}
-
-export const STAGES_WORKING = Object.fromEntries(SCAN_STAGES.map(s => [s.id, 'working']));
-export const STAGES_FAILED = Object.fromEntries(SCAN_STAGES.map(s => [s.id, 'failed']));
-export const CREATE_WORKING = Object.fromEntries(CREATE_STAGES.map(s => [s.id, 'working']));
-export const CREATE_FAILED = Object.fromEntries(CREATE_STAGES.map(s => [s.id, 'failed']));
-export const CREATE_DONE = Object.fromEntries(CREATE_STAGES.map(s => [s.id, 'done']));
-
 export default function InvestigationScan({ states = STAGES_WORKING, stages = SCAN_STAGES }) {
   const settled = stages.every(s => states[s.id] && states[s.id] !== 'working');
 

@@ -59,13 +59,16 @@ function csvCell(value) {
 export default function IncidentTriageBenchmark({ openPage }) {
   const [view, setView] = useState(readSavedState);
   const viewRef = useRef(view);
-  viewRef.current = view;
+
+  useEffect(() => {
+    viewRef.current = view;
+  }, [view]);
   const [scenarios, setScenarios] = useState([]);
   const [loadingScenarios, setLoadingScenarios] = useState(true);
   const [scenarioError, setScenarioError] = useState('');
   const [busy, setBusy] = useState(false);
   const [actionMessage, setActionMessage] = useState('');
-  const [now, setNow] = useState(Date.now());
+  const [now, setNow] = useState(0);
 
   const saveView = useCallback(nextOrUpdater => {
     const next = typeof nextOrUpdater === 'function' ? nextOrUpdater(viewRef.current) : nextOrUpdater;
@@ -95,15 +98,16 @@ export default function IncidentTriageBenchmark({ openPage }) {
     return () => controller.abort();
   }, [saveView]);
 
+  const activeRun = view.activeRun;
+
   useEffect(() => {
-    if (!view.activeRun) return undefined;
+    if (!activeRun) return undefined;
     const timer = window.setInterval(() => setNow(Date.now()), 100);
     return () => window.clearInterval(timer);
-  }, [Boolean(view.activeRun)]);
+  }, [activeRun]);
 
   const scenario = useMemo(() => scenarios.find(s => s.id === view.scenarioId) || null, [scenarios, view.scenarioId]);
   const prepared = Boolean(scenario && view.preparedScenarioId === scenario.id);
-  const activeRun = view.activeRun;
   const activeScenario = scenarios.find(s => s.id === activeRun?.scenarioId) || scenario;
   const elapsedNow = activeRun ? Math.max(0, now - activeRun.startedAt) : 0;
   const allTasksChecked = TASKS.every(task => Boolean(activeRun?.checks?.[task.id]));
