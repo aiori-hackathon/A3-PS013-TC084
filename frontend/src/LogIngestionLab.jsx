@@ -33,9 +33,13 @@ export default function LogIngestionLab({ onIngested, onViewTimeline }) {
     finally { setLoading(false); }
   }
   return <div className="lab-root lab-phase7">
-    <div className="lab-banner"><FileCode2 size={20}/><div><strong>Log Ingestion Lab</strong><p>Submit labeled sample logs through the real ingestion pipeline. Demo data is stored separately from existing device evidence.</p></div></div>
+    {/* The page header above already reads "Log Ingestion Lab", so this
+        banner no longer repeats it. What it says that the header does not -
+        that demo data is kept apart from real device evidence - is the part
+        worth keeping, so the banner is now just that notice. */}
+    <div className="lab-banner"><FileCode2 size={20}/><div><p>Submit labeled sample logs through the real ingestion pipeline. <strong>Demo data is stored separately from existing device evidence.</strong></p></div></div>
     <div className="lab-grid">
-      <section className="tp-card lab-card"><h2>1. Raw log source</h2><p>Choose a sample scenario to inspect before ingestion.</p>
+      <section className="tp-card lab-card"><h2><span className="lab-step" aria-hidden="true">1</span>Raw log source</h2><p>Choose a sample scenario to inspect before ingestion.</p>
         <label className="lab-label" htmlFor="lab-scenario">Security scenario</label>
         <select id="lab-scenario" value={selected} onChange={e => { setSelected(e.target.value); setResult(null); }} disabled={loading}>
           {scenarios.map(s => <option value={s.id} key={s.id}>{s.label}</option>)}
@@ -49,7 +53,7 @@ export default function LogIngestionLab({ onIngested, onViewTimeline }) {
         </button>
         {error && <p className="lab-error" role="alert">{error}</p>}
       </section>
-      <section className="tp-card lab-card"><h2>2. Processing & evidence</h2><p>See what FastAPI actually stores and parses.</p>
+      <section className="tp-card lab-card"><h2><span className="lab-step" aria-hidden="true">2</span>Processing &amp; evidence</h2><p>See what FastAPI actually stores and parses.</p>
         {!result ? <div className="lab-placeholder"><Database size={32}/><strong>No demo batch submitted yet</strong><span>Select a scenario and click “Ingest sample logs”.</span></div> : <>
           <div className="lab-success"><CheckCircle2 size={19}/> Batch {result.status}</div>
           <div className="lab-kv"><span>Device</span><strong>{result.device_id}</strong></div>
@@ -63,7 +67,7 @@ export default function LogIngestionLab({ onIngested, onViewTimeline }) {
             const missing = Array.isArray(e.missing_fields) ? e.missing_fields : [];
             const partial = e.parse_status === 'partial' || warnings.length > 0 || missing.length > 0;
             return <div key={i} className="lab-event">
-              <div className="lab-event-title"><strong>{e.event_type || 'Event'}</strong><span className={partial ? 'lab-parse-badge lab-parse-partial' : 'lab-parse-badge lab-parse-complete'}>{partial ? 'Partial parse' : 'Complete'}</span></div>
+              <div className="lab-event-title"><strong>{(e.event_type || 'Event').replaceAll('_', ' ')}</strong><span className={partial ? 'lab-parse-badge lab-parse-partial' : 'lab-parse-badge lab-parse-complete'}>{partial ? 'Partial parse' : 'Complete'}</span></div>
               <span>{e.severity || 'unknown'} · {e.username || 'Unknown user'}</span>
               {partial && <div className="lab-parse-detail" role="status">
                 {warnings.map((warning, j) => <div key={j}>⚠ {warning}</div>)}

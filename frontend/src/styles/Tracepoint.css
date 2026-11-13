@@ -862,7 +862,7 @@
 
 
 /* TRACEPOINT_TIMELINE_WORKSPACE_V1 — timeline-only, Overview untouched */
-.tp-timeline-workspace { display: grid; gap: 22px; font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif; }
+.tp-timeline-workspace { display: grid; gap: 12px; font-family: inherit; }
 .tp-timeline-summary { display: grid; grid-template-columns: 1fr 1.1fr 1fr 1.55fr; border: 1px solid #e0e3eb; border-radius: 10px; background: #fff; overflow: hidden; }
 .tp-timeline-summary > div { display: flex; flex-direction: column; justify-content: center; gap: 7px; min-height: 115px; padding: 18px 23px; border-right: 1px solid #e8eaf0; }
 .tp-timeline-summary > div:last-child { border-right: 0; }

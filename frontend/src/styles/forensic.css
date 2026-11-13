@@ -105,18 +105,28 @@ html .tp-app.tp-app[data-theme='forensic'] {
   --fx-row-h:         34px;   /* table row: dense enough to fit a shift's work */
 
   /* --- type -------------------------------------------------------------- */
-  /* Archivo for the interface, JetBrains Mono for anything a machine wrote.
+  /* Inter for the interface, IBM Plex Mono for anything a machine wrote.
+     Archivo carried this before and read as cramped: it is a slightly
+     narrowed grotesque, and at 11-13px with tracking on every label the
+     interface looked squeezed. Inter was drawn for user interfaces at small
+     sizes - wider counters, more open apertures - which is the same problem
+     Amazon Ember was drawn for. Ember itself is Amazon's own licensed brand
+     face and cannot be shipped here.
      IBM Plex Sans Condensed used to carry every label here, and the condensed
      width was the single biggest reason the app read as cramped: at 11px a
      narrowed uppercase label is hard work, and uppercase-condensed-tracked
      labels on every panel is the house style of a template. There is no
      condensed cut now - --fx-cond resolves to the same family, so the label
-     rules that reference it simply get normal widths. JetBrains Mono was
-     drawn for reading code at small sizes and separates 0/O and 1/l/I even
-     more clearly than Plex Mono did, which is what a log line needs. */
-  --fx-sans:          'Archivo', system-ui, sans-serif;
-  --fx-cond:          'Archivo', system-ui, sans-serif;
-  --fx-mono:          'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+     rules that reference it simply get normal widths.
+
+     The mono is IBM Plex Mono, and it belongs only where a machine wrote the
+     text: raw log lines, timestamps and stored records, where telling 0 from
+     O and 1 from l actually matters. It used to carry every label, count and
+     sentence in the product, which made the whole interface read as code and
+     was the main reason it looked letter-spaced. */
+  --fx-sans:          'Inter', system-ui, -apple-system, sans-serif;
+  --fx-cond:          'Inter', system-ui, -apple-system, sans-serif;
+  --fx-mono:          'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
 
   /* The scale was built around 11-13px. Everything steps up roughly one
      point, and the small uppercase labels lose some of their tracking, since
@@ -1689,10 +1699,10 @@ html .tp-app.tp-app[data-theme='forensic'][data-theme] [class*='page-header'] {
    ---------------------------------------------------------------------------
    The rule is that mono marks something a machine produced. It had spread to
    prose: chart descriptions, footer copy, empty states and captions were all
-   being set in JetBrains Mono, which is what made those areas read as cramped
+   being set in the mono face, which is what made those areas read as cramped
    and mechanical. Mono is pulled back to actual data - hashes, device ids,
    usernames, timestamps, log lines - and everything written for a person to
-   read goes back to Archivo.
+   read goes back to the interface face.
    =========================================================================== */
 html .tp-app.tp-app[data-theme='forensic'] :is(
   .tp-chart-head p, .tp-chart-empty, .tp-chart-legend,
@@ -2002,7 +2012,7 @@ html .tp-app.tp-app[data-theme='forensic'] .tp-page-header:not(:has(h1)):not(:ha
    The ranked charts set their row labels in mono because the values are
    device names and usernames. In a column of short words at 13px it read as
    heavy and mechanical, and the labels are not the data - the counts are. The
-   label goes back to Archivo and the number stays mono.
+   label goes back to the interface face and the number stays mono.
    =========================================================================== */
 html .tp-app.tp-app[data-theme='forensic'] .tp-chart-ranked-label {
   font-family: var(--fx-sans) !important;
@@ -2745,7 +2755,7 @@ html .tp-overlay.tp-overlay.tp-graph-modal-overlay[data-theme='forensic'] .tp-dr
   color: var(--fx-text, #e7eef7) !important;
   border-left: 1px solid var(--fx-line-strong, #2b3744) !important;
   box-shadow: -12px 0 40px rgba(0, 0, 0, 0.5) !important;
-  font-family: var(--fx-sans, 'Archivo', system-ui, sans-serif) !important;
+  font-family: var(--fx-sans, 'Inter', system-ui, sans-serif) !important;
 }
 
 html .tp-overlay.tp-overlay.tp-graph-modal-overlay[data-theme='forensic'] .tp-drawer-header {
@@ -2845,8 +2855,8 @@ html .tp-overlay.tp-overlay.tp-graph-modal-overlay[data-theme='forensic'] {
   --fx-text-dim: #93a4b8;
   --fx-signal: #c3f04a;
   --fx-r-sm: 2px;
-  --fx-sans: 'Archivo', system-ui, sans-serif;
-  --fx-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+  --fx-sans: 'Inter', system-ui, sans-serif;
+  --fx-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
 }
 
 /* TRACEPOINT_TIMELINE_FORENSIC_CHART_V1 */
@@ -2899,3 +2909,1117 @@ html .tp-app.tp-app[data-theme='forensic'] .tp-chart-legend-failures {
   background: var(--fx-critical) !important;
 }
 
+
+/* ===========================================================================
+   THE TIMELINE PAGE — GIVING THE SPACE BACK TO THE EVENTS
+   ---------------------------------------------------------------------------
+   On a 900px-tall window the first record used to sit below the fold: a page
+   header, three large summary cards, a chart panel, and an explorer heading
+   that repeated the page header word for word all came first. The heading
+   block is gone from the markup; the rest is compressed here, and only on
+   this page, so the other pages keep their normal proportions.
+   =========================================================================== */
+html .tp-app.tp-app[data-theme='forensic'][data-page='timeline'] .tp-page-header {
+  padding-block: 16px 14px !important;
+}
+html .tp-app.tp-app[data-theme='forensic'][data-page='timeline'] .tp-page-header h1 {
+  font-size: 27px !important;
+}
+
+/* The three summary figures: still the first thing read, at about half the
+   height they were. */
+/* Compressing the top went too far here: at 12px of padding the three
+   figures sat on top of their own labels. They are the first thing read on
+   the page and can afford to breathe. */
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-summary > div {
+  padding: 18px 22px !important;
+  display: grid !important;
+  align-content: center !important;
+  gap: 6px !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-summary > div > span {
+  font-family: var(--fx-sans) !important;
+  font-size: 14px !important;
+  letter-spacing: normal !important;
+  text-transform: none !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-summary > div > strong {
+  font-size: 32px !important;
+  line-height: 1.15 !important;
+  letter-spacing: -0.02em !important;
+  font-variant-numeric: tabular-nums;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-summary > div > small,
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-summary-note {
+  font-family: var(--fx-sans) !important;
+  font-size: 13.5px !important;
+  line-height: 1.5 !important;
+  letter-spacing: normal !important;
+}
+
+/* The toolbar: one row, controls at a normal control height rather than the
+   43px the light theme gave them. */
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-toolbar {
+  margin-bottom: 10px;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-controls {
+  padding: 14px 16px !important;
+  gap: 12px !important;
+}
+/* 38px was a cramped control. 44 is a comfortable target and still well
+   short of the 43px-plus-large-type the light theme shipped. */
+html .tp-app.tp-app[data-theme='forensic'] :is(.tp-timeline-search, .tp-timeline-select) {
+  height: 44px !important;
+  border-radius: var(--fx-r-md) !important;
+  padding: 0 14px !important;
+  gap: 11px !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-search {
+  flex: 1 1 340px;
+  max-width: none !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-search input,
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-select select {
+  font-family: var(--fx-sans) !important;
+  font-size: 15px !important;
+  font-weight: 400 !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-result-count {
+  margin-left: auto;
+  font-family: var(--fx-sans) !important;
+  font-size: 13.5px !important;
+  letter-spacing: normal !important;
+  text-transform: none !important;
+  color: var(--fx-text-dim) !important;
+  border: 0 !important;
+  background: transparent !important;
+  padding: 0 !important;
+}
+
+/* The caption line above the panels. */
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-table-caption {
+  font-family: var(--fx-sans) !important;
+  font-size: 12.5px !important;
+  letter-spacing: normal !important;
+  text-transform: none !important;
+  padding: 0 2px 10px !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+/* The event detail window.
+   Rows in the activity stream open this rather than filling a panel that
+   sat empty until something was clicked. The page behind it is blurred and
+   dimmed so the record being read is the only thing in focus. */
+html .tp-app.tp-app[data-theme='forensic'] .tp-overlay.tp-timeline-event-overlay {
+  background: rgba(3, 5, 9, 0.62) !important;
+  backdrop-filter: blur(7px) saturate(0.8);
+  -webkit-backdrop-filter: blur(7px) saturate(0.8);
+}
+
+/* Inside the detail window, the interface face carries the headings and the
+   field labels; the mono is kept for the values and the stored record, which
+   are the machine's own text. The whole window was mono before, which is the
+   look that reads as cramped - and this is the panel a record is actually
+   read in. */
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-event-overlay :is(
+  .tp-drawer-header h2,
+  .tp-drawer-header > div > span,
+  .tp-drawer-body h3,
+  .tp-detail > span,
+  .tp-severity
+) {
+  font-family: var(--fx-sans) !important;
+  letter-spacing: normal !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-event-overlay .tp-drawer-header h2 {
+  font-size: 22px !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.015em !important;
+  text-transform: none !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-event-overlay .tp-drawer-header > div > span {
+  font-size: 12.5px !important;
+  text-transform: none !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-event-overlay .tp-drawer-body h3 {
+  font-size: 15px !important;
+  font-weight: 600 !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-event-overlay .tp-detail > span {
+  font-size: 12.5px !important;
+  text-transform: none !important;
+}
+/* The values stay monospaced: a device id, a batch id and a timestamp are
+   read character by character and compared against a log. */
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-event-overlay .tp-detail > strong {
+  font-family: var(--fx-mono) !important;
+  font-size: 13px !important;
+}
+
+/* The severity tag in the activity stream. TimelineWorkspace.css colours it
+   per level, but the generic card text rule in this file outranks it, so
+   without this every tag painted the same near-white regardless of level. */
+html .tp-app.tp-app[data-theme='forensic'] .tp-tl-tag.sev-critical,
+html .tp-app.tp-app[data-theme='forensic'] .tp-tl-tag.sev-error { color: var(--fx-critical) !important; }
+html .tp-app.tp-app[data-theme='forensic'] .tp-tl-tag.sev-high { color: var(--fx-high) !important; }
+html .tp-app.tp-app[data-theme='forensic'] .tp-tl-tag.sev-medium,
+html .tp-app.tp-app[data-theme='forensic'] .tp-tl-tag.sev-warning { color: var(--fx-medium) !important; }
+html .tp-app.tp-app[data-theme='forensic'] .tp-tl-tag.sev-low,
+html .tp-app.tp-app[data-theme='forensic'] .tp-tl-tag.sev-info { color: var(--fx-low) !important; }
+html .tp-app.tp-app[data-theme='forensic'] .tp-tl-tag.is-fail { color: var(--fx-critical) !important; }
+
+/* The failure figure is the one summary number that reports a signal rather
+   than a size, so it is the one that carries a severity colour. */
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-summary > div.is-signal > strong {
+  color: var(--fx-critical) !important;
+}
+
+/* The page header on the timeline: the title and one line, nothing taller. */
+html .tp-app.tp-app[data-theme='forensic'][data-page='timeline'] .tp-page-header {
+  padding-block: 14px 12px !important;
+  margin-bottom: 10px !important;
+}
+html .tp-app.tp-app[data-theme='forensic'][data-page='timeline'] .tp-page-header h1 {
+  font-size: 25px !important;
+  letter-spacing: -0.02em !important;
+}
+html .tp-app.tp-app[data-theme='forensic'][data-page='timeline'] .tp-page-header p {
+  font-size: 13px !important;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-tl-daystats strong.is-ok { color: var(--fx-verified) !important; }
+html .tp-app.tp-app[data-theme='forensic'] .tp-tl-daystats strong.is-fail { color: var(--fx-critical) !important; }
+
+/* ===========================================================================
+   THE TIMELINE TOOLBAR
+   ---------------------------------------------------------------------------
+   This was a bordered card holding two more bordered boxes - a box inside a
+   box, with the outer one adding nothing but a second frame and more padding.
+   The card is gone: the search field and the severity control sit directly on
+   the page, which is what they are.
+   =========================================================================== */
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-toolbar {
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  overflow: visible !important;
+  margin-bottom: 12px !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-toolbar .tp-timeline-controls {
+  padding: 0 !important;
+  gap: 10px !important;
+  align-items: center !important;
+}
+
+/* The field stops growing once it is long enough to read a query in. It used
+   to stretch the full width of the page as one enormous empty box. */
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-search {
+  flex: 1 1 380px !important;
+  max-width: 560px !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-search svg {
+  color: var(--fx-text-dim) !important;
+  flex: 0 0 auto;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-search input::placeholder {
+  color: var(--fx-text-mute) !important;
+}
+
+/* The severity control: the browser's own arrow removed and replaced, so it
+   matches the rest of the interface instead of the operating system. */
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-select {
+  position: relative;
+  flex: 0 0 auto !important;
+  padding-right: 32px !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-select select {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  background: transparent !important;
+  border: 0 !important;
+  outline: none !important;
+  color: var(--fx-text) !important;
+  padding: 0 !important;
+  max-width: none !important;
+  cursor: pointer;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-select::after {
+  content: '';
+  position: absolute;
+  right: 13px;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  margin-top: -5px;
+  border-right: 1.5px solid var(--fx-text-dim);
+  border-bottom: 1.5px solid var(--fx-text-dim);
+  transform: rotate(45deg);
+  pointer-events: none;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-select svg {
+  color: var(--fx-text-dim) !important;
+  flex: 0 0 auto;
+}
+
+/* Both controls read as one family: same height, same hairline, and a signal
+   ring on the one you are typing in. */
+html .tp-app.tp-app[data-theme='forensic'] :is(.tp-timeline-search, .tp-timeline-select) {
+  background: var(--fx-surface) !important;
+  border: 1px solid var(--fx-line-strong) !important;
+  transition: border-color 130ms ease, box-shadow 130ms ease;
+}
+html .tp-app.tp-app[data-theme='forensic'] :is(.tp-timeline-search, .tp-timeline-select):hover {
+  border-color: var(--fx-line-focus) !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] :is(.tp-timeline-search, .tp-timeline-select):focus-within {
+  border-color: var(--fx-signal) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--fx-signal) 18%, transparent) !important;
+}
+
+/* The input itself carries no frame. The field around it is the control;
+   leaving the input's own border on drew a second rectangle inside the
+   first, which is the same box-in-a-box the card was removed for. */
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-search input {
+  flex: 1 1 auto;
+  min-width: 0;
+  background: transparent !important;
+  border: 0 !important;
+  outline: none !important;
+  box-shadow: none !important;
+  color: var(--fx-text) !important;
+  padding: 0 !important;
+  height: 100%;
+}
+/* The count is a quiet note at the end of the row, not a third control. */
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-result-count {
+  font-weight: 400 !important;
+  white-space: nowrap;
+}
+
+/* The Lab notice: one line, no second page title. */
+html .tp-app.tp-app[data-theme='forensic'] .lab-banner {
+  align-items: center !important;
+  padding: 14px 18px !important;
+  gap: 14px !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .lab-banner p {
+  margin: 0 !important;
+  font-size: 13.5px !important;
+  line-height: 1.55 !important;
+  color: var(--fx-text-dim) !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .lab-banner p strong {
+  color: var(--fx-text) !important;
+  font-weight: 600 !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .lab-banner svg {
+  color: var(--fx-signal) !important;
+  flex: 0 0 auto;
+}
+
+/* The search placeholder measured 3.83:1 on the field. Same value the
+   sign-in screen uses, which clears 4.5:1. */
+html .tp-app.tp-app[data-theme='forensic'] .tp-timeline-search input::placeholder {
+  color: #76899c !important;
+}
+
+/* LogIngestionLab.css styles `.lab-banner strong` as the banner's title at
+   25px/720. The banner no longer has a title, so that rule was landing on the
+   emphasised half of the sentence and setting it twice the size of the words
+   either side of it. It is a sentence now, so it reads as one. */
+html .tp-app.tp-app[data-theme='forensic'] .lab-banner {
+  min-height: 0 !important;
+  border-radius: var(--fx-r-md) !important;
+  background: var(--fx-raised) !important;
+  border: 1px solid var(--fx-line) !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .lab-banner p strong {
+  font-size: inherit !important;
+  font-weight: 600 !important;
+  letter-spacing: inherit !important;
+  line-height: inherit !important;
+  color: var(--fx-text) !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .lab-banner > svg {
+  width: 34px !important;
+  height: 34px !important;
+  padding: 8px !important;
+  border-radius: var(--fx-r-sm) !important;
+  background: color-mix(in srgb, var(--fx-signal) 12%, transparent) !important;
+  color: var(--fx-signal) !important;
+}
+
+/* The two steps run side by side, so they end side by side. The right-hand
+   card was content-height and floated its empty state in a void a third the
+   height of the card beside it. */
+/* Natural heights. Stretching them matched the cards up while step 2 was
+   empty, but once a batch is submitted step 2 is several times longer and
+   stretching left step 1 as a tall empty box. The empty state carries its
+   own minimum height instead, which is the case that needed fixing. */
+html .tp-app.tp-app[data-theme='forensic'] .lab-grid {
+  align-items: start !important;
+  gap: 12px !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .lab-card {
+  display: flex !important;
+  flex-direction: column !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .lab-placeholder {
+  flex: 1 1 auto !important;
+  min-height: 300px !important;
+  border: 1px dashed var(--fx-line-strong) !important;
+  border-radius: var(--fx-r-sm) !important;
+  color: var(--fx-text-dim) !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .lab-placeholder strong {
+  font-size: 15px !important;
+  color: var(--fx-text) !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .lab-placeholder svg { color: var(--fx-text-mute) !important; }
+
+/* The sample lines are the evidence being quoted, so they recess rather than
+   sit proud, and the box stops growing past what it holds. */
+html .tp-app.tp-app[data-theme='forensic'] .lab-logs {
+  background: var(--fx-bg) !important;
+  border: 1px solid var(--fx-line) !important;
+  border-radius: var(--fx-r-sm) !important;
+  color: var(--fx-text) !important;
+  min-height: 0 !important;
+  margin: 14px 0 !important;
+  font-family: var(--fx-mono) !important;
+  font-size: 12px !important;
+}
+
+/* ===========================================================================
+   THE INGESTION LAB — THE TWO STEP CARDS
+   ---------------------------------------------------------------------------
+   Both cards were a 28px heading, a rule, a sentence, a second rule, and then
+   greyscale all the way down. The headings are a normal panel size now, the
+   step number carries the one accent colour the product has, and the values
+   are set in the mono face because they are what the pipeline read off the
+   log, not labels this interface wrote.
+   =========================================================================== */
+html .tp-app.tp-app[data-theme='forensic'] .lab-card {
+  padding: 18px 20px 20px !important;
+  gap: 0 !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .lab-card h2 {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  font-size: 18px !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.015em !important;
+  margin: 0 0 4px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  color: var(--fx-text) !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .lab-step {
+  display: grid;
+  place-items: center;
+  width: 23px;
+  height: 23px;
+  flex: 0 0 auto;
+  border-radius: var(--fx-r-sm);
+  background: color-mix(in srgb, var(--fx-signal) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--fx-signal) 34%, transparent);
+  color: var(--fx-signal);
+  font-family: var(--fx-mono);
+  font-size: 12px;
+  font-weight: 600;
+}
+html .tp-app.tp-app[data-theme='forensic'] .lab-card > p {
+  font-size: 13px !important;
+  color: var(--fx-text-dim) !important;
+  margin: 0 0 16px !important;
+  padding: 0 0 14px !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--fx-line) !important;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .lab-label {
+  font-size: 12.5px !important;
+  font-weight: 500 !important;
+  color: var(--fx-text-dim) !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .lab-card select {
+  height: 44px !important;
+  padding: 0 12px !important;
+  background: var(--fx-surface) !important;
+  border: 1px solid var(--fx-line-strong) !important;
+  border-radius: var(--fx-r-md) !important;
+  color: var(--fx-text) !important;
+  font-family: var(--fx-sans) !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .lab-card select:focus-visible {
+  border-color: var(--fx-signal) !important;
+  outline: none !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--fx-signal) 18%, transparent) !important;
+}
+
+/* Label in the interface face, value in the mono face: the value came off
+   the log, the label did not. */
+html .tp-app.tp-app[data-theme='forensic'] .lab-kv {
+  padding: 11px 0 !important;
+  border-bottom: 1px solid var(--fx-line) !important;
+  font-size: 13px !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .lab-kv span { color: var(--fx-text-dim) !important; }
+html .tp-app.tp-app[data-theme='forensic'] .lab-kv strong,
+html .tp-app.tp-app[data-theme='forensic'] .lab-kv code {
+  font-family: var(--fx-mono) !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  color: var(--fx-text) !important;
+}
+
+/* The one action on this page, so it looks like one. */
+html .tp-app.tp-app[data-theme='forensic'] .lab-submit {
+  align-self: flex-start !important;
+  min-height: 44px !important;
+  padding: 0 18px !important;
+  background: var(--fx-signal) !important;
+  border: 1px solid var(--fx-signal) !important;
+  border-radius: var(--fx-r-md) !important;
+  color: var(--fx-on-signal) !important;
+  font-family: var(--fx-sans) !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  letter-spacing: normal !important;
+  text-transform: none !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .lab-submit:disabled { opacity: 0.55 !important; }
+html .tp-app.tp-app[data-theme='forensic'] .lab-submit svg { color: var(--fx-on-signal) !important; }
+
+/* The ingest button again, with the longhand and enough weight to land. The
+   shorthand `background: var(--fx-signal)` loses to the generic panel-button
+   rule in this file, which sets background-color directly. */
+html .tp-app.tp-app[data-theme='forensic'] .tp-button.primary.lab-submit,
+html .tp-app.tp-app[data-theme='forensic'] button.lab-submit {
+  background-color: var(--fx-signal) !important;
+  background-image: none !important;
+  border-color: var(--fx-signal) !important;
+  color: var(--fx-on-signal) !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-button.primary.lab-submit:hover,
+html .tp-app.tp-app[data-theme='forensic'] button.lab-submit:hover {
+  background-color: color-mix(in srgb, var(--fx-signal) 86%, #ffffff) !important;
+  border-color: color-mix(in srgb, var(--fx-signal) 86%, #ffffff) !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-button.primary.lab-submit svg,
+html .tp-app.tp-app[data-theme='forensic'] button.lab-submit svg {
+  color: var(--fx-on-signal) !important;
+}
+
+/* The parsed-events list. The section heading was running at the size of a
+   page title, and each event sat in a card with more padding than content. */
+html .tp-app.tp-app[data-theme='forensic'] .lab-card h3 {
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.01em !important;
+  margin: 20px 0 10px !important;
+  color: var(--fx-text) !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .lab-events { gap: 8px !important; }
+html .tp-app.tp-app[data-theme='forensic'] .lab-event {
+  padding: 11px 13px !important;
+  gap: 6px !important;
+  background: var(--fx-raised) !important;
+  border: 1px solid var(--fx-line) !important;
+  border-radius: var(--fx-r-sm) !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .lab-event-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+html .tp-app.tp-app[data-theme='forensic'] .lab-event strong {
+  font-size: 13.5px !important;
+  font-weight: 600 !important;
+  color: var(--fx-text) !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .lab-event > span {
+  font-size: 12.5px !important;
+  color: var(--fx-text-dim) !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .lab-event small {
+  font-family: var(--fx-mono) !important;
+  font-size: 11.5px !important;
+  color: var(--fx-text-dim) !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .lab-event code,
+html .tp-app.tp-app[data-theme='forensic'] .lab-event pre {
+  font-family: var(--fx-mono) !important;
+  font-size: 11.5px !important;
+}
+
+/* A parse outcome is a statement about the evidence, so it is badged like
+   one: green when every field was read, amber when some were not. */
+html .tp-app.tp-app[data-theme='forensic'] .lab-parse-badge {
+  padding: 3px 8px !important;
+  border-radius: var(--fx-r-sm) !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+html .tp-app.tp-app[data-theme='forensic'] .lab-parse-complete {
+  color: var(--fx-verified) !important;
+  background: color-mix(in srgb, var(--fx-verified) 12%, transparent) !important;
+  border-color: color-mix(in srgb, var(--fx-verified) 34%, transparent) !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .lab-parse-partial {
+  color: var(--fx-medium) !important;
+  background: color-mix(in srgb, var(--fx-medium) 12%, transparent) !important;
+  border-color: color-mix(in srgb, var(--fx-medium) 34%, transparent) !important;
+}
+
+/* The ingest confirmation and the recorded hash. */
+html .tp-app.tp-app[data-theme='forensic'] .lab-success {
+  padding: 10px 13px !important;
+  border-radius: var(--fx-r-sm) !important;
+  font-size: 13.5px !important;
+  color: var(--fx-verified) !important;
+  background: color-mix(in srgb, var(--fx-verified) 11%, transparent) !important;
+  border: 1px solid color-mix(in srgb, var(--fx-verified) 30%, transparent) !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .lab-success svg { color: var(--fx-verified) !important; }
+html .tp-app.tp-app[data-theme='forensic'] .lab-hash {
+  padding: 12px 13px !important;
+  background: var(--fx-bg) !important;
+  border: 1px solid var(--fx-line) !important;
+  border-radius: var(--fx-r-sm) !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .lab-hash span {
+  font-size: 12px !important;
+  color: var(--fx-text-dim) !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .lab-hash code {
+  font-family: var(--fx-mono) !important;
+  font-size: 11.5px !important;
+  color: var(--fx-text) !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .lab-hash svg { color: var(--fx-signal) !important; }
+html .tp-app.tp-app[data-theme='forensic'] .lab-footnote {
+  font-size: 12.5px !important;
+  color: var(--fx-text-dim) !important;
+}
+
+/* ===========================================================================
+   THE SHARED SEARCH FIELD
+   ---------------------------------------------------------------------------
+   `.tp-search` is used by the evidence register and anywhere else that
+   searches a list, and it had the same fault as the timeline's: the field
+   carried a border, and so did the input inside it, so every search box on
+   the product was a rectangle drawn inside another rectangle.
+   =========================================================================== */
+html .tp-app.tp-app[data-theme='forensic'] .tp-toolbar {
+  padding: 14px 18px !important;
+  gap: 12px !important;
+  border-bottom: 1px solid var(--fx-line) !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-search {
+  height: 44px !important;
+  max-width: 460px !important;
+  padding: 0 14px !important;
+  gap: 10px !important;
+  background: var(--fx-surface) !important;
+  border: 1px solid var(--fx-line-strong) !important;
+  border-radius: var(--fx-r-md) !important;
+  transition: border-color 130ms ease, box-shadow 130ms ease;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-search:hover {
+  border-color: var(--fx-line-focus) !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-search:focus-within {
+  border-color: var(--fx-signal) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--fx-signal) 18%, transparent) !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-search svg {
+  color: var(--fx-text-dim) !important;
+  flex: 0 0 auto;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-search input {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 100%;
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  outline: none !important;
+  box-shadow: none !important;
+  font-family: var(--fx-sans) !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  color: var(--fx-text) !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-search input::placeholder {
+  color: #76899c !important;
+}
+
+/* ===========================================================================
+   THE EVIDENCE REGISTER
+   ---------------------------------------------------------------------------
+   A register of stored batches is a table, so it is allowed to look like one.
+   What it was missing was any colour on the two columns that report a
+   judgement - integrity and trust - which left a verified batch and an
+   unverified one reading identically.
+   =========================================================================== */
+html .tp-app.tp-app[data-theme='forensic'] .tp-evidence-register .tp-card-head h2 {
+  font-size: 18px !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.015em !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-evidence-register .tp-card-head p {
+  font-size: 13px !important;
+  color: var(--fx-text-dim) !important;
+}
+
+/* The trust score bands. Green is a batch that verified cleanly, amber is one
+   that wants a look, red is one whose hash did not match. */
+html .tp-app.tp-app[data-theme='forensic'] .tp-trust-badge {
+  padding: 4px 9px !important;
+  border-radius: var(--fx-r-sm) !important;
+  border: 1px solid transparent !important;
+  font-family: var(--fx-sans) !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  letter-spacing: normal !important;
+  white-space: nowrap;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-trust-badge.good {
+  color: var(--fx-verified) !important;
+  background: color-mix(in srgb, var(--fx-verified) 12%, transparent) !important;
+  border-color: color-mix(in srgb, var(--fx-verified) 32%, transparent) !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-trust-badge.warning {
+  color: var(--fx-medium) !important;
+  background: color-mix(in srgb, var(--fx-medium) 12%, transparent) !important;
+  border-color: color-mix(in srgb, var(--fx-medium) 32%, transparent) !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-trust-badge.danger {
+  color: var(--fx-critical) !important;
+  background: color-mix(in srgb, var(--fx-critical) 12%, transparent) !important;
+  border-color: color-mix(in srgb, var(--fx-critical) 32%, transparent) !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-trust-badge.neutral {
+  color: var(--fx-text-dim) !important;
+  border-color: var(--fx-line-strong) !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-trust-badge svg { color: currentColor !important; }
+
+/* Integrity: "Not checked" is deliberately quiet. It is not a problem, it is
+   a thing nobody has done yet, and colouring it would read as a verdict. */
+html .tp-app.tp-app[data-theme='forensic'] .tp-ev-status {
+  font-family: var(--fx-sans) !important;
+  font-size: 12.5px !important;
+  letter-spacing: normal !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-ev-status.neutral { color: var(--fx-text-dim) !important; }
+html .tp-app.tp-app[data-theme='forensic'] .tp-ev-status.success { color: var(--fx-verified) !important; }
+html .tp-app.tp-app[data-theme='forensic'] .tp-ev-status.danger { color: var(--fx-critical) !important; }
+html .tp-app.tp-app[data-theme='forensic'] .tp-ev-status.pending { color: var(--fx-text-dim) !important; }
+
+/* The per-row action. Sentence case at a normal control size: it was shouting
+   VERIFY in tracked capitals once per row, which on a full register is a
+   column of shouting. */
+html .tp-app.tp-app[data-theme='forensic'] .tp-ev-verify {
+  min-height: 34px !important;
+  padding: 0 13px !important;
+  gap: 7px !important;
+  border-radius: var(--fx-r-sm) !important;
+  border: 1px solid var(--fx-line-strong) !important;
+  background: var(--fx-raised) !important;
+  color: var(--fx-text) !important;
+  font-family: var(--fx-sans) !important;
+  font-size: 12.5px !important;
+  font-weight: 500 !important;
+  letter-spacing: normal !important;
+  text-transform: none !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-ev-verify:hover {
+  border-color: var(--fx-signal) !important;
+  color: var(--fx-signal) !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-ev-verify svg { color: currentColor !important; }
+
+/* The batch identifier is a hash, so it is set in the mono face; the log type
+   under it is a label, so it is not. */
+html .tp-app.tp-app[data-theme='forensic'] .tp-evidence-batch {
+  font-family: var(--fx-mono) !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+}
+
+/* ===========================================================================
+   THE CHAIN OF CUSTODY
+   ---------------------------------------------------------------------------
+   This is the record of who touched what, and it was the faintest thing on
+   the page: four columns of dim text separated by hairlines, with the action
+   set in small tracked capitals. It is given structure here - the action
+   badged by kind, the target and time in the mono face because they identify
+   a record, and the whole block at a readable weight.
+   =========================================================================== */
+html .tp-app.tp-app[data-theme='forensic'] .tp-custody .tp-card-head h3 {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 18px !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.015em !important;
+  color: var(--fx-text) !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-custody .tp-card-head h3 svg { color: var(--fx-signal) !important; }
+html .tp-app.tp-app[data-theme='forensic'] .tp-custody .tp-card-head p,
+html .tp-app.tp-app[data-theme='forensic'] .tp-custody-detail,
+html .tp-app.tp-app[data-theme='forensic'] .tp-custody-empty {
+  font-size: 13px !important;
+  line-height: 1.6 !important;
+  color: var(--fx-text-dim) !important;
+}
+
+/* The seal. Green when the chain verifies, red when it does not - this is
+   one of the few places in the product where a colour is a verdict. */
+html .tp-app.tp-app[data-theme='forensic'] .tp-custody-seal {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 10px !important;
+  border-radius: var(--fx-r-sm) !important;
+  font-family: var(--fx-sans) !important;
+  font-size: 12.5px !important;
+  font-weight: 500 !important;
+  letter-spacing: normal !important;
+  white-space: nowrap;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-custody-seal.intact {
+  color: var(--fx-verified) !important;
+  background: color-mix(in srgb, var(--fx-verified) 12%, transparent) !important;
+  border: 1px solid color-mix(in srgb, var(--fx-verified) 32%, transparent) !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-custody-seal.broken {
+  color: var(--fx-critical) !important;
+  background: color-mix(in srgb, var(--fx-critical) 12%, transparent) !important;
+  border: 1px solid color-mix(in srgb, var(--fx-critical) 32%, transparent) !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-custody-seal svg { color: currentColor !important; }
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-custody-list {
+  margin: 14px 0 0 !important;
+  padding: 0 !important;
+  list-style: none !important;
+  border-top: 1px solid var(--fx-line) !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-custody-entry {
+  display: grid !important;
+  grid-template-columns: 92px minmax(0, 1.1fr) minmax(0, 1.4fr) auto !important;
+  align-items: center !important;
+  gap: 16px !important;
+  padding: 12px 0 !important;
+  border-bottom: 1px solid var(--fx-line) !important;
+}
+/* Each kind of handling gets its own mark, so a verification and an export
+   are not the same row with different words in it. */
+html .tp-app.tp-app[data-theme='forensic'] .tp-custody-action {
+  justify-self: start;
+  padding: 3px 9px !important;
+  border-radius: var(--fx-r-sm) !important;
+  border: 1px solid var(--fx-line-strong) !important;
+  font-family: var(--fx-sans) !important;
+  font-size: 11.5px !important;
+  font-weight: 500 !important;
+  letter-spacing: normal !important;
+  text-transform: capitalize !important;
+  color: var(--fx-text-dim) !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-custody-entry.ingest .tp-custody-action {
+  color: var(--fx-signal) !important;
+  border-color: color-mix(in srgb, var(--fx-signal) 34%, transparent) !important;
+  background: color-mix(in srgb, var(--fx-signal) 10%, transparent) !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-custody-entry.verify .tp-custody-action {
+  color: var(--fx-verified) !important;
+  border-color: color-mix(in srgb, var(--fx-verified) 34%, transparent) !important;
+  background: color-mix(in srgb, var(--fx-verified) 10%, transparent) !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-custody-entry.export .tp-custody-action,
+html .tp-app.tp-app[data-theme='forensic'] .tp-custody-entry.link .tp-custody-action {
+  color: var(--fx-low) !important;
+  border-color: color-mix(in srgb, var(--fx-low) 34%, transparent) !important;
+  background: color-mix(in srgb, var(--fx-low) 10%, transparent) !important;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-custody-target {
+  font-family: var(--fx-mono) !important;
+  font-size: 12.5px !important;
+  color: var(--fx-text) !important;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-custody-meta {
+  font-size: 12.5px !important;
+  color: var(--fx-text-dim) !important;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-custody-time {
+  font-family: var(--fx-mono) !important;
+  font-size: 12px !important;
+  color: var(--fx-text-dim) !important;
+  white-space: nowrap;
+  justify-self: end;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-custody-caution {
+  margin-top: 14px !important;
+  font-size: 12.5px !important;
+  line-height: 1.6 !important;
+  color: var(--fx-text-dim) !important;
+}
+
+/* ===========================================================================
+   THE INVESTIGATIONS REGISTER
+   ---------------------------------------------------------------------------
+   Severity and status were plain text, so a critical case and a low one read
+   identically, and so did an open case and a resolved one. Both are now
+   badged: severity on the product's severity ramp, status on its own small
+   set, kept visually distinct from severity so a status is never mistaken for
+   an alarm level.
+   =========================================================================== */
+html .tp-app.tp-app[data-theme='forensic'] .tp-inv-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px !important;
+  border-radius: var(--fx-r-sm) !important;
+  border: 1px solid var(--fx-line-strong) !important;
+  background: transparent !important;
+  font-family: var(--fx-sans) !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  letter-spacing: normal !important;
+  text-transform: capitalize !important;
+  color: var(--fx-text-dim) !important;
+  white-space: nowrap;
+}
+
+/* severity */
+html .tp-app.tp-app[data-theme='forensic'] .tp-inv-pill.critical {
+  color: var(--fx-critical) !important;
+  border-color: color-mix(in srgb, var(--fx-critical) 36%, transparent) !important;
+  background: color-mix(in srgb, var(--fx-critical) 12%, transparent) !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-inv-pill.high {
+  color: var(--fx-high) !important;
+  border-color: color-mix(in srgb, var(--fx-high) 36%, transparent) !important;
+  background: color-mix(in srgb, var(--fx-high) 12%, transparent) !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-inv-pill.medium {
+  color: var(--fx-medium) !important;
+  border-color: color-mix(in srgb, var(--fx-medium) 36%, transparent) !important;
+  background: color-mix(in srgb, var(--fx-medium) 12%, transparent) !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-inv-pill.low {
+  color: var(--fx-low) !important;
+  border-color: color-mix(in srgb, var(--fx-low) 36%, transparent) !important;
+  background: color-mix(in srgb, var(--fx-low) 12%, transparent) !important;
+}
+
+/* status - outlined rather than filled, so the two columns never read as the
+   same kind of statement */
+html .tp-app.tp-app[data-theme='forensic'] .tp-inv-pill.open {
+  color: var(--fx-text) !important;
+  border-color: var(--fx-line-focus) !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-inv-pill.investigating {
+  color: var(--fx-signal) !important;
+  border-color: color-mix(in srgb, var(--fx-signal) 40%, transparent) !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-inv-pill.resolved,
+html .tp-app.tp-app[data-theme='forensic'] .tp-inv-pill.closed {
+  color: var(--fx-verified) !important;
+  border-color: color-mix(in srgb, var(--fx-verified) 40%, transparent) !important;
+}
+
+/* The case identifier is a reference, so it is monospaced; the title is prose
+   and is not. */
+html .tp-app.tp-app[data-theme='forensic'] .tp-inv-case {
+  display: block;
+  font-family: var(--fx-mono) !important;
+  font-size: 12.5px !important;
+  font-weight: 500 !important;
+  color: var(--fx-text-dim) !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-inv-title {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.01em !important;
+  color: var(--fx-text) !important;
+  margin-top: 3px;
+}
+
+/* The four counts. */
+html .tp-app.tp-app[data-theme='forensic'] .tp-inv-metric {
+  padding: 16px 18px !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-inv-metric > span {
+  font-family: var(--fx-sans) !important;
+  font-size: 13px !important;
+  letter-spacing: normal !important;
+  text-transform: none !important;
+  color: var(--fx-text-dim) !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-inv-metric > strong {
+  font-size: 30px !important;
+  line-height: 1.15 !important;
+  letter-spacing: -0.02em !important;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Header actions at a normal control size and in sentence case. */
+html .tp-app.tp-app[data-theme='forensic'] .tp-inv-head-actions .tp-button {
+  min-height: 38px !important;
+  padding: 0 14px !important;
+  gap: 8px !important;
+  border-radius: var(--fx-r-md) !important;
+  font-family: var(--fx-sans) !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  letter-spacing: normal !important;
+  text-transform: none !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-inv-head-actions .tp-button.primary {
+  background-color: var(--fx-signal) !important;
+  background-image: none !important;
+  border-color: var(--fx-signal) !important;
+  color: var(--fx-on-signal) !important;
+  font-weight: 600 !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-inv-head-actions .tp-button.primary svg {
+  color: var(--fx-on-signal) !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-inv-phase5-register .tp-card-head h2 {
+  font-size: 18px !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.015em !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-inv-phase5-register .tp-card-head p {
+  font-size: 13px !important;
+  color: var(--fx-text-dim) !important;
+}
+
+/* ===========================================================================
+   TABLE HEADERS AND THE CASE WINDOWS
+   ---------------------------------------------------------------------------
+   The last of the 11px uppercase tracked labels. A column heading does not
+   need to shout; it needs to be legible above the data it names.
+   =========================================================================== */
+html .tp-app.tp-app[data-theme='forensic'] .tp-ev-table th {
+  font-family: var(--fx-sans) !important;
+  font-size: 12.5px !important;
+  font-weight: 500 !important;
+  letter-spacing: normal !important;
+  text-transform: none !important;
+  color: var(--fx-text-dim) !important;
+  padding: 11px 16px !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-ev-table td {
+  font-family: var(--fx-sans) !important;
+  font-size: 13.5px !important;
+  color: var(--fx-text) !important;
+  padding: 12px 16px !important;
+}
+
+/* The case windows: create and detail. Same split as everywhere else -
+   headings and labels in the interface face, machine values in the mono. */
+html .tp-app.tp-app[data-theme='forensic'] .tp-inv-modal-overlay {
+  background: rgba(3, 5, 9, 0.62) !important;
+  backdrop-filter: blur(7px) saturate(0.8);
+  -webkit-backdrop-filter: blur(7px) saturate(0.8);
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-investigation-modal .tp-drawer-header h2 {
+  font-family: var(--fx-sans) !important;
+  font-size: 22px !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.015em !important;
+  text-transform: none !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-investigation-modal .tp-drawer-header > div > span {
+  font-family: var(--fx-mono) !important;
+  font-size: 12.5px !important;
+  letter-spacing: normal !important;
+  text-transform: none !important;
+  color: var(--fx-text-dim) !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-investigation-modal :is(h3, h4) {
+  font-family: var(--fx-sans) !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.01em !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] :is(.tp-inv-form label, .tp-inv-status-label) {
+  font-family: var(--fx-sans) !important;
+  font-size: 12.5px !important;
+  font-weight: 500 !important;
+  letter-spacing: normal !important;
+  text-transform: none !important;
+  color: var(--fx-text-dim) !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] :is(.tp-inv-form input, .tp-inv-form textarea, .tp-inv-form select) {
+  background: var(--fx-surface) !important;
+  border: 1px solid var(--fx-line-strong) !important;
+  border-radius: var(--fx-r-md) !important;
+  color: var(--fx-text) !important;
+  font-family: var(--fx-sans) !important;
+  font-size: 14px !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] :is(.tp-inv-form input, .tp-inv-form textarea, .tp-inv-form select):focus-visible {
+  border-color: var(--fx-signal) !important;
+  outline: none !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--fx-signal) 18%, transparent) !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-inv-note {
+  font-size: 13px !important;
+  line-height: 1.6 !important;
+  color: var(--fx-text-dim) !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-inv-empty {
+  font-family: var(--fx-sans) !important;
+  font-size: 13.5px !important;
+  color: var(--fx-text-dim) !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-inv-empty strong {
+  font-size: 16px !important;
+  color: var(--fx-text) !important;
+}
+
+/* The submit inside the case windows. It is the action the window exists
+   for, so it carries the signal colour like every other primary action, and
+   it is written the way it is written in the markup rather than shouted. */
+html .tp-app.tp-app[data-theme='forensic'] .tp-investigation-modal .tp-button.primary,
+html .tp-app.tp-app[data-theme='forensic'] .tp-inv-form .tp-button.primary {
+  min-height: 42px !important;
+  padding: 0 18px !important;
+  border-radius: var(--fx-r-md) !important;
+  background-color: var(--fx-signal) !important;
+  background-image: none !important;
+  border: 1px solid var(--fx-signal) !important;
+  color: var(--fx-on-signal) !important;
+  font-family: var(--fx-sans) !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  letter-spacing: normal !important;
+  text-transform: none !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-investigation-modal .tp-button.primary:hover,
+html .tp-app.tp-app[data-theme='forensic'] .tp-inv-form .tp-button.primary:hover {
+  background-color: color-mix(in srgb, var(--fx-signal) 86%, #ffffff) !important;
+  border-color: color-mix(in srgb, var(--fx-signal) 86%, #ffffff) !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-investigation-modal .tp-button.primary:disabled {
+  opacity: 0.55 !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-investigation-modal .tp-button.primary svg {
+  color: var(--fx-on-signal) !important;
+}

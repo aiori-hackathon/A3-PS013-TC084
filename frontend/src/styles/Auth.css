@@ -3,7 +3,7 @@
    ---------------------------------------------------------------------------
    The sign-in screen is the first thing anyone sees, so it carries the same
    identity as the workspace behind it: near-black surfaces, hairline
-   structure, one lime signal colour, Archivo for the interface and JetBrains
+   structure, one lime signal colour, Inter for the interface and IBM Plex
    Mono for anything a machine would have written.
 
    This file used to be a light navy/blue/amber screen with a second
@@ -48,8 +48,8 @@
   --fx-r-sm:        2px;
   --fx-r-md:        3px;
 
-  --fx-sans:        'Archivo', system-ui, -apple-system, sans-serif;
-  --fx-mono:        'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+  --fx-sans:        'Inter', system-ui, -apple-system, sans-serif;
+  --fx-mono:        'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
 
   min-height: 100vh;
   display: grid;

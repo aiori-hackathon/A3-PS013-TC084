@@ -253,14 +253,11 @@ export default function Investigations({ events = [] }) {
   );
 
   return <div className="tp-inv tp-inv-phase5">
-    <div className="tp-inv-phase5-hero">
-      <div>
-        <span className="tp-inv-phase5-eyebrow"><ShieldAlert size={15}/> CASE MANAGEMENT / INVESTIGATIONS</span>
-        <h2>Turn evidence into an investigation.</h2>
-        <p>Organize security leads, link collected events, and document analyst findings with a clear case history.</p>
-      </div>
-      <span className="tp-inv-phase5-hero-count"><AnimatedMetricCount value={counts.total} /> {counts.total === 1 ? 'CASE' : 'CASES'} IN REGISTER</span>
-    </div>
+    {/* The hero that used to sit here said nothing the page does not say
+        twice over: the page header already reads "Investigations / Review
+        events and prepare incident investigations", and its "N CASES IN
+        REGISTER" figure is the "Total cases" tile directly below it. It cost
+        about 170px before the first case. */}
     <div className="tp-inv-metrics">
       {[['Total cases', counts.total], ['Open', counts.open], ['Investigating', counts.investigating], ['Resolved', counts.resolved]].map(([label, value]) =>
         <div className="tp-card tp-inv-metric" key={label}><span>{label}</span><strong><AnimatedMetricCount value={value} /></strong></div>

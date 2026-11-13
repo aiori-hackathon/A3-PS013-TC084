@@ -1,0 +1,573 @@
+/* ===========================================================================
+   THE TIMELINE WORKSPACE
+   ---------------------------------------------------------------------------
+   The activity strip and the three panels under it: sources, stream,
+   inspector. Everything is keyed to the forensic tokens declared in
+   forensic.css, with literal fallbacks so the layout survives on a theme that
+   does not declare them.
+   =========================================================================== */
+
+/* --- the activity strip --------------------------------------------------
+   Short on purpose. The chart that was here before stood about 320px tall
+   with a heading, a legend, an axis, gridlines, per-column values and a
+   two-line footer, and it pushed the records themselves below the fold. */
+/* Surface, border and radius come from .tp-card, which the theme owns, so
+   these panels pick up any change to the product's panel treatment instead
+   of holding their own copy of it. Only layout lives here. */
+.tp-tl-activity {
+  display: grid;
+  gap: 7px;
+  margin: 0 0 12px;
+  padding: 10px 16px 11px;
+}
+
+.tp-tl-activity-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+.tp-tl-activity-title {
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: 0.9px;
+  text-transform: uppercase;
+  color: var(--fx-text-dim, #93a4b8);
+}
+.tp-tl-activity-note {
+  font-size: 12.5px;
+  color: var(--fx-text-dim, #93a4b8);
+}
+
+.tp-tl-activity-plot {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  align-items: end;
+  gap: 2px;
+  height: 42px;
+}
+.tp-tl-activity-col { height: 100%; }
+.tp-tl-activity-track {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  /* A hairline under every column, so a day with no events reads as
+     measured-and-zero rather than as a gap in the data. */
+  border-bottom: 1px solid var(--fx-line-strong, #2b3744);
+}
+.tp-tl-activity-bar {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  width: 100%;
+  background: var(--fx-signal-dim, #6f8c22);
+  animation: tp-tl-grow 420ms ease-out backwards;
+  animation-delay: var(--bar-delay, 0ms);
+}
+.tp-tl-activity-fail {
+  display: block;
+  width: 100%;
+  background: var(--fx-critical, #ff4d6a);
+}
+@keyframes tp-tl-grow { from { transform: scaleY(0); transform-origin: bottom; } }
+
+/* --- the three panels ----------------------------------------------------- */
+/* Two columns now. The record detail used to take a third of the width as a
+   permanent panel, which it did not earn: it is empty until you click
+   something, and a log line is wide. It opens in a window over the page
+   instead, and the stream gets the space. */
+.tp-tl-grid {
+  display: grid;
+  grid-template-columns: 274px minmax(0, 1fr);
+  gap: 12px;
+  /* Both columns end on the same line. They used to be content-height, so
+     the side column ran on past the bottom of the stream (or stopped short
+     of it) and the two blocks never lined up. */
+  align-items: stretch;
+}
+
+.tp-tl-grid-empty {
+  padding: 34px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--fx-text-dim, #93a4b8);
+}
+
+.tp-tl-sources,
+.tp-tl-stream {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.tp-tl-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 15px;
+  border-bottom: 1px solid var(--fx-line, #1e2733);
+  /* Sentence case in the interface face. These were 10.5px uppercase mono
+     with 0.9px of tracking, which is the look that reads as squeezed. */
+  font-size: 14.5px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--fx-text, #e7eef7);
+}
+.tp-tl-panel-count { white-space: nowrap; }
+.tp-tl-panel-count strong {
+  color: var(--fx-text, #e7eef7);
+  font-size: 13.5px;
+  margin-right: 3px;
+}
+
+/* --- sources tree --------------------------------------------------------- */
+.tp-tl-tree {
+  padding: 8px;
+  overflow-y: auto;
+  max-height: clamp(220px, 38vh, 520px);
+}
+.tp-tl-tree-group + .tp-tl-tree-group { margin-top: 10px; }
+
+.tp-tl-tree-device,
+.tp-tl-tree-user {
+  display: grid;
+  align-items: center;
+  width: 100%;
+  border: 1px solid transparent;
+  border-radius: var(--fx-r-sm, 2px);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  color: var(--fx-text-dim, #93a4b8);
+}
+.tp-tl-tree-device {
+  grid-template-columns: 11px 9px minmax(0, 1fr) auto;
+  gap: 8px;
+  padding: 9px 10px;
+  font-size: 13.5px;
+  color: var(--fx-text, #e7eef7);
+  background: var(--fx-raised, #151c25);
+  border-color: var(--fx-line, #1e2733);
+}
+.tp-tl-tree-user {
+  grid-template-columns: 14px minmax(0, 1fr) auto;
+  gap: 6px;
+  margin: 4px 0 0 10px;
+  padding: 7px 10px;
+  width: calc(100% - 10px);
+  font-size: 13px;
+}
+
+.tp-tl-tree-device:hover,
+.tp-tl-tree-user:hover {
+  border-color: var(--fx-line-focus, #3d5168);
+  color: var(--fx-text, #e7eef7);
+}
+/* The selected source is marked the way the left rail marks the active page:
+   an inset signal bar, not a filled block. */
+.tp-tl-tree-device[data-active],
+.tp-tl-tree-user[data-active] {
+  color: var(--fx-signal, #c3f04a);
+  background: color-mix(in srgb, var(--fx-signal, #c3f04a) 10%, transparent);
+  border-color: color-mix(in srgb, var(--fx-signal, #c3f04a) 34%, transparent);
+  box-shadow: inset 2px 0 0 0 var(--fx-signal, #c3f04a);
+}
+.tp-tl-tree-device:focus-visible,
+.tp-tl-tree-user:focus-visible,
+.tp-tl-day:focus-visible,
+.tp-tl-row:focus-visible {
+  outline: 2px solid var(--fx-signal, #c3f04a);
+  outline-offset: -2px;
+}
+
+/* The disclosure arrow. A CSS triangle rather than a glyph, so it turns
+   rather than being swapped for a different character. */
+.tp-tl-tree-caret {
+  width: 0; height: 0;
+  justify-self: center;
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  border-left: 5px solid currentColor;
+  opacity: 0.72;
+  transition: transform 140ms ease;
+}
+.tp-tl-tree-device[aria-expanded='true'] .tp-tl-tree-caret { transform: rotate(90deg); }
+
+.tp-tl-tree-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--fx-verified, #2fbf84);
+  justify-self: center;
+}
+.tp-tl-tree-branch { color: var(--fx-text-mute, #627485); font-size: 12.5px; }
+.tp-tl-tree-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tp-tl-tree-count {
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+  color: var(--fx-text-dim, #93a4b8);
+}
+.tp-tl-tree-device[data-active] .tp-tl-tree-count,
+.tp-tl-tree-user[data-active] .tp-tl-tree-count { color: inherit; }
+
+/* --- the stream ----------------------------------------------------------- */
+.tp-tl-stream-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px 12px;
+}
+.tp-tl-stream-head h3 {
+  margin: 0 0 3px;
+  font-size: 22.5px;
+  font-weight: 600;
+  letter-spacing: -0.4px;
+  color: var(--fx-text, #e7eef7);
+  overflow-wrap: anywhere;
+}
+.tp-tl-stream-head p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--fx-text-dim, #93a4b8);
+}
+.tp-tl-stream-count { text-align: right; white-space: nowrap; }
+.tp-tl-stream-count strong {
+  display: block;
+  font-size: 25px;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--fx-text, #e7eef7);
+  font-variant-numeric: tabular-nums;
+}
+.tp-tl-stream-count small {
+  font-size: 12px;
+  color: var(--fx-text-dim, #93a4b8);
+}
+
+.tp-tl-days {
+  display: flex;
+  gap: 7px;
+  padding: 0 16px 12px;
+  overflow-x: auto;
+}
+.tp-tl-day {
+  display: grid;
+  gap: 2px;
+  padding: 7px 11px;
+  background: var(--fx-raised, #151c25);
+  border: 1px solid var(--fx-line, #1e2733);
+  border-radius: var(--fx-r-sm, 2px);
+  cursor: pointer;
+  text-align: left;
+  white-space: nowrap;
+}
+.tp-tl-day strong {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--fx-text, #e7eef7);
+}
+.tp-tl-day small {
+  font-size: 11.5px;
+  color: var(--fx-text-dim, #93a4b8);
+}
+.tp-tl-day:hover { border-color: var(--fx-line-focus, #3d5168); }
+.tp-tl-day[data-active] {
+  border-color: color-mix(in srgb, var(--fx-signal, #c3f04a) 44%, transparent);
+  background: color-mix(in srgb, var(--fx-signal, #c3f04a) 11%, transparent);
+}
+.tp-tl-day[data-active] strong { color: var(--fx-signal, #c3f04a); }
+
+.tp-tl-daystats {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 26px;
+  padding: 11px 16px;
+  border-block: 1px solid var(--fx-line, #1e2733);
+  background: var(--fx-bg, #090c11);
+}
+.tp-tl-daystats > div { display: grid; gap: 2px; }
+.tp-tl-daystats span {
+  font-size: 13.5px;
+  color: var(--fx-text-dim, #93a4b8);
+}
+.tp-tl-daystats strong {
+  font-size: 18.5px;
+  font-weight: 600;
+  color: var(--fx-text, #e7eef7);
+  font-variant-numeric: tabular-nums;
+}
+.tp-tl-daystats strong.is-fail { color: var(--fx-critical, #ff4d6a); }
+/* The counterpart to the failure figure: a verified-green, kept apart from
+   the severity ramp because a successful login is not a severity. */
+.tp-tl-daystats strong.is-ok { color: var(--fx-verified, #2fbf84); }
+.tp-tl-daystats-date {
+  margin-left: auto;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  font-size: 12.5px !important;
+}
+
+.tp-tl-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  /* Tied to the window rather than a fixed pixel count, so the records take
+     whatever the screen has. This is the panel the page exists for. */
+  max-height: clamp(420px, 64vh, 900px);
+}
+.tp-tl-rows-empty {
+  padding: 28px 16px;
+  text-align: center;
+  font-size: 13.5px;
+  color: var(--fx-text-dim, #93a4b8);
+}
+
+.tp-tl-row {
+  display: grid;
+  grid-template-columns: 84px 9px minmax(0, 1fr) auto 15px;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  padding: 10px 16px;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--fx-line, #1e2733);
+  text-align: left;
+  cursor: pointer;
+  color: var(--fx-text-dim, #93a4b8);
+}
+.tp-tl-row:hover { background: var(--fx-raised, #151c25); }
+.tp-tl-row[data-active] {
+  background: var(--fx-raised, #151c25);
+  box-shadow: inset 2px 0 0 0 var(--fx-signal, #c3f04a);
+}
+
+.tp-tl-row-time { display: grid; gap: 1px; }
+.tp-tl-row-time strong {
+  font-family: var(--fx-mono, monospace);
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--fx-text, #e7eef7);
+  font-variant-numeric: tabular-nums;
+}
+.tp-tl-row-time small {
+  font-family: var(--fx-mono, monospace);
+  font-size: 11px;
+  color: var(--fx-text-dim, #93a4b8);
+}
+
+.tp-tl-row-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--fx-info, #949aa3); }
+.tp-tl-row-dot.sev-critical { background: var(--fx-critical, #ff4d6a); }
+.tp-tl-row-dot.sev-high     { background: var(--fx-high, #ff8a3d); }
+.tp-tl-row-dot.sev-medium,
+.tp-tl-row-dot.sev-warning  { background: var(--fx-medium, #f0b429); }
+.tp-tl-row-dot.sev-low,
+.tp-tl-row-dot.sev-info     { background: var(--fx-low, #4fd1c5); }
+.tp-tl-row-dot.sev-error    { background: var(--fx-critical, #ff4d6a); }
+
+.tp-tl-row-body { display: grid; gap: 2px; min-width: 0; }
+/* Left as the record spells it. Capitalising turned "invalid user" into
+   "Invalid User", which reads as a label this product invented rather than
+   the event type the log actually carries. */
+.tp-tl-row-body strong {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--fx-text, #e7eef7);
+}
+.tp-tl-row-body small {
+  font-family: var(--fx-mono, monospace);
+  font-size: 13px;
+  color: var(--fx-text-dim, #93a4b8);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tp-tl-row-tags { display: flex; gap: 6px; align-items: center; }
+.tp-tl-tag {
+  padding: 3px 7px;
+  border: 1px solid var(--fx-line-strong, #2b3744);
+  border-radius: var(--fx-r-sm, 2px);
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--fx-text-dim, #93a4b8);
+  white-space: nowrap;
+  text-transform: capitalize;
+}
+.tp-tl-tag.is-fail {
+  color: var(--fx-critical, #ff4d6a);
+  border-color: color-mix(in srgb, var(--fx-critical, #ff4d6a) 42%, transparent);
+  background: color-mix(in srgb, var(--fx-critical, #ff4d6a) 12%, transparent);
+}
+.tp-tl-tag.sev-critical { color: var(--fx-critical, #ff4d6a); border-color: color-mix(in srgb, var(--fx-critical, #ff4d6a) 42%, transparent); }
+.tp-tl-tag.sev-high     { color: var(--fx-high, #ff8a3d);     border-color: color-mix(in srgb, var(--fx-high, #ff8a3d) 42%, transparent); }
+.tp-tl-tag.sev-medium,
+.tp-tl-tag.sev-warning  { color: var(--fx-medium, #f0b429);   border-color: color-mix(in srgb, var(--fx-medium, #f0b429) 42%, transparent); }
+.tp-tl-tag.sev-low,
+.tp-tl-tag.sev-info     { color: var(--fx-low, #4fd1c5);      border-color: color-mix(in srgb, var(--fx-low, #4fd1c5) 42%, transparent); }
+.tp-tl-tag.sev-error    { color: var(--fx-critical, #ff4d6a); border-color: color-mix(in srgb, var(--fx-critical, #ff4d6a) 42%, transparent); }
+
+/* severityClass() in Dashboard.jsx emits "sev-<level>". These rules targeted
+   ".tp-sev-<level>", which matches nothing, so every dot and every tag has
+   been painting the neutral default regardless of severity. */
+
+.tp-tl-row svg { color: var(--fx-text-mute, #627485); }
+
+.tp-tl-stream-foot {
+  margin: 0;
+  padding: 11px 16px;
+  border-top: 1px solid var(--fx-line, #1e2733);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--fx-text-dim, #93a4b8);
+}
+
+/* --- the inspector -------------------------------------------------------- */
+.tp-tl-inspector-body { padding: 14px 16px 16px; }
+.tp-tl-inspector-empty {
+  margin: 0;
+  padding: 30px 16px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--fx-text-dim, #93a4b8);
+}
+.tp-tl-inspector-body h3 {
+  margin: 0 0 14px;
+  font-size: 18.5px;
+  font-weight: 600;
+  color: var(--fx-text, #e7eef7);
+}
+
+.tp-tl-field {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--fx-line, #1e2733);
+}
+.tp-tl-field > span {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 13.5px;
+  color: var(--fx-text-dim, #93a4b8);
+}
+.tp-tl-field > strong {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--fx-text, #e7eef7);
+  overflow-wrap: anywhere;
+}
+.tp-tl-message {
+  margin: 0 0 5px;
+  font-family: var(--fx-mono, monospace);
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--fx-text, #e7eef7);
+  overflow-wrap: anywhere;
+}
+.tp-tl-field > small {
+  font-size: 12px;
+  color: var(--fx-text-dim, #93a4b8);
+}
+
+.tp-tl-raw { margin-top: 14px; }
+.tp-tl-raw summary {
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--fx-signal, #c3f04a);
+  list-style: none;
+}
+.tp-tl-raw summary::-webkit-details-marker { display: none; }
+.tp-tl-raw summary::before { content: '▸ '; }
+.tp-tl-raw[open] summary::before { content: '▾ '; }
+.tp-tl-raw pre {
+  margin: 10px 0 0;
+  padding: 12px;
+  max-height: 260px;
+  overflow: auto;
+  background: var(--fx-bg, #090c11);
+  border: 1px solid var(--fx-line, #1e2733);
+  border-radius: var(--fx-r-sm, 2px);
+  font-family: var(--fx-mono, monospace);
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--fx-text, #e7eef7);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* --- narrower ------------------------------------------------------------- */
+@media (max-width: 1320px) {
+  .tp-tl-grid { grid-template-columns: 240px minmax(0, 1fr); }
+}
+@media (max-width: 860px) {
+  .tp-tl-grid { grid-template-columns: minmax(0, 1fr); }
+  .tp-tl-row { grid-template-columns: 66px 8px minmax(0, 1fr); }
+  .tp-tl-row-tags, .tp-tl-row svg { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tp-tl-activity-bar { animation: none; }
+  .tp-tl-tree-caret { transition: none; }
+}
+
+/* --- the left column ------------------------------------------------------
+   The sources tree stops at however many devices and accounts there are,
+   while the stream beside it runs to the height of a day's records. That gap
+   was dead space; the event mix fills it with something counted from the
+   same selection. */
+/* The tree takes what it needs; the event mix absorbs whatever is left, so
+   the column finishes level with the stream beside it. */
+.tp-tl-side {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 12px;
+  min-width: 0;
+}
+
+.tp-tl-mix {
+  min-height: 0;
+  overflow: hidden;
+}
+.tp-tl-mix-body {
+  padding: 14px 15px 16px;
+  display: grid;
+  grid-template-rows: auto auto;
+  align-content: center;
+  gap: 14px;
+  justify-items: center;
+  min-height: 0;
+  overflow-y: auto;
+}
+.tp-tl-donut { width: 132px; height: 132px; display: block; }
+.tp-tl-donut-total {
+  font-size: 23px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  fill: var(--fx-text, #e7eef7);
+}
+.tp-tl-donut-label { font-size: 11.5px; fill: var(--fx-text-dim, #93a4b8); }
+
+.tp-tl-mix-legend { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; width: 100%; }
+.tp-tl-mix-legend li {
+  display: grid;
+  grid-template-columns: 9px minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+}
+.tp-tl-mix-legend i { width: 9px; height: 9px; border-radius: 2px; display: block; }
+.tp-tl-mix-legend span {
+  color: var(--fx-text, #e7eef7);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.tp-tl-mix-legend strong {
+  font-weight: 600;
+  color: var(--fx-text, #e7eef7);
+  font-variant-numeric: tabular-nums;
+}
+.tp-tl-mix-legend small { color: var(--fx-text-dim, #93a4b8); font-size: 11.5px; min-width: 32px; text-align: right; }
