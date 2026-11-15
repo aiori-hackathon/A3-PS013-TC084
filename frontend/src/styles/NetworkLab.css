@@ -43,17 +43,46 @@
   color: var(--fx-text-dim, #93a4b8);
 }
 
-.nl-sessions {
+/* Sessions sit in a column beside the investigation rather than above it:
+   a long list of cards would otherwise push the topology off-screen. */
+.nl-layout {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 9px;
+  grid-template-columns: 290px minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+.nl-aside {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: sticky;
+  top: 12px;
+}
+.nl-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+.nl-sessions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 580px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+.nl-sessions::-webkit-scrollbar { width: 8px; }
+.nl-sessions::-webkit-scrollbar-thumb {
+  background: var(--fx-line-strong, #2b3744);
+  border-radius: 4px;
 }
 .nl-session {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 3px;
   text-align: left;
-  padding: 12px 14px;
+  padding: 9px 12px;
   border: 1px solid var(--fx-line, #1e2733);
   border-radius: var(--fx-r-md, 3px);
   background: var(--fx-surface, #0f141b);
@@ -70,13 +99,13 @@
   box-shadow: inset 3px 0 0 0 var(--fx-signal, #c3f04a);
 }
 .nl-session-id {
-  font-size: 13.5px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--fx-text, #e7eef7);
   overflow-wrap: anywhere;
 }
 .nl-session.selected .nl-session-id { color: var(--fx-signal, #c3f04a); }
-.nl-session-meta { font-size: 12px; color: var(--fx-text-dim, #93a4b8); }
+.nl-session-meta { font-size: 11.5px; color: var(--fx-text-dim, #93a4b8); }
 .nl-session-warn {
   display: inline-flex;
   align-items: center;
@@ -115,6 +144,41 @@
   background: rgba(255, 77, 106, .1);
 }
 .nl-phase-detail { font-size: 12px; color: var(--fx-text-dim, #93a4b8); }
+
+.nl-replay, .nl-report {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border: 1px solid var(--fx-line-strong, #2b3744);
+  border-radius: var(--fx-r-sm, 2px);
+  background: var(--fx-raised, #151c25);
+  color: var(--fx-text-dim, #93a4b8);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.nl-replay:hover, .nl-report:hover {
+  color: var(--fx-text, #e7eef7);
+  border-color: var(--fx-line-focus, #3d5168);
+}
+.nl-replay.active {
+  color: var(--fx-signal, #c3f04a);
+  border-color: rgba(195, 240, 74, .5);
+  background: rgba(195, 240, 74, .1);
+}
+.nl-report:disabled { opacity: .5; cursor: progress; }
+
+.nl-reportbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--fx-line, #1e2733);
+}
+.nl-reportbar .nl-phase-detail { margin-left: auto; }
 
 /* --- topology ---------------------------------------------------------- */
 
@@ -323,7 +387,29 @@
   font-size: 12px;
 }
 
+@media (max-width: 1040px) {
+  .nl-layout { grid-template-columns: 1fr; }
+  .nl-aside { position: static; }
+  .nl-sessions { max-height: 230px; }
+}
 @media (max-width: 740px) {
-  .nl-sessions { grid-template-columns: 1fr; }
   .nl-topology { max-height: 260px; }
+}
+
+.nl-reportview {
+  margin: 12px 0 0;
+  padding: 16px 18px;
+  max-height: 460px;
+  overflow: auto;
+  border: 1px solid var(--fx-line, #1e2733);
+  border-radius: var(--fx-r-md, 3px);
+  background: var(--fx-bg, #090c11);
+  color: #bccadb;
+  /* forensic.css forces monospace on <pre> with !important; this report
+     is prose, so it is set in Inter like the rest of the page. */
+  font-family: var(--fx-sans, 'Inter', system-ui, sans-serif) !important;
+  font-size: 12.5px;
+  line-height: 1.65;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }

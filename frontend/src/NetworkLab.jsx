@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { AlertTriangle, CircleSlash, Network, RefreshCw } from 'lucide-react';
+import { AlertTriangle, ArrowDownToLine, CircleSlash, FileText, Network, Pause, Play, RefreshCw } from 'lucide-react';
 import './styles/NetworkLab.css';
 
 const PHASE_ORDER = ['normal', 'fault', 'recovered'];
@@ -218,6 +218,9 @@ export default function NetworkLab() {
   const [selected, setSelected] = useState(null);
   const [detail, setDetail] = useState(null);
   const [phase, setPhase] = useState('fault');
+  const [replaying, setReplaying] = useState(false);
+  const [report, setReport] = useState('');
+  const [reporting, setReporting] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -238,6 +241,35 @@ export default function NetworkLab() {
       setLoading(false);
     }
   }, []);
+
+  async function generateReport() {
+    if (!selected) return;
+    setReporting(true);
+    try {
+      const response = await fetch(
+        `/api/v1/network/sessions/${encodeURIComponent(selected)}/report`,
+        { credentials: 'same-origin' },
+      );
+      if (!response.ok) {
+        throw new Error(`Report could not be generated (HTTP ${response.status}).`);
+      }
+      setReport(await response.text());
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setReporting(false);
+    }
+  }
+
+  function downloadReport() {
+    const blob = new Blob([report], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `tracepoint_network_${selected}.txt`;
+    link.click();
+    URL.revokeObjectURL(url);
+  }
 
   // The first load is inlined rather than calling loadSessions, so no state
   // is set synchronously from the effect body.
@@ -284,10 +316,26 @@ export default function NetworkLab() {
     return () => { active = false; };
   }, [selected]);
 
-  const observations = detail?.observations || [];
+  const observations = useMemo(() => detail?.observations || [], [detail]);
   const observation = observations.find(o => o.phase === phase) || observations[0];
   const rca = detail?.rca;
-  const phases = PHASE_ORDER.filter(name => observations.some(o => o.phase === name));
+  const phases = useMemo(
+    () => PHASE_ORDER.filter(name => observations.some(o => o.phase === name)),
+    [observations],
+  );
+
+  // Replay walks the recorded phases in order. It is a playback of evidence
+  // already collected, not a control that drives a live network - the lab
+  // itself does that, and nothing here can reach it.
+  useEffect(() => {
+    if (!replaying || phases.length < 2) return undefined;
+    const timer = setTimeout(() => {
+      const next = phases.indexOf(phase) + 1;
+      if (next >= phases.length) setReplaying(false);
+      else setPhase(phases[next]);
+    }, 1900);
+    return () => clearTimeout(timer);
+  }, [replaying, phase, phases]);
 
   return (
     <div className="nl-root">
@@ -303,8 +351,10 @@ export default function NetworkLab() {
 
       {error && <div className="tp-error" role="alert">{error}</div>}
 
+      <div className="nl-layout">
+        <aside className="nl-aside">
       <div className="nl-sessionbar">
-        <h3>Investigation sessions</h3>
+        <h3>Sessions{sessions.length ? ` \u00b7 ${sessions.length}` : ''}</h3>
         <button
           type="button"
           className="tp-button"
@@ -334,22 +384,24 @@ export default function NetworkLab() {
               type="button"
               key={item.session_id}
               className={`nl-session ${item.session_id === selected ? 'selected' : ''}`}
-              onClick={() => { setDetail(null); setSelected(item.session_id); }}
+              onClick={() => { setReplaying(false); setReport(''); setDetail(null); setSelected(item.session_id); }}
             >
               <span className="nl-session-id">{item.session_id}</span>
-              <span className="nl-session-meta">{item.device_id}</span>
               <span className="nl-session-meta">
-                {item.observations} observations · {(item.phases || []).join(' / ').toUpperCase()}
+                {item.device_id} · {item.observations} obs
               </span>
               {!item.topology_available && (
-                <span className="nl-session-warn"><AlertTriangle size={12} /> no topology</span>
+                <span className="nl-session-warn"><AlertTriangle size={11} /> no topology</span>
               )}
             </button>
           ))}
         </div>
       )}
 
-      {selected && detail && (
+        </aside>
+
+        <section className="nl-detail">
+      {selected && detail ? (
         <>
           <div className="nl-phasebar">
             {phases.map(name => (
@@ -357,11 +409,26 @@ export default function NetworkLab() {
                 type="button"
                 key={name}
                 className={`nl-phase ${name} ${name === phase ? 'selected' : ''}`}
-                onClick={() => setPhase(name)}
+                onClick={() => { setReplaying(false); setPhase(name); }}
               >
                 {name.toUpperCase()}
               </button>
             ))}
+            {phases.length > 1 && (
+              <button
+                type="button"
+                className={`nl-replay ${replaying ? 'active' : ''}`}
+                onClick={() => {
+                  if (replaying) { setReplaying(false); return; }
+                  setPhase(phases[0]);
+                  setReplaying(true);
+                }}
+                title="Step through the recorded phases of this investigation"
+              >
+                {replaying ? <Pause size={13} /> : <Play size={13} />}
+                {replaying ? 'Stop' : 'Replay'}
+              </button>
+            )}
             {observation && (
               <span className="nl-phase-detail">
                 packet loss {observation.packet_loss_percent ?? '—'}% · {observation.timestamp_utc}
@@ -446,9 +513,37 @@ export default function NetworkLab() {
                 </div>
               </>
             )}
+
+            <div className="nl-reportbar">
+              <button
+                type="button"
+                className="nl-report"
+                onClick={generateReport}
+                disabled={reporting}
+              >
+                <FileText size={13} />
+                {reporting ? 'Generating…' : 'Generate investigation report'}
+              </button>
+              {report && (
+                <button type="button" className="nl-report" onClick={downloadReport}>
+                  <ArrowDownToLine size={13} /> Download .txt
+                </button>
+              )}
+              <span className="nl-phase-detail">
+                Rendered from stored evidence; not itself evidence.
+              </span>
+            </div>
+
+            {report && <div className="nl-reportview">{report}</div>}
           </div>
         </>
+      ) : (
+        <div className="nl-empty">
+          Select a session to inspect its topology and analysis.
+        </div>
       )}
+        </section>
+      </div>
     </div>
   );
 }
