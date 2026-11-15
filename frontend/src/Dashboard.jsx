@@ -12,7 +12,7 @@ import {
   useRef,
   useState
 } from 'react';
-import { Wifi, WifiOff, Activity, ArrowDownToLine, ChevronRight, CircleHelp, Clock3, FileClock, FileText, Fingerprint, LayoutDashboard, LogOut, Menu, RefreshCw, Search, ShieldAlert, SlidersHorizontal, Terminal, X, GitBranch, BookOpen} from 'lucide-react';
+import { Wifi, WifiOff, Activity, ArrowDownToLine, ChevronRight, CircleHelp, Clock3, FileClock, FileText, Fingerprint, LayoutDashboard, LogOut, Menu, RefreshCw, Search, ShieldAlert, SlidersHorizontal, Terminal, X, GitBranch, BookOpen, Network} from 'lucide-react';
 import './styles/Tracepoint.css';
 import './styles/TracepointTimelineGraphModal.css';
 import './styles/TimelineWorkspace.css';
@@ -26,6 +26,7 @@ const Reports = lazy(() => import('./Reports'));
 const Investigations = lazy(() => import('./Investigations'));
 const EvidenceLibrary = lazy(() => import('./EvidenceLibrary'));
 const LogIngestionLab = lazy(() => import('./LogIngestionLab'));
+const NetworkLab = lazy(() => import('./NetworkLab'));
 
 import './styles/TracepointOfficialPortal.css';
 import './styles/TracepointEyeHero.css';
@@ -47,6 +48,7 @@ const navigation = [
   ['evidence', 'Evidence', Fingerprint],
   ['investigations', 'Investigations', ShieldAlert],
   ['graph', 'Investigation Graph', GitBranch],
+  ['netlab', 'Network Lab', Network],
   ['guide', 'Workflow Guide', BookOpen],
 ];
 const text = value => value === undefined || value === null || value === '' ? '—' : String(value);
@@ -802,7 +804,7 @@ export default function Dashboard({ user, onSignOut }) {
     <main className="tp-main">
     {/* TRACEPOINT_SINGLE_NAV_V1: status and account live in primary navigation */}
 
-      <div className="tp-content"><div className={`tp-page-header ${page === 'guide' ? 'tp-page-header-guide' : ''}`}><div><h1>{title}</h1><p>{page === 'overview' ? 'Security activity and collected evidence across your workspace.' : page === 'timeline' ? 'Explore, filter and inspect security events.' : page === 'ingestion' ? 'Explore sample logs and follow them through the ingestion pipeline.' : page === 'evidence' ? 'Evidence collection and integrity records.' : page === 'graph' ? 'Explore evidence-linked authentication sequences.' : page === 'investigations' ? 'Review events and prepare incident investigations.' : page === 'guide' ? 'Follow the workflow from raw log ingestion to an incident report.' : 'Export collected security activity.'}</p></div><div className="tp-actions">
+      <div className="tp-content"><div className={`tp-page-header ${page === 'guide' ? 'tp-page-header-guide' : ''}`}><div><h1>{title}</h1><p>{page === 'overview' ? 'Security activity and collected evidence across your workspace.' : page === 'timeline' ? 'Explore, filter and inspect security events.' : page === 'ingestion' ? 'Explore sample logs and follow them through the ingestion pipeline.' : page === 'evidence' ? 'Evidence collection and integrity records.' : page === 'graph' ? 'Explore evidence-linked authentication sequences.' : page === 'investigations' ? 'Review events and prepare incident investigations.' : page === 'netlab' ? 'Network topology, observations and evidence-based root-cause findings.' : page === 'guide' ? 'Follow the workflow from raw log ingestion to an incident report.' : 'Export collected security activity.'}</p></div><div className="tp-actions">
           <Button variant="outline" className="tp-button" onClick={() => {
 {page === 'ingestion' && (
   <LazyPage name="Log Ingestion Lab">
@@ -821,6 +823,7 @@ export default function Dashboard({ user, onSignOut }) {
     <Investigations events={events} />
   </LazyPage>
 )}
+
 
 {page === 'graph' && (
   <LazyPage name="Investigation Graph">
@@ -956,6 +959,11 @@ export default function Dashboard({ user, onSignOut }) {
     {page === 'investigations' && (
       <LazyPage name="Investigations">
         <Investigations events={events} />
+      </LazyPage>
+    )}
+    {page === 'netlab' && (
+      <LazyPage name="Network Lab">
+        <NetworkLab />
       </LazyPage>
     )}
     {page === 'graph' && (
