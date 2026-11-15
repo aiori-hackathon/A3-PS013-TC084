@@ -10,7 +10,10 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://api.tracepoint.jassist.qzz.io',
+        // Defaults to the deployed API so `npm run dev` behaves as before.
+        // Set VITE_API_PROXY to work against a backend running locally, so
+        // local testing cannot reach production data by accident.
+        target: process.env.VITE_API_PROXY || 'https://api.tracepoint.jassist.qzz.io',
         changeOrigin: true,
       },
     },
