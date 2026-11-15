@@ -800,3 +800,9 @@ app.include_router(trust_score_router)
 
 from app.assistant import router as assistant_router
 app.include_router(assistant_router)
+
+# TRACEPOINT_NETWORK_LAB_V1
+# Network investigation sessions: agent ingest, stored evidence, and
+# topology-aware root-cause analysis derived on read.
+from app.network import router as network_router
+app.include_router(network_router)
