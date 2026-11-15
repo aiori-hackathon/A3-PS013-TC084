@@ -422,133 +422,226 @@
 .tp-app[data-theme="dark"] .tp-graph-edge.tentative { color: #9fc2e4 !important; }
 
 
-/* TRACEPOINT_GRAPH_TYPOGRAPHY_FINAL_V2
-   Investigation Graph only — typography and text readability.
-   Does not change layout, spacing, graph structure, or other pages.
-*/
+/* TRACEPOINT_GRAPH_AMBER_LARGE_TYPE_V1
+   Investigation Graph only: Amazon-style amber text + larger type.
+   Light theme uses a deeper amber (AA contrast on white); dark/forensic
+   themes and the dark hero use the bright Amazon amber. */
+html .tp-app .tp-graph-root.tp-graph-phase5 {
+  --gx-amber-strong: #9a5b00;   /* headings, numbers, node titles */
+  --gx-amber-soft:   #7d4e0a;   /* secondary / descriptive text   */
+  --gx-amber-accent: #c77700;   /* icons, links, edges            */
+  --gx-hero-strong:  #ffb84d;
+  --gx-hero-soft:    #ffd9a0;
+}
+html .tp-app[data-theme="dark"] .tp-graph-root.tp-graph-phase5,
+html .tp-app[data-theme="forensic"] .tp-graph-root.tp-graph-phase5 {
+  --gx-amber-strong: #ffb84d;
+  --gx-amber-soft:   #f0c070;
+  --gx-amber-accent: #ff9900;
+}
 
+/* ---- Hero ---- */
+html .tp-app .tp-graph-phase5 .tp-graph-phase5-hero h2 { color: var(--gx-hero-strong) !important; font-size: 30px !important; }
+html .tp-app .tp-graph-phase5 .tp-graph-phase5-hero h2 svg { color: #ff9900 !important; width: 26px; height: 26px; }
+html .tp-app .tp-graph-phase5 .tp-graph-phase5-hero p { color: var(--gx-hero-soft) !important; font-size: 16.5px !important; line-height: 1.7; max-width: 780px; }
+html .tp-app .tp-graph-phase5 .tp-graph-phase5-hero .tp-button { font-size: 15.5px !important; min-height: 46px; padding: 11px 20px; color: #7a4300 !important; font-weight: 700; }
+
+/* ---- Stat cards ---- */
+html .tp-app .tp-graph-phase5 .tp-graph-stats > .tp-card strong { color: var(--gx-amber-strong) !important; font-size: 40px !important; }
+html .tp-app .tp-graph-phase5 .tp-graph-stats > .tp-card span { color: var(--gx-amber-soft) !important; font-size: 15.5px !important; font-weight: 650; }
+html .tp-app .tp-graph-phase5 .tp-graph-stats > .tp-card > svg { color: var(--gx-amber-accent) !important; width: 23px; height: 23px; }
+
+/* ---- Panel + section headings ---- */
+html .tp-app .tp-graph-phase5 .tp-graph-panel-head h3,
+html .tp-app .tp-graph-phase5 .tp-graph-gaps h3 { color: var(--gx-amber-strong) !important; font-size: 23px !important; }
+html .tp-app .tp-graph-phase5 .tp-graph-gaps h3 > svg { color: var(--gx-amber-accent) !important; width: 21px; height: 21px; }
+html .tp-app .tp-graph-phase5 .tp-graph-panel-head p,
+html .tp-app .tp-graph-phase5 .tp-graph-gaps > p { color: var(--gx-amber-soft) !important; font-size: 15.5px !important; line-height: 1.7; }
+html .tp-app .tp-graph-phase5 .tp-graph-legend { color: var(--gx-amber-soft) !important; font-size: 14px !important; }
+html .tp-app .tp-graph-phase5 .tp-graph-legend i { border-top-color: var(--gx-amber-accent) !important; }
+
+/* ---- Sequence nodes ---- */
+html .tp-app .tp-graph-phase5 .tp-graph-node > span { color: var(--gx-amber-soft) !important; font-size: 14px !important; }
+html .tp-app .tp-graph-phase5 .tp-graph-node strong { color: var(--gx-amber-strong) !important; font-size: 19px !important; }
+html .tp-app .tp-graph-phase5 .tp-graph-node small { color: var(--gx-amber-soft) !important; font-size: 14.5px !important; line-height: 1.7; }
+html .tp-app .tp-graph-phase5 .tp-graph-edge,
+html .tp-app .tp-graph-phase5 .tp-graph-edge.tentative { color: var(--gx-amber-accent) !important; font-size: 14px !important; }
+html .tp-app .tp-graph-phase5 .tp-graph-edge svg { width: 30px; height: 30px; }
+html .tp-app .tp-graph-phase5 .tp-graph-reason { color: var(--gx-amber-soft) !important; font-size: 15px !important; line-height: 1.7; }
+.tp-graph-phase5 .tp-graph-sequence { grid-template-columns: minmax(0,1fr) 150px minmax(0,1fr); }
+.tp-graph-phase5 .tp-graph-node { min-height: 140px; }
+
+/* ---- Evidence requiring review ---- */
+html .tp-app .tp-graph-phase5 .tp-graph-gaps > button { min-height: 62px; }
+html .tp-app .tp-graph-phase5 .tp-graph-gaps > button span { color: var(--gx-amber-strong) !important; font-size: 16px !important; min-width: 220px; }
+html .tp-app .tp-graph-phase5 .tp-graph-gaps > button small { color: var(--gx-amber-soft) !important; font-size: 14.5px !important; }
+html .tp-app .tp-graph-phase5 .tp-graph-gaps > button > svg { color: var(--gx-amber-accent) !important; }
+html .tp-app .tp-graph-phase5 .tp-graph-gaps > button:hover span { color: var(--gx-amber-accent) !important; }
+html .tp-app .tp-graph-phase5 .tp-graph-no-gaps { color: var(--gx-amber-soft) !important; font-size: 16px !important; }
+
+/* ---- Empty state + cautions ---- */
+html .tp-app .tp-graph-phase5 .tp-graph-empty strong { color: var(--gx-amber-strong) !important; font-size: 18px; }
+html .tp-app .tp-graph-phase5 .tp-graph-empty p,
+html .tp-app .tp-graph-phase5 .tp-graph-empty > svg { color: var(--gx-amber-soft) !important; font-size: 15px; }
+html .tp-app .tp-graph-phase5 .tp-graph-caution { color: var(--gx-amber-soft) !important; font-size: 14.5px !important; }
+
+/* ---- Event details modal (portal under <body>) ---- */
+html .tp-overlay.tp-graph-modal-overlay .tp-graph-event-modal { --gx-m-strong:#9a5b00; --gx-m-soft:#7d4e0a; }
+html .tp-overlay.tp-graph-modal-overlay[data-theme="dark"] .tp-graph-event-modal,
+html .tp-overlay.tp-graph-modal-overlay[data-theme="forensic"] .tp-graph-event-modal { --gx-m-strong:#ffb84d; --gx-m-soft:#f0c070; }
+html .tp-overlay.tp-graph-modal-overlay .tp-drawer-header h2 { color: var(--gx-m-strong) !important; font-size: 26px !important; }
+html .tp-overlay.tp-graph-modal-overlay .tp-drawer-header span,
+html .tp-overlay.tp-graph-modal-overlay .tp-detail span,
+html .tp-overlay.tp-graph-modal-overlay .tp-drawer-body p,
+html .tp-overlay.tp-graph-modal-overlay .tp-graph-caution { color: var(--gx-m-soft) !important; font-size: 15px !important; }
+html .tp-overlay.tp-graph-modal-overlay .tp-drawer-body h3 { color: var(--gx-m-strong) !important; font-size: 19px !important; }
+html .tp-overlay.tp-graph-modal-overlay .tp-detail strong { color: var(--gx-m-strong) !important; font-size: 16.5px !important; }
+html .tp-overlay.tp-graph-modal-overlay .tp-drawer-body pre { font-size: 14px !important; line-height: 1.65; }
+
+/* ---- Responsive ---- */
+@media (max-width: 1150px) {
+  .tp-graph-phase5 .tp-graph-sequence { grid-template-columns: minmax(0,1fr) 105px minmax(0,1fr); }
+}
+@media (max-width: 800px) {
+  html .tp-app .tp-graph-phase5 .tp-graph-phase5-hero h2 { font-size: 25px !important; }
+  html .tp-app .tp-graph-phase5 .tp-graph-phase5-hero p { font-size: 15.5px !important; }
+  html .tp-app .tp-graph-phase5 .tp-graph-stats > .tp-card strong { font-size: 34px !important; }
+  html .tp-app .tp-graph-phase5 .tp-graph-gaps > button span { min-width: 0; }
+  .tp-graph-phase5 .tp-graph-sequence { grid-template-columns: minmax(0,1fr); }
+}
+
+/* Preserve the existing forensic font family */
 .tp-app[data-theme="forensic"] .tp-graph-root.tp-graph-phase5 {
   font-family: var(--fx-sans, 'Inter', system-ui, -apple-system, sans-serif) !important;
-  color: #273044 !important;
 }
 
 .tp-app[data-theme="forensic"] .tp-graph-root.tp-graph-phase5 *:not(svg):not(path):not(pre):not(code) {
   font-family: var(--fx-sans, 'Inter', system-ui, -apple-system, sans-serif) !important;
 }
 
-.tp-app[data-theme="forensic"] .tp-graph-root.tp-graph-phase5 .tp-graph-phase5-hero h2 {
-  font-size: 24px !important;
-  font-weight: 750 !important;
+/* TRACEPOINT_GRAPH_TYPOGRAPHY_ALIGNMENT_V1
+   Match Investigation Graph typography with other Tracepoint pages.
+   Preserve amber colours, layout and spacing.
+*/
+
+html .tp-app .tp-graph-phase5 .tp-graph-phase5-hero h2 {
+  font-size: 26px !important;
+}
+
+html .tp-app .tp-graph-phase5 .tp-graph-phase5-hero p {
+  font-size: 15px !important;
+}
+
+html .tp-app .tp-graph-phase5 .tp-graph-stats > .tp-card strong {
+  font-size: 36px !important;
+}
+
+html .tp-app .tp-graph-phase5 .tp-graph-stats > .tp-card span {
+  font-size: 14px !important;
+}
+
+html .tp-app .tp-graph-phase5 .tp-graph-panel-head h3,
+html .tp-app .tp-graph-phase5 .tp-graph-gaps h3 {
+  font-size: 21px !important;
+}
+
+html .tp-app .tp-graph-phase5 .tp-graph-panel-head p,
+html .tp-app .tp-graph-phase5 .tp-graph-gaps > p {
+  font-size: 14px !important;
+}
+
+html .tp-app .tp-graph-phase5 .tp-graph-node > span {
+  font-size: 13px !important;
+}
+
+html .tp-app .tp-graph-phase5 .tp-graph-node strong {
+  font-size: 17px !important;
+}
+
+html .tp-app .tp-graph-phase5 .tp-graph-node small {
+  font-size: 13.5px !important;
+}
+
+html .tp-app .tp-graph-phase5 .tp-graph-edge {
+  font-size: 13px !important;
+}
+
+html .tp-app .tp-graph-phase5 .tp-graph-reason {
+  font-size: 14px !important;
+}
+
+html .tp-app .tp-graph-phase5 .tp-graph-gaps > button span {
+  font-size: 14.5px !important;
+}
+
+html .tp-app .tp-graph-phase5 .tp-graph-gaps > button small {
+  font-size: 13.5px !important;
+}
+
+html .tp-overlay.tp-graph-modal-overlay .tp-drawer-header h2 {
+  font-size: 22px !important;
+}
+
+html .tp-overlay.tp-graph-modal-overlay .tp-drawer-body h3 {
+  font-size: 17px !important;
+}
+
+html .tp-overlay.tp-graph-modal-overlay .tp-detail strong {
+  font-size: 14.5px !important;
+}
+
+html .tp-overlay.tp-graph-modal-overlay .tp-drawer-header span,
+html .tp-overlay.tp-graph-modal-overlay .tp-detail span,
+html .tp-overlay.tp-graph-modal-overlay .tp-drawer-body p {
+  font-size: 14px !important;
+}
+
+html .tp-overlay.tp-graph-modal-overlay .tp-drawer-body pre {
+  font-size: 13px !important;
+}
+
+@media (max-width: 800px) {
+  html .tp-app .tp-graph-phase5 .tp-graph-phase5-hero h2 {
+    font-size: 23px !important;
+  }
+
+  html .tp-app .tp-graph-phase5 .tp-graph-stats > .tp-card strong {
+    font-size: 32px !important;
+  }
+}
+
+/* FINAL GRAPH INTRO HEADING SIZE */
+html .tp-app.tp-app[data-theme="forensic"] .tp-graph-root .tp-graph-intro h2 {
+  font-size: 22px !important;
   line-height: 1.3 !important;
-  letter-spacing: -0.5px !important;
-  color: #ffffff !important;
 }
 
-.tp-app[data-theme="forensic"] .tp-graph-root.tp-graph-phase5 .tp-graph-phase5-hero p {
-  font-size: 14px !important;
-  font-weight: 450 !important;
-  line-height: 1.65 !important;
-  color: #d1d5e0 !important;
+/* FINAL OVERRIDE: INVESTIGATION GRAPH MAIN TITLE */
+html .tp-app.tp-app[data-theme="forensic"] .tp-graph-root.tp-graph-phase5 .tp-graph-phase5-hero h2,
+html .tp-app.tp-app[data-theme="forensic"] .tp-graph-root .tp-graph-intro h2 {
+  font-size: 22px !important;
+  line-height: 1.3 !important;
 }
 
-.tp-app[data-theme="forensic"] .tp-graph-root.tp-graph-phase5 .tp-graph-stats strong {
-  font-size: 32px !important;
-  font-weight: 750 !important;
+/* Match Investigation Graph heading with other page headings */
+html .tp-app.tp-app[data-theme="forensic"] .tp-graph-root.tp-graph-phase5 .tp-graph-phase5-hero h2,
+html .tp-app.tp-app[data-theme="forensic"] .tp-graph-root .tp-graph-intro h2 {
+  font-size: 28px !important;
+}
+
+/* Final heading size adjustment */
+html .tp-app.tp-app[data-theme="forensic"] .tp-graph-root.tp-graph-phase5 .tp-graph-phase5-hero h2,
+html .tp-app.tp-app[data-theme="forensic"] .tp-graph-root .tp-graph-intro h2 {
+  font-size: 24px !important;
+}
+
+/* Investigation Graph: refine statistic typography only */
+html .tp-app .tp-graph-phase5 .tp-graph-stats > .tp-card strong {
+  font-size: 30px !important;
   line-height: 1.2 !important;
-  letter-spacing: -0.6px !important;
-  color: #273044 !important;
 }
 
-.tp-app[data-theme="forensic"] .tp-graph-root.tp-graph-phase5 .tp-graph-stats span {
+html .tp-app .tp-graph-phase5 .tp-graph-stats > .tp-card span {
   font-size: 13px !important;
-  font-weight: 600 !important;
-  line-height: 1.5 !important;
-  color: #59677d !important;
-}
-
-.tp-app[data-theme="forensic"] .tp-graph-root.tp-graph-phase5 .tp-graph-panel-head h3,
-.tp-app[data-theme="forensic"] .tp-graph-root.tp-graph-phase5 .tp-graph-gaps h3 {
-  font-size: 19px !important;
-  font-weight: 700 !important;
-  line-height: 1.4 !important;
-  letter-spacing: -0.25px !important;
-  color: #283148 !important;
-}
-
-.tp-app[data-theme="forensic"] .tp-graph-root.tp-graph-phase5 .tp-graph-panel-head p,
-.tp-app[data-theme="forensic"] .tp-graph-root.tp-graph-phase5 .tp-graph-gaps > p {
-  font-size: 14px !important;
-  font-weight: 450 !important;
-  line-height: 1.65 !important;
-  color: #657187 !important;
-}
-
-.tp-app[data-theme="forensic"] .tp-graph-root.tp-graph-phase5 .tp-graph-legend {
-  font-size: 12px !important;
-  font-weight: 600 !important;
-  line-height: 1.5 !important;
-  color: #59677d !important;
-}
-
-.tp-app[data-theme="forensic"] .tp-graph-root.tp-graph-phase5 .tp-graph-node span {
-  font-size: 12px !important;
-  font-weight: 650 !important;
   line-height: 1.5 !important;
 }
-
-.tp-app[data-theme="forensic"] .tp-graph-root.tp-graph-phase5 .tp-graph-node strong {
-  font-size: 16px !important;
-  font-weight: 700 !important;
-  line-height: 1.4 !important;
-  color: #273044 !important;
-}
-
-.tp-app[data-theme="forensic"] .tp-graph-root.tp-graph-phase5 .tp-graph-node small {
-  font-size: 12px !important;
-  font-weight: 500 !important;
-  line-height: 1.6 !important;
-  color: #647187 !important;
-}
-
-.tp-app[data-theme="forensic"] .tp-graph-root.tp-graph-phase5 .tp-graph-edge {
-  font-size: 11px !important;
-  font-weight: 650 !important;
-}
-
-.tp-app[data-theme="forensic"] .tp-graph-root.tp-graph-phase5 .tp-graph-reason {
-  font-size: 13px !important;
-  font-weight: 450 !important;
-  line-height: 1.65 !important;
-  color: #58667c !important;
-}
-
-.tp-app[data-theme="forensic"] .tp-graph-root.tp-graph-phase5 .tp-graph-gaps > button span {
-  font-size: 13px !important;
-  font-weight: 650 !important;
-  line-height: 1.5 !important;
-  color: #303b50 !important;
-}
-
-.tp-app[data-theme="forensic"] .tp-graph-root.tp-graph-phase5 .tp-graph-gaps > button small {
-  font-size: 12px !important;
-  font-weight: 500 !important;
-  line-height: 1.5 !important;
-}
-
-.tp-app[data-theme="forensic"] .tp-graph-root.tp-graph-phase5 .tp-graph-empty strong {
-  font-size: 16px !important;
-  font-weight: 700 !important;
-  line-height: 1.5 !important;
-  color: #303b50 !important;
-}
-
-.tp-app[data-theme="forensic"] .tp-graph-root.tp-graph-phase5 .tp-graph-empty p,
-.tp-app[data-theme="forensic"] .tp-graph-root.tp-graph-phase5 .tp-graph-no-gaps,
-.tp-app[data-theme="forensic"] .tp-graph-root.tp-graph-phase5 .tp-graph-caution {
-  font-size: 13px !important;
-  font-weight: 450 !important;
-  line-height: 1.65 !important;
-  color: #657187 !important;
-}
-
-/* END TRACEPOINT_GRAPH_TYPOGRAPHY_FINAL_V2 */
