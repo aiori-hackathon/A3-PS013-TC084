@@ -5,9 +5,15 @@ import './styles/NetworkLab.css';
 const PHASE_ORDER = ['normal', 'fault', 'recovered'];
 
 function failureMessage(status) {
-  return status === 401
-    ? 'Session expired. Please sign in again.'
-    : `Could not load network sessions (HTTP ${status}).`;
+  if (status === 401) return 'Session expired. Please sign in again.';
+  // A 404 here means the API being talked to has no network routes at all,
+  // which is what you get pointing a dev server at a backend that predates
+  // this feature — not a missing session.
+  if (status === 404) {
+    return 'This workspace API does not provide network sessions yet. '
+      + 'The backend serving it needs the network investigation routes.';
+  }
+  return `Could not load network sessions (HTTP ${status}).`;
 }
 
 const NODE_W = 132;

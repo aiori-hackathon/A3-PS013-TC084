@@ -824,11 +824,6 @@ export default function Dashboard({ user, onSignOut }) {
   </LazyPage>
 )}
 
-{page === 'netlab' && (
-  <LazyPage name="Network Lab">
-    <NetworkLab />
-  </LazyPage>
-)}
 
 {page === 'graph' && (
   <LazyPage name="Investigation Graph">
@@ -964,6 +959,11 @@ export default function Dashboard({ user, onSignOut }) {
     {page === 'investigations' && (
       <LazyPage name="Investigations">
         <Investigations events={events} />
+      </LazyPage>
+    )}
+    {page === 'netlab' && (
+      <LazyPage name="Network Lab">
+        <NetworkLab />
       </LazyPage>
     )}
     {page === 'graph' && (
