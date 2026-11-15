@@ -179,3 +179,51 @@ def test_a_session_without_topology_is_served_but_not_analysed(api):
 def test_unknown_session_is_not_found(api):
     client, _key, _user = api
     assert client.get("/api/v1/network/sessions/nope").status_code == 404
+
+
+def test_report_is_rendered_from_stored_evidence(api):
+    client, key, _user = api
+    client.post("/api/v1/network/ingest", json=batch(), headers={"X-API-Key": key})
+
+    response = client.get("/api/v1/network/sessions/lab-test/report")
+
+    assert response.status_code == 200
+    assert "TRACEPOINT - NETWORK INVESTIGATION REPORT" in response.text
+    assert "h2:h2-eth0--s1:s1-eth2" in response.text
+    assert "attachment" in response.headers["content-disposition"]
+
+
+def test_report_keeps_hypotheses_marked_unconfirmed(api):
+    client, key, _user = api
+    client.post("/api/v1/network/ingest", json=batch(), headers={"X-API-Key": key})
+
+    text = client.get("/api/v1/network/sessions/lab-test/report").text
+
+    assert "ROOT-CAUSE HYPOTHESES" in text
+    assert "NOT CONFIRMED" in text
+    assert "It is not a probability" in text
+    # the surviving switch port must still be reported as contradicting
+    assert "s1-eth1" in text
+
+
+def test_report_for_a_session_without_topology_says_so(api):
+    client, key, _user = api
+    client.post(
+        "/api/v1/network/ingest",
+        json=batch("legacy", legacy_session()),
+        headers={"X-API-Key": key},
+    )
+
+    text = client.get("/api/v1/network/sessions/legacy/report").text
+
+    assert "Not available for this session." in text
+    assert "FAULT LOCALISATION" not in text
+
+
+def test_report_requires_sign_in(api):
+    client, key, _user = api
+    client.post("/api/v1/network/ingest", json=batch(), headers={"X-API-Key": key})
+
+    client.post("/api/v1/auth/logout")
+
+    assert client.get("/api/v1/network/sessions/lab-test/report").status_code == 401

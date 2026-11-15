@@ -17,11 +17,13 @@ import json
 import re
 
 from fastapi import APIRouter, Header, HTTPException, Request
+from fastapi.responses import PlainTextResponse
 from pydantic import BaseModel, ConfigDict, Field
 from pydantic import ValidationError
 
 from app import custody
 from app import network_rca
+from app import network_report
 
 router = APIRouter(prefix="/api/v1/network", tags=["network"])
 
@@ -66,6 +68,38 @@ def require_user(request: Request) -> int:
     if user is None:
         raise HTTPException(status_code=401, detail="Sign in required")
     return user["id"]
+
+
+def load_for_analysis(user_id: int, session_id: str):
+    """Stored session, its metadata and freshly derived analysis."""
+    if not SAFE_ID.match(session_id):
+        raise HTTPException(status_code=422, detail="Invalid session_id")
+
+    path = session_dir(user_id) / f"{session_id}.json"
+    if not path.is_file():
+        raise HTTPException(status_code=404, detail="Network session not found")
+
+    stored = read_session(path)
+    if not isinstance(stored, dict):
+        raise HTTPException(status_code=500, detail="Stored session could not be read")
+
+    meta = read_session(path.with_suffix(".meta.json")) or {}
+    observations = stored.get("observations") or []
+
+    try:
+        analysis = network_rca.analyse(observations)
+    except Exception as error:  # analysis must never make evidence unreadable
+        analysis = {
+            "topology_available": False,
+            "hypotheses": [],
+            "fault_localisation": None,
+            "impact": None,
+            "recovery": None,
+            "observed_facts": [],
+            "limitations": ["Analysis failed: " + str(error)],
+        }
+
+    return summarise(session_id, stored, meta), observations, analysis
 
 
 def read_session(path: Path):
@@ -201,38 +235,23 @@ def list_sessions(request: Request):
 
 @router.get("/sessions/{session_id}")
 def get_session(session_id: str, request: Request):
-    user_id = require_user(request)
+    session, observations, analysis = load_for_analysis(
+        require_user(request), session_id
+    )
+    return {"session": session, "observations": observations, "rca": analysis}
 
-    if not SAFE_ID.match(session_id):
-        raise HTTPException(status_code=422, detail="Invalid session_id")
 
-    path = session_dir(user_id) / f"{session_id}.json"
-    if not path.is_file():
-        raise HTTPException(status_code=404, detail="Network session not found")
-
-    stored = read_session(path)
-    if not isinstance(stored, dict):
-        raise HTTPException(status_code=500, detail="Stored session could not be read")
-
-    meta = read_session(path.with_suffix(".meta.json")) or {}
-    observations = stored.get("observations") or []
-
-    # Derived on read, never stored alongside the evidence.
-    try:
-        analysis = network_rca.analyse(observations)
-    except Exception as error:  # analysis must never make evidence unreadable
-        analysis = {
-            "topology_available": False,
-            "hypotheses": [],
-            "fault_localisation": None,
-            "impact": None,
-            "recovery": None,
-            "observed_facts": [],
-            "limitations": ["Analysis failed: " + str(error)],
-        }
-
-    return {
-        "session": summarise(session_id, stored, meta),
-        "observations": observations,
-        "rca": analysis,
-    }
+@router.get("/sessions/{session_id}/report", response_class=PlainTextResponse)
+def session_report(session_id: str, request: Request):
+    """A plain-text investigation report, rendered from stored evidence."""
+    session, observations, analysis = load_for_analysis(
+        require_user(request), session_id
+    )
+    text = network_report.build(session, observations, analysis)
+    return PlainTextResponse(
+        text,
+        headers={
+            "Content-Disposition":
+                f'attachment; filename="tracepoint_network_{session_id}.txt"'
+        },
+    )
