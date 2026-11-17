@@ -422,12 +422,18 @@ function TimelineExplorer({ events, loading, onInspect }) {
 
   const activeDay = days.find(d => d.key === dayPick) || days[0] || null;
 
-  /* Ascending, so the day reads as it happened. */
+  /* Newest first. This read ascending, on the reasoning that a day should
+     play back in the order it happened - but on a host collecting thousands
+     of events a day that buries the most recent activity under everything
+     that came before it: opening today put midnight at the top and the login
+     from a minute ago a thousand rows below the fold. Every other surface in
+     the product leads with the newest record, and the first question anyone
+     asks a timeline is what just happened. */
   const rows = useMemo(() => {
     if (!activeDay) return [];
     return scoped
       .filter(e => dayKeyOf(timestamp(e)) === activeDay.key)
-      .sort((a, b) => new Date(timestamp(a)) - new Date(timestamp(b)));
+      .sort((a, b) => new Date(timestamp(b)) - new Date(timestamp(a)));
   }, [scoped, activeDay?.key]);
 
   /* Only marks which row is highlighted. The record itself is read in the
