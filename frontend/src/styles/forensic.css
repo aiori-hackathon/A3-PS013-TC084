@@ -4173,3 +4173,27 @@ html .tp-overlay.tp-overlay.tp-graph-modal-overlay .tp-drawer-body pre {
 }
 
 /* END TRACEPOINT INVESTIGATION GRAPH TYPOGRAPHY REFINEMENT V1 */
+
+/* The title panel stops short of the globe.
+
+   The globe is absolutely positioned at width 58%, right -2%, so its box
+   starts at 44% of the band. The panel beside it was only bounded by a 650px
+   cap, which at the sizes this is actually viewed at left its right edge -
+   and its opaque background - sitting over the globe's left limb: 65px of
+   overlap at 1460, 70px at 1024.
+
+   Measured against the real page this time, left rail included. An earlier
+   attempt was tuned against a harness that omitted the 234px rail, so the
+   band sat further left and wider than it really is and the numbers it gave
+   were meaningless.
+
+   calc(44% - 42px) subtracts the band's own padding and leaves a margin, so
+   the panel cannot reach the globe at any width: clearance of 9px at 1024,
+   87px at 1460 and 339px at 1990. The headline keeps its three lines at 1460
+   and above; below roughly 1100 it takes a fourth, which is unavoidable
+   without moving the globe. */
+@media (min-width: 981px) {
+  html .tp-app.tp-app[data-theme='forensic'] .tp-forensic-intro-copy {
+    max-width: min(650px, calc(44% - 42px)) !important;
+  }
+}
