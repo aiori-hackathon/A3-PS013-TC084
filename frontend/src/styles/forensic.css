@@ -4173,3 +4173,50 @@ html .tp-overlay.tp-overlay.tp-graph-modal-overlay .tp-drawer-body pre {
 }
 
 /* END TRACEPOINT INVESTIGATION GRAPH TYPOGRAPHY REFINEMENT V1 */
+
+/* ===========================================================================
+   THE OVERVIEW BAND: NOTHING SITS ON THE GLOBE
+   ---------------------------------------------------------------------------
+   The collection status and the globe's own readout were both absolutely
+   positioned over the globe. Measured at 1680px, the globe's circle is
+   centred at (1351, 425) with a radius of 300, and the status card sat 212px
+   from that centre while the readout sat 260px - both well inside it, so each
+   card punched an opaque hole in the dots behind it.
+
+   There is no room beside the globe either: the copy column ends about 100px
+   short of where the globe begins, and the cards are 245px and 340px wide.
+   So the status card moves into the left column under the copy, where the
+   band already had empty space, and the readout goes back under the globe it
+   describes. The globe comes down enough to leave room for it.
+   =========================================================================== */
+@media (min-width: 981px) {
+  html .tp-app.tp-app[data-theme='forensic'] .tp-forensic-intro-side {
+    position: static !important;
+    width: 100% !important;
+    max-width: 340px !important;
+    margin: 14px 0 0 !important;
+    top: auto !important;
+    right: auto !important;
+  }
+
+  html .tp-app.tp-app[data-theme='forensic'] .tp-globe {
+    width: 46% !important;
+    right: 1% !important;
+    max-width: 520px !important;
+  }
+  html .tp-app.tp-app[data-theme='forensic'] .tp-globe-svg {
+    width: clamp(320px, 31vw, 440px) !important;
+  }
+
+  /* The readout is the globe's caption, so it sits under the globe rather
+     than on top of it. */
+  html .tp-app.tp-app[data-theme='forensic'] .tp-globe-readout {
+    position: static !important;
+    right: auto !important;
+    bottom: auto !important;
+    max-width: 420px !important;
+    /* Measured clearance from the globe's edge was 10px at 1680; this keeps
+       it comfortable as the globe scales with the viewport. */
+    margin-top: 18px !important;
+  }
+}
