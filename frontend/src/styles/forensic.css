@@ -4200,3 +4200,19 @@ html .tp-overlay.tp-overlay.tp-graph-modal-overlay .tp-drawer-body pre {
     right: auto !important;
   }
 }
+
+/* The title block must stop before the globe starts.
+
+   The globe is absolutely positioned at width 58%, right -2%, so its box
+   begins at 44% of the band, and the copy was running to 53.7% - a 78px
+   overlap at 1100px wide.
+
+   A breakpoint was the wrong tool here: capping only below 1400px left 1440
+   still overlapping by 74px, because the globe's SVG keeps growing with the
+   viewport until it reaches its 600px limit. This caps the copy against the
+   same 44% the globe is positioned from, so the two can never meet at any
+   width, and the min() leaves the copy at its natural 650px once the band is
+   wide enough that there was never a collision to begin with. */
+html .tp-app.tp-app[data-theme='forensic'] .tp-forensic-intro-copy {
+  max-width: min(650px, calc(44% - 60px)) !important;
+}
