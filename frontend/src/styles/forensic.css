@@ -4197,3 +4197,27 @@ html .tp-overlay.tp-overlay.tp-graph-modal-overlay .tp-drawer-body pre {
     max-width: min(650px, calc(44% - 42px)) !important;
   }
 }
+
+/* No panel behind the title.
+
+   The copy sat in an opaque surface-coloured box, and it was that box - not
+   the text - that cut into the globe: the text itself is transparent, so a
+   dark rectangle was the only thing hiding the dots behind it. Removing the
+   box removes the problem at its source rather than measuring a clearance
+   against it, and it is how the reference this band is modelled on handles
+   the same arrangement: type straight on the page, the object behind it
+   free to run under the words.
+
+   The width cap above stays, so the lines still break where they did and the
+   text keeps clear of the globe's bright edge, where it would be hard to
+   read against the dots. */
+@media (min-width: 981px) {
+  html .tp-app.tp-app[data-theme='forensic'] .tp-forensic-intro-copy {
+    background: transparent !important;
+    background-image: none !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+  }
+}
