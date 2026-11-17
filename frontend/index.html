@@ -2,16 +2,12 @@
 <html lang="en">
   <head>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <!-- TRACEPOINT_ASYNC_GOOGLE_FONTS -->
-    <link
-      rel="preload"
-      as="style"
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
-      onload="this.onload=null;this.rel='stylesheet'"
-    />
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" /></noscript>
+    <!-- Inter and IBM Plex Mono are bundled: main.jsx imports them from
+         @fontsource, and the build emits the woff2 files alongside the app.
+         This head used to request the same two families from Google as well,
+         so every load fetched fonts it already had, and a page meant to be
+         read offline or on a locked-down network depended on a third party
+         to render its own type. -->
     <meta charset="UTF-8" />
     <meta
       name="description"
