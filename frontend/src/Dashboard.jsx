@@ -51,6 +51,16 @@ const navigation = [
   ['netlab', 'Network Lab', Network],
   ['guide', 'Workflow Guide', BookOpen],
 ];
+/* Every timestamp on screen is rendered in one fixed zone rather than the
+   zone of whichever machine happens to be showing it. The records are stored
+   in UTC; leaving the display to the viewer's browser meant the same event
+   read as a different wall-clock time on a different laptop, which is not a
+   property evidence should have. Asia/Kolkata is the zone the workspace and
+   its hosts operate in, and it is stated next to the time so nobody has to
+   assume it. */
+const DISPLAY_TZ = 'Asia/Kolkata';
+const DISPLAY_TZ_LABEL = 'IST';
+
 const text = value => value === undefined || value === null || value === '' ? '—' : String(value);
 const timestamp = e => e.timestamp || e.event_timestamp || e.time || e.received_at || e.datetime || '';
 const eventType = e => text(e.event_type || e.type || e.action || 'Event').replaceAll('_', ' ');
@@ -62,8 +72,8 @@ const device = e => text(e.device_id || e.hostname || e.device || e.host);
 // Login" over "failed login". The eventType fallback is gone with it: a row
 // with no message should say nothing, not repeat its own title.
 const message = e => text(e.message || e.raw_log || e.raw_line || e.raw || e.description || e.details || '');
-const dateLabel = value => { const d = new Date(value); return value && !Number.isNaN(d.getTime()) ? d.toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : text(value); };
-const fullDate = value => { const d = new Date(value); return value && !Number.isNaN(d.getTime()) ? d.toLocaleString(undefined, { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', second: '2-digit', timeZoneName: 'short' }) : text(value); };
+const dateLabel = value => { const d = new Date(value); return value && !Number.isNaN(d.getTime()) ? d.toLocaleString(undefined, { timeZone: DISPLAY_TZ, month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : text(value); };
+const fullDate = value => { const d = new Date(value); return value && !Number.isNaN(d.getTime()) ? `${d.toLocaleString(undefined, { timeZone: DISPLAY_TZ, year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', second: '2-digit' })} ${DISPLAY_TZ_LABEL}` : text(value); };
 const unpack = data => Array.isArray(data) ? data : (data?.events || data?.timeline || data?.items || data?.data?.events || []);
 const csvValue = value => '"' + String(value ?? '').replaceAll('"', '""') + '"';
 // The parser compares each source clock against the time this server received
@@ -95,12 +105,15 @@ const severityClass = value => {
 const CHART_DAYS = 7;
 function TrendChart({ events }) {
   const buckets = useMemo(() => {
-    const today = new Date(); today.setHours(0, 0, 0, 0);
+    /* Midnight in the display zone, not in the viewer's, so a bucket holds
+       the same events wherever the page is opened. */
+    const today = new Date(new Date().toLocaleString('en-US', { timeZone: DISPLAY_TZ }));
+    today.setHours(0, 0, 0, 0);
     return Array.from({ length: CHART_DAYS }, (_, index) => {
       const day = new Date(today); day.setDate(today.getDate() - (CHART_DAYS - 1 - index));
       const next = new Date(day); next.setDate(day.getDate() + 1);
       const current = events.filter(e => { const time = Date.parse(timestamp(e)); return time >= day.getTime() && time < next.getTime(); });
-      return { label: day.toLocaleDateString(undefined, { weekday: 'short' }), title: day.toLocaleDateString(undefined, { day: 'numeric', month: 'short' }), total: current.length, failures: current.filter(fail).length };
+      return { label: day.toLocaleDateString(undefined, { timeZone: DISPLAY_TZ, weekday: 'short' }), title: day.toLocaleDateString(undefined, { timeZone: DISPLAY_TZ, day: 'numeric', month: 'short' }), total: current.length, failures: current.filter(fail).length };
     });
   }, [events]);
   const max = Math.max(1, ...buckets.map(b => b.total));
@@ -125,8 +138,8 @@ const eventDateParts = value => {
   const d = new Date(value);
   if (!value || Number.isNaN(d.getTime())) return { date: text(value), time: '' };
   return {
-    date: d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }),
-    time: d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }),
+    date: d.toLocaleDateString(undefined, { timeZone: DISPLAY_TZ, month: 'short', day: 'numeric', year: 'numeric' }),
+    time: d.toLocaleTimeString(undefined, { timeZone: DISPLAY_TZ, hour: 'numeric', minute: '2-digit' }),
   };
 };
 function EventTable({ rows, loading, onSelect }) {
@@ -250,7 +263,7 @@ function TimelineActivityChart({ events, animationKey }) {
   if (!data) return null;
 
   const peak = Math.max(1, ...data.buckets.map(b => b.total));
-  const stamp = d => d.toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+  const stamp = d => d.toLocaleString(undefined, { timeZone: DISPLAY_TZ, month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
 
   return (
     <section className="tp-card tp-tl-activity" aria-label="Collected event activity over the collection range">
@@ -317,18 +330,25 @@ const isAuthAttempt = e => /login|logon|auth|password|credential|invalid user|se
 
 const UNDATED = 'undated';
 
+const DAY_KEY_FORMAT = new Intl.DateTimeFormat('en-CA', {
+  timeZone: DISPLAY_TZ, year: 'numeric', month: '2-digit', day: '2-digit',
+});
+
 const dayKeyOf = value => {
   const d = new Date(value);
   if (Number.isNaN(d.getTime())) return UNDATED;
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  /* en-CA formats as YYYY-MM-DD, which the day list sorts on directly. The
+     local getters this replaced bucketed by the viewer's midnight, so an
+     event could sit under a different date than the one its row displayed. */
+  return DAY_KEY_FORMAT.format(d);
 };
 
 const dayTitle = date => date
-  ? date.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+  ? date.toLocaleDateString(undefined, { timeZone: DISPLAY_TZ, weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
   : 'Events without a readable timestamp';
 
 const dayShort = date => date
-  ? date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+  ? date.toLocaleDateString(undefined, { timeZone: DISPLAY_TZ, month: 'short', day: 'numeric' })
   : 'Undated';
 
 /* The clock time and its zone, split so the row can set them on two lines.
@@ -337,9 +357,8 @@ const dayShort = date => date
 const timeParts = value => {
   const d = new Date(value);
   if (Number.isNaN(d.getTime())) return ['—', ''];
-  const t = d.toLocaleTimeString(undefined, { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
-  const z = d.toLocaleTimeString(undefined, { timeZoneName: 'short' }).split(' ').slice(1).join(' ');
-  return [t, z];
+  const t = d.toLocaleTimeString(undefined, { timeZone: DISPLAY_TZ, hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  return [t, DISPLAY_TZ_LABEL];
 };
 
 function TimelineExplorer({ events, loading, onInspect }) {
