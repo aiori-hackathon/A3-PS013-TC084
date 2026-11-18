@@ -1,0 +1,1302 @@
+/* ===========================================================================
+   AIORI-3 ANIMATED SCROLL & LIGHT PISTA MICRO-INTERACTIONS
+   =========================================================================== */
+
+/* Top Reading Scroll Progress Bar */
+.tp-scroll-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3.5px;
+  z-index: 9999;
+  background: linear-gradient(90deg, #FF9933 0%, #FFFFFF 45%, #138808 100%);
+  box-shadow: 0 0 10px rgba(19, 136, 8, 0.45);
+  transition: width 0.12s cubic-bezier(0.1, 0.9, 0.2, 1);
+  pointer-events: none;
+}
+
+/* ===========================================================================
+   SIDEBAR BRANDING — CLEAN ALIGNMENT, NO BROKEN PSEUDO-ELEMENTS
+   =========================================================================== */
+.aiori-sidebar-brand {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px !important;
+  padding: 16px 14px 12px !important;
+  margin-bottom: 12px !important;
+  border-bottom: 1px solid #D5E5D8 !important;
+  text-decoration: none !important;
+}
+
+.aiori-brand-row {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  white-space: nowrap !important;
+}
+
+.aiori-brand-flag {
+  font-size: 20px !important;
+  line-height: 1 !important;
+  flex-shrink: 0 !important;
+}
+
+.aiori-brand-title {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-size: 19px !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.5px !important;
+  color: #13281E !important;
+  line-height: 1 !important;
+}
+
+.aiori-brand-dot {
+  color: #E66A1F !important;
+}
+
+.aiori-brand-badge {
+  font-family: 'IBM Plex Mono', monospace !important;
+  font-size: 9.5px !important;
+  font-weight: 700 !important;
+  background: #E2F0E5 !important;
+  color: #1A5436 !important;
+  border: 1px solid #B7DEBF !important;
+  padding: 2px 6px !important;
+  border-radius: 6px !important;
+  white-space: nowrap !important;
+  letter-spacing: 0.5px !important;
+  flex-shrink: 0 !important;
+}
+
+.aiori-brand-sub {
+  font-family: 'IBM Plex Mono', monospace !important;
+  font-size: 8.5px !important;
+  font-weight: 700 !important;
+  color: #25543D !important;
+  letter-spacing: 0.8px !important;
+  text-transform: uppercase !important;
+  line-height: 1.2 !important;
+}
+
+/* Kill any legacy pseudo-elements that injected CYBER INCIDENT text */
+html .tp-app .tp-sidebar .tp-brand,
+.aiori-sidebar-brand,
+.aiori-brand-title {
+  position: static !important;
+}
+
+html .tp-app .tp-sidebar .tp-brand::before,
+html .tp-app .tp-sidebar .tp-brand::after,
+.aiori-sidebar-brand::before,
+.aiori-sidebar-brand::after,
+.aiori-brand-title::before,
+.aiori-brand-title::after {
+  content: none !important;
+  display: none !important;
+}
+
+/* ===========================================================================
+   HERO TYPOGRAPHY & CONTRAST ON LIGHT PISTA
+   =========================================================================== */
+html .tp-app.tp-app[data-theme='forensic'] .tp-forensic-intro-copy > strong,
+html .tp-app .tp-forensic-intro-copy > strong,
+.tp-forensic-intro-copy > strong {
+  color: #13281E !important;
+  font-weight: 800 !important;
+  text-shadow: none !important;
+  opacity: 1 !important;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-forensic-intro-copy > p,
+html .tp-app .tp-forensic-intro-copy > p,
+.tp-forensic-intro-copy > p {
+  color: #385545 !important;
+  opacity: 1 !important;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-forensic-kicker,
+html .tp-app .tp-forensic-kicker,
+.tp-forensic-kicker {
+  color: #1A5E38 !important;
+  font-weight: 700 !important;
+}
+
+/* ===========================================================================
+   HERO BUTTONS — REMOVE REPLAY & REFRESH BUTTONS ON OVERVIEW
+   =========================================================================== */
+.aiori-top-controls,
+.aiori-replay-btn,
+html .tp-app[data-page='overview'] .tp-page-header .tp-actions {
+  display: none !important;
+}
+
+/* ===========================================================================
+   EXPANSIVE GLOBE SIZING & COMPOSITION — MATCHED TO TEXT TITLE
+   =========================================================================== */
+html .tp-app.tp-app[data-theme='forensic'] .tp-forensic-intro {
+  position: relative !important;
+  display: block !important;
+  min-height: 560px !important;
+  padding: 44px 32px 64px !important;
+  overflow: visible !important;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-forensic-intro-copy {
+  position: relative !important;
+  z-index: 3 !important;
+  width: 46% !important;
+  max-width: 530px !important;
+  padding-top: 14px !important;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-globe {
+  position: absolute !important;
+  z-index: 1 !important;
+  top: 50% !important;
+  right: -1% !important;
+  transform: translateY(-50%) !important;
+  width: auto !important;
+  max-width: none !important;
+  gap: 0 !important;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-globe-stage {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: visible !important;
+}
+
+html body #root .tp-app.tp-app[data-theme='forensic'] .tp-globe-svg,
+html .tp-app.tp-app[data-theme='forensic'] .tp-globe-svg,
+.aiori-globe-svg {
+  width: clamp(540px, 46vw, 680px) !important;
+  height: clamp(390px, 34vw, 500px) !important;
+  max-width: none !important;
+  overflow: visible !important;
+}
+
+/* ===========================================================================
+   COLLECTION STATUS CARD — LIGHT PISTA FLOATING CARD
+   =========================================================================== */
+html .tp-app.tp-app[data-theme='forensic'] .tp-forensic-intro-side,
+.tp-forensic-intro-side {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 4px !important;
+  position: absolute !important;
+  z-index: 4 !important;
+  top: 18px !important;
+  right: 28px !important;
+  width: auto !important;
+  min-width: 220px !important;
+  padding: 14px 18px !important;
+  background: rgba(255, 255, 255, 0.96) !important;
+  border: 1px solid #CFE2D4 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 16px rgba(35, 84, 58, 0.08) !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-forensic-intro-side > span,
+.tp-forensic-intro-side > span {
+  font-family: 'IBM Plex Mono', monospace !important;
+  font-size: 10px !important;
+  letter-spacing: 0.1em !important;
+  font-weight: 700 !important;
+  color: #2D6A4F !important;
+  text-transform: uppercase !important;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-forensic-intro-side > strong,
+.tp-forensic-intro-side > strong {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 20px !important;
+  font-weight: 800 !important;
+  color: #13281E !important;
+  letter-spacing: -0.3px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  margin: 2px 0 !important;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-forensic-status-dot,
+.tp-forensic-status-dot {
+  width: 8px !important;
+  height: 8px !important;
+  border-radius: 50% !important;
+  background: #138808 !important;
+  box-shadow: 0 0 8px rgba(19, 136, 8, 0.6) !important;
+  display: inline-block !important;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-forensic-intro-side > small,
+.tp-forensic-intro-side > small {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  color: #4D6B58 !important;
+}
+
+/* ===========================================================================
+   BOTTOM CARDS — GUARANTEED HIGH CONTRAST & VISIBILITY
+   =========================================================================== */
+html .tp-app.tp-app[data-theme='forensic'] .tp-globe-readout,
+html .tp-app .tp-globe-readout,
+.tp-globe-readout {
+  background: rgba(255, 255, 255, 0.96) !important;
+  border: 1px solid #CFE2D4 !important;
+  border-radius: 12px !important;
+  padding: 10px 18px !important;
+  box-shadow: 0 4px 16px rgba(35, 84, 58, 0.08) !important;
+  backdrop-filter: blur(8px) !important;
+  color: #13281E !important;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-globe-stat,
+html .tp-app .tp-globe-stat,
+.tp-globe-stat {
+  color: #4D6B58 !important;
+  font-size: 11.5px !important;
+  font-weight: 500 !important;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-globe-stat strong,
+html .tp-app .tp-globe-stat strong,
+.tp-globe-stat strong {
+  color: #13281E !important;
+  font-weight: 800 !important;
+  font-size: 14.5px !important;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-globe-stat.is-flagged strong,
+.tp-globe-stat.is-flagged strong {
+  color: #D9381E !important;
+}
+
+/* AIORI-3 Spotlight Pill High Contrast */
+html .tp-app.tp-app[data-theme='forensic'] .aiori-spotlight-pill,
+html .tp-app .aiori-spotlight-pill,
+.aiori-spotlight-pill {
+  position: absolute !important;
+  z-index: 4 !important;
+  left: 32px !important;
+  bottom: 24px !important;
+  max-width: 440px !important;
+  background: rgba(255, 255, 255, 0.96) !important;
+  border: 1px solid #CFE2D4 !important;
+  border-radius: 12px !important;
+  padding: 8px 16px !important;
+  box-shadow: 0 4px 16px rgba(35, 84, 58, 0.08) !important;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .aiori-spotlight-top strong,
+html .tp-app .aiori-spotlight-top strong,
+.aiori-spotlight-top strong {
+  color: #13281E !important;
+  font-size: 13px !important;
+  font-weight: 750 !important;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .aiori-active-chip,
+html .tp-app .aiori-active-chip,
+.aiori-active-chip {
+  background: #E8F5EB !important;
+  color: #138808 !important;
+  border: 1px solid #74C69D !important;
+  font-size: 10px !important;
+  font-weight: 750 !important;
+  padding: 2px 7px !important;
+  border-radius: 8px !important;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .aiori-spotlight-sub,
+html .tp-app.tp-app[data-theme='forensic'] .aiori-spotlight-sub *,
+html .tp-app .aiori-spotlight-sub,
+html .tp-app .aiori-spotlight-sub *,
+.aiori-spotlight-sub,
+.aiori-spotlight-sub * {
+  color: #1A4D30 !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  display: inline-block !important;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .aiori-spotlight-sub .mono,
+html .tp-app .aiori-spotlight-sub .mono,
+.aiori-spotlight-sub .mono {
+  color: #0E281A !important;
+  font-weight: 800 !important;
+}
+
+/* Animated Entrance Keyframes */
+@keyframes tpFadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===========================================================================
+   HIGH-DENSITY FORENSIC PORTAL CARDS & TELEMETRY MODULES
+   =========================================================================== */
+.tp-portal-services {
+  display: grid !important;
+  grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  gap: 14px !important;
+  margin: 0 0 24px !important;
+}
+
+.tp-portal-services button.tp-portal-service {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  align-items: stretch !important;
+  min-height: 154px !important;
+  padding: 15px 15px 13px !important;
+  background: #FFFFFF !important;
+  border: 1px solid #D4E5D9 !important;
+  border-radius: 14px !important;
+  box-shadow: 0 2px 8px rgba(19, 42, 30, 0.04), 0 8px 24px -6px rgba(19, 42, 30, 0.08) !important;
+  text-align: left !important;
+  text-transform: none !important;
+  cursor: pointer !important;
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.22s ease !important;
+}
+
+.tp-portal-services button.tp-portal-service:hover {
+  transform: translateY(-3px) !important;
+  border-color: #2D6A4F !important;
+  box-shadow: 0 12px 30px -6px rgba(19, 42, 30, 0.16) !important;
+}
+
+.tp-portal-service-top {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  margin-bottom: 11px !important;
+}
+
+.tp-portal-service-icon {
+  display: grid !important;
+  place-items: center !important;
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: 11px !important;
+  background: linear-gradient(135deg, #132A1E 0%, #1A3F2C 100%) !important;
+  border: 1px solid rgba(82, 183, 136, 0.35) !important;
+  box-shadow: 0 2px 8px rgba(19, 42, 30, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.15) !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+  flex-shrink: 0 !important;
+  margin: 0 !important;
+}
+
+.tp-portal-services button.tp-portal-service:hover .tp-portal-service-icon {
+  transform: scale(1.06) !important;
+  box-shadow: 0 4px 14px rgba(19, 42, 30, 0.35) !important;
+}
+
+.tp-portal-tags {
+  display: flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+}
+
+.tp-portal-code {
+  font-family: 'IBM Plex Mono', monospace !important;
+  font-size: 9px !important;
+  font-weight: 750 !important;
+  letter-spacing: 0.04em !important;
+  color: #4E6B5A !important;
+  background: #EAF3EC !important;
+  padding: 2px 5px !important;
+  border-radius: 4px !important;
+}
+
+.tp-portal-badge {
+  font-family: 'IBM Plex Mono', monospace !important;
+  font-size: 8.5px !important;
+  font-weight: 750 !important;
+  letter-spacing: 0.06em !important;
+  padding: 2px 5px !important;
+  border-radius: 4px !important;
+  text-transform: uppercase !important;
+}
+
+.tp-portal-badge.ingestion {
+  background: #E8F5EB !important;
+  color: #138808 !important;
+  border: 1px solid #A3D9B1 !important;
+}
+
+.tp-portal-badge.timeline {
+  background: #EAF3EC !important;
+  color: #2D6A4F !important;
+  border: 1px solid #CFE2D4 !important;
+}
+
+.tp-portal-badge.evidence {
+  background: #E6F3EE !important;
+  color: #1B5E38 !important;
+  border: 1px solid #8ECBA5 !important;
+}
+
+.tp-portal-badge.graph {
+  background: #EFF6F1 !important;
+  color: #23543D !important;
+  border: 1px solid #BFE3C7 !important;
+}
+
+.tp-portal-badge.reports {
+  background: #E8F4EC !important;
+  color: #154D2E !important;
+  border: 1px solid #A8DCB6 !important;
+}
+
+.tp-portal-services .tp-portal-service-copy {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 3px !important;
+  flex: 1 !important;
+}
+
+.tp-portal-services .tp-portal-service-copy strong {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 13.5px !important;
+  font-weight: 750 !important;
+  color: #11261B !important;
+  letter-spacing: -0.2px !important;
+  line-height: 1.25 !important;
+  text-transform: none !important;
+  margin: 0 !important;
+}
+
+.tp-portal-services .tp-portal-service-copy small {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 11px !important;
+  color: #4E6E5B !important;
+  line-height: 1.4 !important;
+  text-transform: none !important;
+}
+
+.tp-portal-service-open {
+  margin-top: 10px !important;
+  padding-top: 8px !important;
+  border-top: 1px solid #EEF5F0 !important;
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  color: #1A5E38 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  text-transform: none !important;
+}
+
+.tp-portal-service-open svg,
+.tp-portal-arrow {
+  transition: transform 0.2s ease !important;
+  color: #1A5E38 !important;
+}
+
+.tp-portal-services button.tp-portal-service:hover .tp-portal-arrow {
+  transform: translateX(4px) !important;
+}
+
+/* ===========================================================================
+   HIGH-DENSITY FORENSIC METRIC CARDS
+   =========================================================================== */
+.tp-app.tp-app[data-theme='forensic'] .tp-forensic-metrics,
+.tp-metrics.tp-forensic-metrics {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 14px !important;
+  margin: 18px 0 16px !important;
+  background: transparent !important;
+  border: none !important;
+  overflow: visible !important;
+}
+
+.tp-app.tp-app[data-theme='forensic'] .tp-forensic-metrics .tp-metric,
+.tp-metrics.tp-forensic-metrics .tp-metric {
+  background: #FFFFFF !important;
+  border: 1px solid #D4E5D9 !important;
+  border-radius: 13px !important;
+  padding: 14px 16px 12px !important;
+  box-shadow: 0 2px 8px rgba(19, 42, 30, 0.04) !important;
+  min-height: 108px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.2s ease !important;
+}
+
+.tp-app.tp-app[data-theme='forensic'] .tp-forensic-metrics .tp-metric:hover,
+.tp-metrics.tp-forensic-metrics .tp-metric:hover {
+  transform: translateY(-2px) !important;
+  border-color: #52B788 !important;
+  box-shadow: 0 8px 20px -4px rgba(19, 42, 30, 0.1) !important;
+}
+
+.tp-metric-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  margin-bottom: 6px !important;
+}
+
+.tp-metric-label {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 12px !important;
+  font-weight: 650 !important;
+  color: #3A5647 !important;
+  text-transform: none !important;
+}
+
+.tp-metric-body {
+  display: flex !important;
+  align-items: baseline !important;
+  justify-content: space-between !important;
+  margin-bottom: 2px !important;
+}
+
+.tp-app.tp-app[data-theme='forensic'] .tp-forensic-metrics .tp-metric strong,
+.tp-metric strong.tp-metric-value {
+  font-family: 'IBM Plex Mono', monospace !important;
+  font-size: 28px !important;
+  font-weight: 800 !important;
+  color: #11261B !important;
+  letter-spacing: -0.6px !important;
+  line-height: 1.1 !important;
+  margin: 0 !important;
+  display: block !important;
+}
+
+.tp-app.tp-app[data-theme='forensic'] .tp-forensic-metrics .tp-metric.is-alert-metric strong,
+.tp-metric.is-alert-metric strong.tp-metric-value {
+  color: #D9381E !important;
+}
+
+.tp-metric-chip {
+  font-family: 'IBM Plex Mono', monospace !important;
+  font-size: 8.5px !important;
+  font-weight: 750 !important;
+  letter-spacing: 0.05em !important;
+  padding: 2px 6px !important;
+  border-radius: 4px !important;
+  text-transform: uppercase !important;
+}
+
+.tp-metric-chip.normal {
+  background: #E8F5EB !important;
+  color: #138808 !important;
+  border: 1px solid #A3D9B1 !important;
+}
+
+.tp-metric-chip.alert {
+  background: #FDF0ED !important;
+  color: #D9381E !important;
+  border: 1px solid #F8C9BE !important;
+}
+
+.tp-app.tp-app[data-theme='forensic'] .tp-forensic-metrics .tp-metric > span,
+.tp-metric span.tp-metric-note {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 11px !important;
+  color: #587766 !important;
+  font-weight: 500 !important;
+  display: block !important;
+  text-transform: none !important;
+}
+
+/* ===========================================================================
+   MAX-CONTRAST SELECTION RULES (NO INVISIBLE TEXT ON HIGHLIGHT)
+   =========================================================================== */
+html .tp-app ::selection,
+html .tp-app *::selection,
+body ::selection,
+body *::selection,
+::selection {
+  background: #1B4D36 !important;
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+}
+html .tp-app ::-moz-selection,
+html .tp-app *::-moz-selection,
+body ::-moz-selection,
+body *::-moz-selection,
+::-moz-selection {
+  background: #1B4D36 !important;
+  color: #FFFFFF !important;
+}
+
+/* ===========================================================================
+   TELEMETRY CHARTS & PROFILE CARDS (PINTEST CRAFT DESIGN — ZERO WASTED SPACE)
+   =========================================================================== */
+.tp-charts {
+  display: grid !important;
+  grid-template-columns: repeat(6, 1fr) !important;
+  gap: 14px !important;
+  margin: 0 0 24px !important;
+}
+
+.tp-chart-timeline-card {
+  grid-column: span 4 !important;
+  background: #FFFFFF !important;
+  border: 1px solid #D4E5D9 !important;
+  border-radius: 14px !important;
+  padding: 16px 18px 14px !important;
+  box-shadow: 0 2px 10px rgba(19, 42, 30, 0.04) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  min-height: 215px !important;
+}
+
+.tp-chart-event-types-card {
+  grid-column: span 2 !important;
+  min-height: 215px !important;
+}
+
+.tp-chart-usernames-card {
+  grid-column: span 3 !important;
+}
+
+.tp-chart-devices-card {
+  grid-column: span 3 !important;
+}
+
+@media (max-width: 1080px) {
+  .tp-chart-timeline-card { grid-column: span 6 !important; }
+  .tp-chart-event-types-card { grid-column: span 6 !important; }
+  .tp-chart-usernames-card { grid-column: span 3 !important; }
+  .tp-chart-devices-card { grid-column: span 3 !important; }
+}
+
+@media (max-width: 680px) {
+  .tp-charts { grid-template-columns: 1fr !important; }
+  .tp-chart-timeline-card,
+  .tp-chart-event-types-card,
+  .tp-chart-usernames-card,
+  .tp-chart-devices-card { grid-column: span 1 !important; }
+}
+
+.tp-chart-head {
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+  margin-bottom: 12px !important;
+}
+
+.tp-chart-title-group {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 2px !important;
+}
+
+.tp-chart-kicker {
+  font-family: 'IBM Plex Mono', monospace !important;
+  font-size: 9px !important;
+  font-weight: 750 !important;
+  letter-spacing: 0.08em !important;
+  color: #2D6A4F !important;
+  text-transform: uppercase !important;
+}
+
+.tp-chart-head h3 {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 14.5px !important;
+  font-weight: 750 !important;
+  color: #11261B !important;
+  margin: 0 !important;
+  letter-spacing: -0.2px !important;
+  text-transform: none !important;
+}
+
+.tp-chart-head p {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 11px !important;
+  color: #4E6E5B !important;
+  margin: 0 !important;
+  text-transform: none !important;
+}
+
+.tp-chart-horizon-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  padding: 3px 8px !important;
+  background: #EAF3EC !important;
+  border: 1px solid #CFE2D4 !important;
+  border-radius: 9999px !important;
+  font-family: 'IBM Plex Mono', monospace !important;
+  font-size: 9.5px !important;
+  font-weight: 650 !important;
+  color: #23543D !important;
+}
+
+.tp-chart-radar-pip {
+  width: 6px !important;
+  height: 6px !important;
+  border-radius: 50% !important;
+  background: #138808 !important;
+  box-shadow: 0 0 6px rgba(19, 136, 8, 0.6) !important;
+}
+
+.tp-chart-cols-wrapper {
+  display: flex !important;
+  align-items: flex-end !important;
+  gap: 8px !important;
+  margin: 6px 0 8px !important;
+  position: relative !important;
+}
+
+.tp-chart-y-axis {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  height: 72px !important;
+  padding-bottom: 16px !important;
+  font-family: 'IBM Plex Mono', monospace !important;
+  font-size: 8.5px !important;
+  font-weight: 650 !important;
+  color: #7A9B86 !important;
+  text-align: right !important;
+  width: 16px !important;
+  flex-shrink: 0 !important;
+  user-select: none !important;
+  border-right: 1px solid #E2EDE5 !important;
+  padding-right: 5px !important;
+}
+
+.tp-chart-cols {
+  display: flex !important;
+  align-items: flex-end !important;
+  gap: 5px !important;
+  height: 72px !important;
+  padding-bottom: 2px !important;
+  flex: 1 !important;
+  min-width: 0 !important;
+  border-bottom: 1px solid #D4E5D9 !important;
+}
+
+.tp-chart-col {
+  position: relative !important;
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  height: 100% !important;
+  justify-content: flex-end !important;
+  gap: 3px !important;
+}
+
+.tp-chart-stack {
+  width: 100% !important;
+  max-width: 18px !important;
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  position: relative !important;
+}
+
+.tp-chart-zero-pip {
+  width: 6px !important;
+  height: 2.5px !important;
+  border-radius: 1px !important;
+  background: #D4E5D9 !important;
+  margin-bottom: 1px !important;
+}
+
+.tp-chart-active-tag {
+  position: absolute !important;
+  top: -17px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  background: #132A1E !important;
+  color: #52B788 !important;
+  font-family: 'IBM Plex Mono', monospace !important;
+  font-size: 8.5px !important;
+  font-weight: 800 !important;
+  padding: 1px 4px !important;
+  border-radius: 3px !important;
+  border: 1px solid #2D6A4F !important;
+  white-space: nowrap !important;
+}
+
+.tp-chart-seg {
+  display: block !important;
+  width: 100% !important;
+  border-radius: 2px 2px 0 0 !important;
+  transition: opacity 0.15s ease !important;
+}
+
+.tp-chart-seg.is-failed {
+  background: linear-gradient(180deg, #E63946 0%, #D9381E 100%) !important;
+}
+
+.tp-chart-seg.is-ok {
+  background: linear-gradient(180deg, #52B788 0%, #2D6A4F 100%) !important;
+}
+
+.tp-chart-col:hover .tp-chart-seg {
+  opacity: 0.85 !important;
+}
+
+.tp-chart-col-label {
+  font-family: 'IBM Plex Mono', monospace !important;
+  font-size: 8.5px !important;
+  color: #6B8B77 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  line-height: 1.15 !important;
+  user-select: none !important;
+}
+
+.tp-chart-col-label em {
+  font-style: normal !important;
+  font-size: 7.5px !important;
+  color: #8BA896 !important;
+}
+
+.tp-chart-legend {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  margin-top: 10px !important;
+  padding-top: 8px !important;
+  border-top: 1px solid #EEF5F0 !important;
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 10.5px !important;
+  color: #4E6E5B !important;
+}
+
+.tp-legend-keys {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+}
+
+.tp-legend-keys span {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+}
+
+.tp-legend-keys i {
+  width: 7px !important;
+  height: 7px !important;
+  border-radius: 2px !important;
+  display: inline-block !important;
+}
+
+.tp-legend-keys i.is-failed { background: #D9381E !important; }
+.tp-legend-keys i.is-ok { background: #2D6A4F !important; }
+.tp-legend-keys i.is-monitored { background: #CFE2D4 !important; }
+
+.tp-legend-stats {
+  display: flex !important;
+  align-items: center !important;
+  gap: 7px !important;
+  font-family: 'IBM Plex Mono', monospace !important;
+  font-size: 10px !important;
+  color: #3A5647 !important;
+  font-weight: 600 !important;
+}
+
+.tp-chart-horizon-count {
+  background: transparent !important;
+  color: #23543D !important;
+  font-family: 'IBM Plex Mono', monospace !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+}
+
+/* --- Ranked Distribution Profile Cards --- */
+.tp-ranked-card {
+  background: #FFFFFF !important;
+  border: 1px solid #D4E5D9 !important;
+  border-radius: 14px !important;
+  padding: 16px 18px 14px !important;
+  box-shadow: 0 2px 10px rgba(19, 42, 30, 0.04) !important;
+  min-height: auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.tp-ranked-card:hover {
+  transform: translateY(-2px) !important;
+  border-color: #52B788 !important;
+  box-shadow: 0 8px 20px -4px rgba(19, 42, 30, 0.1) !important;
+}
+
+.tp-ranked-container {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+  flex: 1 !important;
+  justify-content: space-between !important;
+}
+
+.tp-chart-ranked {
+  list-style: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 9px !important;
+}
+
+.tp-ranked-row {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+.tp-ranked-index {
+  display: grid !important;
+  place-items: center !important;
+  width: 22px !important;
+  height: 22px !important;
+  border-radius: 6px !important;
+  background: #EAF3EC !important;
+  border: 1px solid #CFE2D4 !important;
+  font-family: 'IBM Plex Mono', monospace !important;
+  font-size: 9.5px !important;
+  font-weight: 750 !important;
+  color: #23543D !important;
+  flex-shrink: 0 !important;
+}
+
+.tp-ranked-content {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px !important;
+  flex: 1 !important;
+  min-width: 0 !important;
+}
+
+.tp-ranked-meta {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+}
+
+.tp-chart-ranked-label {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 12px !important;
+  font-weight: 650 !important;
+  color: #11261B !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  text-transform: none !important;
+}
+
+.tp-ranked-badge-group {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  flex-shrink: 0 !important;
+}
+
+.tp-chart-ranked-value {
+  font-family: 'IBM Plex Mono', monospace !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  color: #23543D !important;
+}
+
+.tp-chart-ranked-value small {
+  font-size: 9px !important;
+  color: #5D7A6B !important;
+  font-weight: 500 !important;
+  margin-left: 2px !important;
+}
+
+.tp-ranked-pct-pill {
+  font-family: 'IBM Plex Mono', monospace !important;
+  font-size: 9px !important;
+  font-weight: 750 !important;
+  background: #E8F5EB !important;
+  color: #138808 !important;
+  border: 1px solid #A3D9B1 !important;
+  padding: 1px 5px !important;
+  border-radius: 4px !important;
+}
+
+.tp-chart-ranked-track {
+  height: 7px !important;
+  background: #EAF3EC !important;
+  border-radius: 4px !important;
+  overflow: hidden !important;
+  width: 100% !important;
+}
+
+.tp-chart-ranked-fill {
+  display: block !important;
+  height: 100% !important;
+  border-radius: 4px !important;
+  background: linear-gradient(90deg, #2D6A4F 0%, #52B788 100%) !important;
+}
+
+.tp-ranked-footer {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  margin-top: 10px !important;
+  padding-top: 8px !important;
+  border-top: 1px solid #EEF5F0 !important;
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 10.5px !important;
+  color: #4E6E5B !important;
+}
+
+.tp-ranked-check {
+  display: grid !important;
+  place-items: center !important;
+  width: 14px !important;
+  height: 14px !important;
+  border-radius: 50% !important;
+  background: #E8F5EB !important;
+  color: #138808 !important;
+  font-size: 9px !important;
+  font-weight: 800 !important;
+  flex-shrink: 0 !important;
+}
+
+/* ===========================================================================
+   FLUID SCROLL REVEAL & STAGGERED TELEMETRY ANIMATIONS
+   =========================================================================== */
+.tp-scroll-reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.tp-scroll-reveal.tp-in-view {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Staggered Children inside Grid/Flex Modules */
+.tp-stagger-parent > * {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tp-stagger-parent.tp-in-view > *:nth-child(1) { opacity: 1; transform: translateY(0); transition-delay: 0.04s; }
+.tp-stagger-parent.tp-in-view > *:nth-child(2) { opacity: 1; transform: translateY(0); transition-delay: 0.09s; }
+.tp-stagger-parent.tp-in-view > *:nth-child(3) { opacity: 1; transform: translateY(0); transition-delay: 0.14s; }
+.tp-stagger-parent.tp-in-view > *:nth-child(4) { opacity: 1; transform: translateY(0); transition-delay: 0.19s; }
+.tp-stagger-parent.tp-in-view > *:nth-child(5) { opacity: 1; transform: translateY(0); transition-delay: 0.24s; }
+.tp-stagger-parent.tp-in-view > *:nth-child(6) { opacity: 1; transform: translateY(0); transition-delay: 0.29s; }
+
+/* Telemetry Table Rows Staggered Glide */
+.tp-forensic-table tbody tr {
+  opacity: 0;
+  transform: translateX(-12px);
+  animation: aioriRowGlide 0.4s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--row-idx, 0) * 50ms) forwards;
+  transition: background-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease !important;
+}
+
+@keyframes aioriRowGlide {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.tp-forensic-table tbody tr:hover {
+  background: #F0F6F2 !important;
+  cursor: pointer;
+}
+
+/* Interactive Timeline Rows Stagger */
+.tp-tl-rows li {
+  opacity: 0;
+  transform: translateX(-10px);
+  animation: aioriRowGlide 0.4s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--row-idx, 0) * 40ms) forwards;
+}
+
+/* ===========================================================================
+   FORENSIC ANALYTICS & CHARTS POLISH — ELIMINATE EMPTY VOIDS
+   =========================================================================== */
+.tp-charts {
+  margin: 0 0 28px !important;
+  gap: 14px !important;
+}
+
+.tp-chart-card {
+  background: #FFFFFF !important;
+  border: 1px solid #CFE2D4 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 14px rgba(35, 84, 58, 0.05) !important;
+  padding: 18px 20px 16px !important;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.2s ease !important;
+}
+
+.tp-chart-card:hover {
+  transform: translateY(-3px) !important;
+  border-color: #74C69D !important;
+  box-shadow: 0 10px 24px -4px rgba(35, 84, 58, 0.1) !important;
+}
+
+.tp-chart-head h3 {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 15px !important;
+  font-weight: 800 !important;
+  color: #11261B !important;
+  letter-spacing: -0.2px !important;
+}
+
+.tp-chart-head p {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 12px !important;
+  color: #4D6B58 !important;
+  margin-top: 2px !important;
+}
+
+.tp-chart-cols {
+  background: linear-gradient(180deg, rgba(82, 183, 136, 0.05) 0%, transparent 100%) !important;
+  border: 1px solid #E4EFE7 !important;
+  border-radius: 8px !important;
+  padding: 12px 10px 6px !important;
+}
+
+.tp-chart-col {
+  border-radius: 4px !important;
+  transition: background-color 0.15s ease !important;
+}
+
+.tp-chart-col:hover {
+  background: rgba(82, 183, 136, 0.12) !important;
+}
+
+.tp-chart-ranked-label {
+  color: #1A3E2A !important;
+  font-weight: 600 !important;
+}
+
+.tp-chart-ranked-track {
+  background: #E8F2EA !important;
+  height: 9px !important;
+  border-radius: 4px !important;
+}
+
+.tp-chart-ranked-value {
+  color: #11261B !important;
+  font-weight: 700 !important;
+}
+
+/* Tactile Card Elevation Micro-Interactions */
+.tp-card,
+.tp-ev-card {
+  transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1),
+              box-shadow 0.2s cubic-bezier(0.2, 0, 0, 1),
+              border-color 0.2s ease !important;
+}
+
+.tp-button {
+  transition: all 0.15s ease !important;
+}
+
+.tp-button:hover {
+  transform: translateY(-1px);
+}
+
+.tp-button:active {
+  transform: translateY(0);
+}
+
+/* Utility Bar Indian Identity */
+.tp-public-utility-bar {
+  background: #EAF3EC !important;
+  border-bottom: 1px solid #D5E5D8 !important;
+  color: #2D543F !important;
+}
+
+.tp-public-utility-dot.is-online {
+  background: #138808 !important;
+  box-shadow: 0 0 8px rgba(19, 136, 8, 0.6) !important;
+}
+
+/* Sidebar clean light styling */
+html .tp-app.tp-app[data-theme='forensic'] .tp-sidebar {
+  background: #FFFFFF !important;
+  border-right: 1px solid #D5E5D8 !important;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-nav-item {
+  color: #4D6B58 !important;
+  font-weight: 600 !important;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-nav-item.active {
+  background: #E2F0E5 !important;
+  color: #174E30 !important;
+  font-weight: 700 !important;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-workspace {
+  background: #F4F9F5 !important;
+  border: 1px solid #D5E5D8 !important;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-workspace strong {
+  color: #13281E !important;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-workspace small {
+  color: #557262 !important;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-workspace-avatar {
+  background: #25543D !important;
+  color: #FFFFFF !important;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-profile strong {
+  color: #13281E !important;
+  font-weight: 700 !important;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-profile small {
+  color: #4D6B58 !important;
+  font-weight: 500 !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tp-forensic-intro,
+  .tp-portal-services,
+  .tp-forensic-metrics,
+  .tp-forensic-analytics,
+  .tp-forensic-review {
+    animation: none !important;
+  }
+}

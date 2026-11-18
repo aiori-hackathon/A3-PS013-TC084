@@ -1,45 +1,29 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { isLand } from './landmask';
+import handImg from './assets/pointing-hand.png';
 import './styles/EvidenceGlobe.css';
 
-/* THE EVIDENCE GLOBE
+/* THE EVIDENCE GLOBE — AIORI-3 CUTE CARTOON EDITION
    ---------------------------------------------------------------------------
-   A rotating dot-matrix Earth.
+   A rotating dot-matrix Earth featuring the cute 3D cartoon boy mascot
+   swiping and rotating the globe with his small pointing finger, locking
+   dead-center onto India with radiant tricolor pulses.
+   --------------------------------------------------------------------------- */
 
-   WHERE THE LINE IS DRAWN
-   The land is real geography and claims nothing about the evidence. Event
-   markers use stable positions derived from event identity, not geographic
-   data. Tracepoint has no geolocation - parser.py never extracts a source IP
-   into a field and there is no lookup service - so marker positions do not
-   represent real locations.
-
-   WHAT IS REAL
-     markers       one per event, coloured by its real severity, larger when
-                   it carries a failure indicator
-     readouts      real counts
-
-   Nothing is randomised; the same evidence always draws the same globe. */
-
-const R = 118;
-const CX = 150;
-const CY = 150;
+const R = 145;
+const CX = 210;
+const CY = 155;
 const LAT_STEP = 3.4;
 const RING_DOTS = 72;
 
+// India target coordinates
+const INDIA_LAT = 21.5;
+const INDIA_LON = 78.5;
+// For theta = (lon + spin) = 0: spin = 360 - 78.5 = 281.5°
+const TARGET_SPIN = ((360 - INDIA_LON) % 360 + 360) % 360;
+// Positive tilt (+0.375 rad = 21.5°) brings the northern hemisphere down to the horizontal center
+const TARGET_TILT = +0.375;
 
-/* The sphere's surface as a lat/lon grid. Rings thin towards the poles so the
-   spacing stays even, which is what makes a flat projection read as a ball. */
-/* Two grids, not one.
-
-   The first version dotted land and ocean at nearly the same weight and the
-   continents were lost in it. Dropping the ocean entirely fixed that but left
-   the sphere blank whenever it turned to face the Pacific, so the dot pattern
-   that makes it a dot-matrix globe kept disappearing.
-
-   So: a dense, bright grid on land, and a sparse, very faint one over the
-   whole sphere underneath it. The faint grid is what keeps the surface
-   readable at every angle; it is quiet enough that the continents still
-   carry the shape. */
 function buildGrid() {
   const cells = [];
   for (let lat = -88; lat <= 88; lat += LAT_STEP) {
@@ -49,7 +33,14 @@ function buildGrid() {
     for (let j = 0; j < count; j += 1) {
       const lon = -180 + (j / count) * 360;
       if (!isLand(lat, lon)) continue;
-      cells.push({ lat, lon, phi, land: true });
+      const inIndia = lat >= 7.5 && lat <= 36.5 && lon >= 68 && lon <= 92;
+      let tricolor = null;
+      if (inIndia) {
+        if (lat >= 24) tricolor = '#FF9933'; // Saffron
+        else if (lat >= 16.5) tricolor = '#FFFFFF'; // White
+        else tricolor = '#138808'; // India Green
+      }
+      cells.push({ lat, lon, phi, land: true, inIndia, tricolor });
     }
   }
   for (let lat = -84; lat <= 84; lat += LAT_STEP * 2.2) {
@@ -57,17 +48,21 @@ function buildGrid() {
     const ringR = Math.cos(phi);
     const count = Math.max(5, Math.round(46 * ringR));
     for (let j = 0; j < count; j += 1) {
-      cells.push({ lat, lon: -180 + (j / count) * 360, phi, land: false });
+      cells.push({ lat, lon: -180 + (j / count) * 360, phi, land: false, inIndia: false, tricolor: null });
     }
   }
   return cells;
 }
 
 const SEV_VAR = {
-  critical: 'var(--fx-critical)', high: 'var(--fx-high)', medium: 'var(--fx-medium)',
-  warning: 'var(--fx-medium)', low: 'var(--fx-low)', info: 'var(--fx-verified)',
+  critical: '#D9381E',
+  high: '#E66A1F',
+  medium: '#D97706',
+  warning: '#D97706',
+  low: '#2D6A4F',
+  info: '#1B4D3E',
 };
-const sevVar = s => SEV_VAR[String(s || '').trim().toLowerCase()] || 'var(--fx-info)';
+const sevVar = s => SEV_VAR[String(s || '').trim().toLowerCase()] || '#2D6A4F';
 
 function hash(str) {
   let h = 2166136261;
@@ -99,41 +94,121 @@ export default function EvidenceGlobe({
   timestampOf = e => e.timestamp,
 }) {
   const grid = useMemo(() => buildGrid(), []);
-  const [spin, setSpin] = useState(0);
-  // Tilt is the second axis. Without it a drag could only ever slide the
-  // globe sideways, which does not feel like holding a ball.
-  const [tilt, setTilt] = useState(-0.18);
+
+  // Spin & Tilt state
+  const [spin, setSpin] = useState(TARGET_SPIN - 160);
+  const [tilt, setTilt] = useState(0.1);
   const [dragging, setDragging] = useState(false);
+
+  // Animation State: 'swiping' -> 'spinning' -> 'locked'
+  const [introState, setIntroState] = useState('swiping');
+  const [swipeProgress, setSwipeProgress] = useState(0); // 0 to 1
+  const [pulseCount, setPulseCount] = useState(0);
+
   const raf = useRef(0);
   const drag = useRef(null);
 
-  /* Real rotation, not a CSS spin of the whole disc: the longitude offset
-     advances and the projection is recomputed, so continents round the limb
-     and disappear the way they should. Throttled to about 15fps, which is
-     enough for something this slow and keeps the work small. */
-  useEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
-    let last = 0;
-    const tick = now => {
-      // The idle drift stops while a hand is on it, so the globe does not
-      // creep out from under the pointer mid-drag.
-      if (!dragging && now - last > 66) { setSpin(s => (s + 0.55) % 360); last = now; }
-      raf.current = requestAnimationFrame(tick);
-    };
-    raf.current = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf.current);
-  }, [dragging]);
+  // Play/Replay the cartoon finger swipe animation sequence
+  const startIntroSequence = useCallback(() => {
+    setIntroState('swiping');
+    setSwipeProgress(0);
+    const startSpin = (TARGET_SPIN - 180 + 360) % 360;
+    setSpin(startSpin);
+    setTilt(0.12);
 
-  /* Drag to turn it. Pointer events rather than mouse events so a trackpad,
-     a touchscreen and a pen all work, and capture so the gesture survives the
-     pointer leaving the circle. Horizontal drag spins, vertical drag tilts,
-     and tilt is clamped short of the poles because past that the projection
-     flips and the globe appears to turn inside out. */
+    // Phase 1: Cartoon character swipes finger across globe (~950ms)
+    const swipeStart = performance.now();
+    const swipeDuration = 950;
+
+    const animateSwipe = now => {
+      const elapsed = now - swipeStart;
+      const p = Math.min(1, elapsed / swipeDuration);
+      setSwipeProgress(p);
+
+      if (p < 1) {
+        raf.current = requestAnimationFrame(animateSwipe);
+      } else {
+        // Phase 2: Rapid spin with natural cubic deceleration to India (~2200ms)
+        setIntroState('spinning');
+        const spinStart = performance.now();
+        const spinDuration = 2200;
+        const initialSpin = startSpin;
+        const deltaSpin = (TARGET_SPIN - initialSpin + 720) % 360 + 360; // 1 full spin + target
+        const initialTilt = 0.12;
+
+        const animateSpin = tNow => {
+          const sElapsed = tNow - spinStart;
+          const sp = Math.min(1, sElapsed / spinDuration);
+          const ease = 1 - Math.pow(1 - sp, 3.5);
+
+          setSpin((initialSpin + deltaSpin * ease) % 360);
+          setTilt(initialTilt + (TARGET_TILT - initialTilt) * ease);
+
+          if (sp < 1) {
+            raf.current = requestAnimationFrame(animateSpin);
+          } else {
+            // Phase 3: Locked dead-center on India with Tricolor celebration
+            setSpin(TARGET_SPIN);
+            setTilt(TARGET_TILT);
+            setIntroState('locked');
+            setPulseCount(c => c + 1);
+          }
+        };
+
+        raf.current = requestAnimationFrame(animateSpin);
+      }
+    };
+
+    raf.current = requestAnimationFrame(animateSwipe);
+  }, []);
+
+  // Run on mount
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setSpin(TARGET_SPIN);
+      setTilt(TARGET_TILT);
+      setIntroState('locked');
+      return undefined;
+    }
+
+    const timer = setTimeout(() => {
+      startIntroSequence();
+    }, 250);
+
+    return () => {
+      clearTimeout(timer);
+      cancelAnimationFrame(raf.current);
+    };
+  }, [startIntroSequence]);
+
+  // Gentle breathing oscillation around India when locked
+  useEffect(() => {
+    if (introState !== 'locked' || dragging) return undefined;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
+
+    let last = performance.now();
+    const idleTick = now => {
+      if (!dragging && now - last > 75) {
+        const osc = Math.sin(now * 0.0007) * 0.06;
+        setSpin(s => s + osc);
+        last = now;
+      }
+      raf.current = requestAnimationFrame(idleTick);
+    };
+    raf.current = requestAnimationFrame(idleTick);
+    return () => cancelAnimationFrame(raf.current);
+  }, [introState, dragging]);
+
+  // Pointer drag gestures
   const onPointerDown = e => {
     e.currentTarget.setPointerCapture(e.pointerId);
     drag.current = { x: e.clientX, y: e.clientY, spin, tilt };
     setDragging(true);
+    if (introState !== 'locked') {
+      setIntroState('locked');
+    }
   };
+
   const onPointerMove = e => {
     if (!drag.current) return;
     const dx = e.clientX - drag.current.x;
@@ -141,14 +216,14 @@ export default function EvidenceGlobe({
     setSpin(((drag.current.spin + dx * 0.45) % 360 + 360) % 360);
     setTilt(Math.max(-1.1, Math.min(1.1, drag.current.tilt + dy * 0.006)));
   };
+
   const endDrag = e => {
     if (!drag.current) return;
     drag.current = null;
     setDragging(false);
-    try { e.currentTarget.releasePointerCapture(e.pointerId); } catch { /* already released */ }
+    try { e.currentTarget.releasePointerCapture(e.pointerId); } catch {}
   };
 
-  /* Keyboard equivalent, so the globe is not mouse-only. */
   const onKeyDown = e => {
     const step = e.shiftKey ? 15 : 5;
     if (e.key === 'ArrowLeft') { setSpin(s => (s - step + 360) % 360); e.preventDefault(); }
@@ -157,34 +232,38 @@ export default function EvidenceGlobe({
     if (e.key === 'ArrowDown') { setTilt(t => Math.min(1.1, t + 0.08)); e.preventDefault(); }
   };
 
+  // Compute Surface Dots with India Highlight
   const dots = useMemo(() => {
     const out = [];
-    const ct = Math.cos(tilt); const st = Math.sin(tilt);
+    const ct = Math.cos(tilt);
+    const st = Math.sin(tilt);
     for (const c of grid) {
       const theta = ((c.lon + spin) * Math.PI) / 180;
-      // Rotate about the vertical axis for the spin, then about the
-      // horizontal one for the tilt. Depth after both rotations decides
-      // whether a point is on the near face at all.
       const x1 = Math.cos(c.phi) * Math.sin(theta);
       const y1 = Math.sin(c.phi);
       const z1 = Math.cos(c.phi) * Math.cos(theta);
       const y2 = y1 * ct - z1 * st;
       const z2 = y1 * st + z1 * ct;
       if (z2 <= 0.02) continue;
-      out.push({ x: CX + x1 * R, y: CY - y2 * R, z: z2, land: c.land });
+      out.push({
+        x: CX + x1 * R,
+        y: CY - y2 * R,
+        z: z2,
+        land: c.land,
+        inIndia: c.inIndia,
+        tricolor: c.tricolor,
+      });
     }
     return out;
   }, [grid, spin, tilt]);
 
+  // Event Markers
   const model = useMemo(() => {
     const ordered = [...events].sort(
-      (a, b) =>
-        (Date.parse(timestampOf(a)) || 0) -
-        (Date.parse(timestampOf(b)) || 0),
+      (a, b) => (Date.parse(timestampOf(a)) || 0) - (Date.parse(timestampOf(b)) || 0)
     );
     const markers = ordered.slice(-RING_DOTS).map((e, i) => {
       const position = eventPosition(e, i);
-
       return {
         ...position,
         fill: sevVar(severityOf(e)),
@@ -193,9 +272,7 @@ export default function EvidenceGlobe({
       };
     });
     const failures = events.filter(isFailure).length;
-    const devices = new Set(
-      events.map(deviceOf).filter(d => d && d !== '—')
-    ).size;
+    const devices = new Set(events.map(deviceOf).filter(d => d && d !== '—')).size;
 
     return {
       markers,
@@ -210,8 +287,8 @@ export default function EvidenceGlobe({
     const st = Math.sin(tilt);
 
     return model.markers.map(marker => {
-      const phi = marker.lat * Math.PI / 180;
-      const theta = (marker.lon + spin) * Math.PI / 180;
+      const phi = (marker.lat * Math.PI) / 180;
+      const theta = ((marker.lon + spin) * Math.PI) / 180;
 
       const x1 = Math.cos(phi) * Math.sin(theta);
       const y1 = Math.sin(phi);
@@ -230,109 +307,220 @@ export default function EvidenceGlobe({
     });
   }, [model.markers, spin, tilt]);
 
+  // Pointing Hand Motion Dynamics (using user's cartoon pointing hand icon)
+  const handX = introState === 'swiping'
+    ? 68 + swipeProgress * 40
+    : introState === 'spinning'
+    ? 80
+    : 102;
+
+  const handY = introState === 'swiping'
+    ? 136.5 + Math.sin(swipeProgress * Math.PI) * 4
+    : introState === 'spinning'
+    ? 134
+    : 140.5;
+
+  const handAngle = introState === 'swiping'
+    ? -4 + swipeProgress * 8
+    : introState === 'spinning'
+    ? -6
+    : 0;
+
   const empty = model.total === 0;
 
   return (
-    <figure className="tp-globe" data-empty={empty || undefined}>
-      <svg
-        className="tp-globe-svg"
-        viewBox="0 0 300 300"
-        role="img"
-        tabIndex={0}
-        data-dragging={dragging || undefined}
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={endDrag}
-        onPointerCancel={endDrag}
-        onKeyDown={onKeyDown}
-           aria-label={empty
-             ? 'Evidence globe. No events collected yet.'
-             : `Evidence globe: ${model.total} events across ${model.devices} devices, ${model.failures} carrying failure indicators. Drag or use the arrow keys to turn it.`}
-      >
-        <defs>
-          <radialGradient id="tp-globe-shade" cx="36%" cy="31%" r="80%">
-            <stop offset="0%" stopColor="var(--fx-globe)" stopOpacity="0.16" />
-            <stop offset="52%" stopColor="#050810" stopOpacity="0.94" />
-            <stop offset="100%" stopColor="#03050a" stopOpacity="1" />
-          </radialGradient>
-          {/* The rim light. A hard stroke round the edge made the thing read
-              as a flat disc with a border; a soft falloff over the last tenth
-              of the radius reads as a lit edge instead. */}
-          <radialGradient id="tp-globe-rim" cx="50%" cy="50%" r="50%">
-            <stop offset="90%" stopColor="var(--fx-globe)" stopOpacity="0" />
-            <stop offset="97.5%" stopColor="var(--fx-globe)" stopOpacity="0.38" />
-            <stop offset="99.5%" stopColor="var(--fx-globe)" stopOpacity="0.72" />
-            <stop offset="100%" stopColor="var(--fx-globe)" stopOpacity="0.15" />
-          </radialGradient>
-          {/* The atmosphere: the same edge, blurred outward, so the glow sits
-              off the surface rather than on it. */}
-          <filter id="tp-globe-atmo-blur" x="-45%" y="-45%" width="190%" height="190%">
-            <feGaussianBlur stdDeviation="6" />
-          </filter>
-          <filter id="tp-event-glow" x="-200%" y="-200%" width="400%" height="400%">
-            <feGaussianBlur stdDeviation="3" result="blur" />
-            <feMerge>
-              <feMergeNode in="blur" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
-        </defs>
+    <figure className="tp-globe aiori-globe-container" data-empty={empty || undefined}>
+      <div className="tp-globe-stage">
+        <svg
+          className="tp-globe-svg aiori-globe-svg"
+          viewBox="-50 0 420 310"
+          role="img"
+          tabIndex={0}
+          data-dragging={dragging || undefined}
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={endDrag}
+          onPointerCancel={endDrag}
+          onKeyDown={onKeyDown}
+          aria-label="Interactive AIORI-3 Evidence Globe"
+        >
+          <defs>
+            {/* Deep Pista-Pine Sphere Gradient */}
+            <radialGradient id="tp-globe-shade-pista" cx="35%" cy="30%" r="85%">
+              <stop offset="0%" stopColor="#1E4430" stopOpacity="0.95" />
+              <stop offset="48%" stopColor="#122A1E" stopOpacity="0.98" />
+              <stop offset="100%" stopColor="#0B1A12" stopOpacity="1" />
+            </radialGradient>
 
-        {/* atmosphere, body, rim light - in that order, so the glow is
-            behind the sphere and the lit edge sits on top of it */}
-        <circle className="tp-globe-atmo" cx={CX} cy={CY} r={R + 2}
-                filter="url(#tp-globe-atmo-blur)" />
-        <circle cx={CX} cy={CY} r={R} fill="url(#tp-globe-shade)" />
-        <circle className="tp-globe-rim" cx={CX} cy={CY} r={R} fill="url(#tp-globe-rim)" />
+            <radialGradient id="tp-globe-rim-pista" cx="50%" cy="50%" r="50%">
+              <stop offset="88%" stopColor="#2D6A4F" stopOpacity="0" />
+              <stop offset="97%" stopColor="#52B788" stopOpacity="0.45" />
+              <stop offset="100%" stopColor="#74C69D" stopOpacity="0.15" />
+            </radialGradient>
 
-        {/* The surface: a faint grid everywhere, the continents bright on
-            top of it. Both fade towards the limb, which is what reads as
-            curvature. */}
-        <g className="tp-globe-surface">
-          {dots.map((d, i) => (
-            <circle
-              key={i} cx={d.x} cy={d.y}
-              r={d.land ? 0.9 + d.z * 1.25 : 0.4 + d.z * 0.45}
-              className={d.land ? 'is-land' : 'is-grid'}
-              opacity={d.land ? 0.32 + d.z * 0.66 : 0.06 + d.z * 0.16}
-            />
-          ))}
-        </g>
+            <filter id="tp-globe-atmo-blur" x="-30%" y="-30%" width="160%" height="160%">
+              <feGaussianBlur stdDeviation="5" />
+            </filter>
 
-        <g className="tp-globe-markers">
-          {surfaceMarkers.filter(d => d.visible).map((d, i) => (
-            <g key={i}>
-              <circle
-                cx={d.x}
-                cy={d.y}
-                r={d.fail ? 5 : 3.8}
-                fill={d.fill}
-                opacity={0.25}
-                filter="url(#tp-event-glow)"
-              />
-              <circle
-                cx={d.x}
-                cy={d.y}
-                r={d.fail ? 2.7 : 2}
-                fill={d.fill}
-                opacity={Math.min(1, 0.55 + d.z * 0.45)}
-              >
-                <title>{d.label}</title>
-              </circle>
+            <filter id="tp-tricolor-glow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="2.5" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
+
+          {/* Outer Atmosphere Glow */}
+          <circle
+            className="tp-globe-atmo"
+            cx={CX}
+            cy={CY}
+            r={R + 3}
+            filter="url(#tp-globe-atmo-blur)"
+          />
+
+          {/* Globe Sphere */}
+          <circle cx={CX} cy={CY} r={R} fill="url(#tp-globe-shade-pista)" />
+          <circle className="tp-globe-rim" cx={CX} cy={CY} r={R} fill="url(#tp-globe-rim-pista)" />
+
+          {/* Dot Matrix Surface with India Centered at CX, CY */}
+          <g className="tp-globe-surface">
+            {dots.map((d, i) => {
+              const isIndiaHighlight = introState === 'locked' && d.inIndia;
+              const fill = isIndiaHighlight
+                ? d.tricolor
+                : d.land
+                ? '#52B788'
+                : 'rgba(82, 183, 136, 0.15)';
+
+              return (
+                <circle
+                  key={i}
+                  cx={d.x}
+                  cy={d.y}
+                  r={isIndiaHighlight ? 1.7 + d.z * 1.5 : d.land ? 0.95 + d.z * 1.25 : 0.45 + d.z * 0.4}
+                  fill={fill}
+                  className={d.land ? 'is-land' : 'is-grid'}
+                  opacity={isIndiaHighlight ? 0.95 : d.land ? 0.4 + d.z * 0.58 : 0.08 + d.z * 0.15}
+                  filter={isIndiaHighlight ? 'url(#tp-tricolor-glow)' : undefined}
+                />
+              );
+            })}
+          </g>
+
+          {/* Event Markers */}
+          <g className="tp-globe-markers">
+            {surfaceMarkers.filter(d => d.visible).map((d, i) => (
+              <g key={i}>
+                <circle
+                  cx={d.x}
+                  cy={d.y}
+                  r={d.fail ? 5 : 3.5}
+                  fill={d.fill}
+                  opacity={0.3}
+                />
+                <circle
+                  cx={d.x}
+                  cy={d.y}
+                  r={d.fail ? 2.8 : 2}
+                  fill={d.fill}
+                  opacity={Math.min(1, 0.65 + d.z * 0.35)}
+                >
+                  <title>{d.label}</title>
+                </circle>
+              </g>
+            ))}
+          </g>
+
+          {/* Concentric Tricolor Ripples Radiating from India Center (CX, CY) */}
+          {introState === 'locked' && (
+            <g className="aiori-india-pulse" key={pulseCount}>
+              {/* Saffron Ripple */}
+              <circle cx={CX} cy={CY} r={18} fill="none" stroke="#FF9933" strokeWidth="2.2" className="ripple-saffron" />
+              {/* White Ripple */}
+              <circle cx={CX} cy={CY} r={13} fill="none" stroke="#FFFFFF" strokeWidth="1.8" className="ripple-white" />
+              {/* India Green Ripple */}
+              <circle cx={CX} cy={CY} r={8} fill="none" stroke="#138808" strokeWidth="2.4" className="ripple-green" />
+              {/* Ashoka Navy Blue Center Pin */}
+              <circle cx={CX} cy={CY} r={3.4} fill="#0A2351" stroke="#FFFFFF" strokeWidth="1.2" className="center-chakra-dot" />
             </g>
-          ))}
-        </g>
-      </svg>
+          )}
 
+          {/* High-Tech India Telemetry Target Reticle */}
+          {introState === 'locked' && (
+            <g className="aiori-telemetry-reticle">
+              {/* Telemetry Radar Rings */}
+              <circle cx={CX} cy={CY} r="18" fill="none" stroke="#FF9933" strokeWidth="1.2" strokeDasharray="3 3" opacity="0.9" />
+              <circle cx={CX} cy={CY} r="28" fill="none" stroke="#52B788" strokeWidth="1" strokeDasharray="4 4" opacity="0.65" />
+            </g>
+          )}
+
+          {/* ============================================================== */}
+          {/* THE POINTING HAND (USER'S CARTOON ASSET WITH BUILT-IN BLUE CUFF)*/}
+          {/* ============================================================== */}
+          <g
+            className="aiori-pointing-hand-rig"
+            transform={`translate(${handX}, ${handY}) rotate(${handAngle})`}
+            style={{
+              transformOrigin: '20px 20px',
+              transition: introState === 'swiping' ? 'none' : 'transform 0.4s cubic-bezier(0.18, 0.9, 0.3, 1)',
+            }}
+          >
+            {/* The user-provided cartoon pointing hand icon with built-in blue cuff */}
+            <image
+              href={handImg}
+              x="0"
+              y="0"
+              width="60"
+              height="40.5"
+              preserveAspectRatio="xMidYMid meet"
+            />
+
+            {/* Glowing Touch Contact Point at the index fingertip */}
+            {introState === 'swiping' && (
+              <g transform="translate(60, 14.5)">
+                <circle cx="0" cy="0" r="7" fill="none" stroke="#FF9933" strokeWidth="2.2" className="aiori-touch-ring" />
+                <circle cx="0" cy="0" r="3.5" fill="#FFFFFF" />
+              </g>
+            )}
+          </g>
+
+          {/* Dynamic Motion Swoosh Particle Trails when Swiping */}
+          {introState === 'swiping' && (
+            <g className="aiori-swipe-swoosh">
+              <path
+                d="M 140 146 C 175 138, 220 150, 265 170"
+                fill="none"
+                stroke="rgba(255, 255, 255, 0.85)"
+                strokeWidth="3.5"
+                strokeDasharray="9 5"
+                strokeLinecap="round"
+                className="aiori-trail-dash"
+              />
+              <path
+                d="M 146 158 C 180 150, 226 162, 272 182"
+                fill="none"
+                stroke="#FF9933"
+                strokeWidth="2.5"
+                strokeDasharray="7 5"
+                strokeLinecap="round"
+                opacity="0.9"
+              />
+            </g>
+          )}
+        </svg>
+      </div>
+
+      {/* Overview Readouts */}
       <figcaption className="tp-globe-readout">
-        {empty ? <span className="tp-globe-note">No evidence collected yet</span> : (
+        {empty ? (
+          <span className="tp-globe-note">No evidence collected yet</span>
+        ) : (
           <>
             <span className="tp-globe-stat"><strong>{model.total}</strong> events</span>
             <span className="tp-globe-stat"><strong>{model.devices}</strong> devices</span>
             <span className="tp-globe-stat is-flagged"><strong>{model.failures}</strong> failures</span>
-            <span className="tp-globe-note">
-              Markers are placed on the globe by a stable event-derived position; they do not represent real locations.
-            </span>
           </>
         )}
       </figcaption>

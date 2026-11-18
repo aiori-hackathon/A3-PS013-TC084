@@ -1,19 +1,21 @@
 @import "tailwindcss/theme.css" layer(theme);
 @import "tailwindcss/utilities.css" layer(utilities);
 
-/* The page under everything. This used to be a light grey with near-black
-   text, which showed as a white flash on every load: App.jsx renders its
-   "Opening Tracepoint" state before the session check resolves, and that
-   state sits on the root background. The workspace and the sign-in screen
-   both paint their own near-black surface over this, so the only thing this
-   changes is what you see before either of them mounts. */
+/* ===========================================================================
+   TRACEPOINT — AIORI-3 LIGHT PISTA THEME
+   ---------------------------------------------------------------------------
+   Root configuration for AIORI-3 Indian National Internet Operations Research.
+   Soft pistachio mist background with deep forest pine typography.
+   =========================================================================== */
+
 :root {
   font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  color: #e7eef7;
-  background: #090c11;
+  color: #13281E;
+  background: #F3F7F4;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
+  scroll-behavior: smooth;
 }
 
 * {
@@ -23,6 +25,8 @@
 body {
   margin: 0;
   min-width: 320px;
+  background: #F3F7F4;
+  color: #13281E;
 }
 
 button,
@@ -39,4 +43,23 @@ code,
 pre,
 .mono {
   font-family: 'IBM Plex Mono', monospace;
+}
+
+/* Custom Pista Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #EAF2EC;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #B8D4C0;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #8DB897;
 }

@@ -1,0 +1,15 @@
+{
+  "name": "tracepoint-agent",
+  "version": "1.0.0",
+  "description": "Tracepoint log and network evidence collection agents",
+  "type": "module",
+  "bin": {
+    "agent": "./agent.js",
+    "network-agent": "./network_agent.js"
+  },
+  "scripts": {
+    "start": "node agent.js",
+    "network": "node network_agent.js",
+    "test": "node --test"
+  }
+}

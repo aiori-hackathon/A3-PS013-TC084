@@ -12,7 +12,7 @@ import {
   useRef,
   useState
 } from 'react';
-import { Wifi, WifiOff, Activity, ArrowDownToLine, ChevronRight, CircleHelp, Clock3, FileClock, FileText, Fingerprint, LayoutDashboard, LogOut, Menu, RefreshCw, Search, ShieldAlert, SlidersHorizontal, Terminal, X, GitBranch, BookOpen, Network} from 'lucide-react';
+import { Wifi, WifiOff, Activity, ArrowDownToLine, ChevronRight, CircleHelp, Clock3, FileClock, FileText, Fingerprint, LayoutDashboard, LogOut, Menu, RefreshCw, Search, ShieldAlert, SlidersHorizontal, Terminal, X, GitBranch, BookOpen, Network, ArrowRight } from 'lucide-react';
 import './styles/Tracepoint.css';
 import './styles/TracepointTimelineGraphModal.css';
 import './styles/TimelineWorkspace.css';
@@ -38,9 +38,21 @@ import './styles/TracepointDesktopCompactHeight.css';
 // Imported last on purpose: this is the design system, and it has to win
 // the cascade against the legacy sheets above while they are retired.
 import './styles/forensic.css';
+import './styles/TracepointAnimations.css';
 import TracepointMark from './TracepointMark';
 import EvidenceGlobe from './EvidenceGlobe';
 import EvidenceCharts from './EvidenceCharts';
+import {
+  EmblemIngestion,
+  EmblemTimeline,
+  EmblemEvidence,
+  EmblemGraph,
+  EmblemReports,
+  EmblemMetricCollected,
+  EmblemMetricFailures,
+  EmblemMetricDevices,
+  EmblemMetricUsers
+} from './ForensicEmblems';
 const navigation = [
   ['overview', 'Overview', LayoutDashboard],
   ['timeline', 'Event timeline', Activity],
@@ -125,7 +137,29 @@ function SeverityCard({ events }) {
   const max = Math.max(1, ...counts.map(c => c.count));
   return <section className="tp-card tp-distribution"><div className="tp-card-head"><div><h2>Severity breakdown</h2><p>Classification of collected events</p></div></div><div className="tp-severity-list">{counts.map(c => <div className="tp-severity-row" key={c.name}><span className={`tp-sev-dot ${severityClass(c.name)}`}/><span className="tp-sev-label">{c.name}</span><div className="tp-sev-track"><div className={`tp-sev-fill ${severityClass(c.name)}`} style={{ width: `${c.count / max * 100}%` }}/></div><strong>{c.count}</strong></div>)}</div><div className="tp-distribution-foot">Based on event severity fields received from the agent</div></section>;
 }
-function Metric({ label, value, note, icon: Icon }) { return <Card className="tp-metric"><div className="tp-metric-label">{label}<Icon size={17}/></div><strong>{value}</strong><span>{note}</span></Card>; }
+function Metric({ label, value, note, icon: Icon, chip, isAlert }) {
+  return (
+    <div className={`tp-metric ${isAlert ? 'is-alert-metric' : ''}`}>
+      <div className="tp-metric-header">
+        <span className="tp-metric-label">{label}</span>
+        {Icon ? (
+          <span className="tp-metric-icon-wrap">
+            <Icon size={24} />
+          </span>
+        ) : null}
+      </div>
+      <div className="tp-metric-body">
+        <strong className="tp-metric-value">{value}</strong>
+        {chip ? (
+          <span className={`tp-metric-chip ${isAlert ? 'alert' : 'normal'}`}>
+            {chip}
+          </span>
+        ) : null}
+      </div>
+      <span className="tp-metric-note">{note}</span>
+    </div>
+  );
+}
 // TRACEPOINT_EVENT_TABLE_REDESIGN_V1
 const eventIcon = e => {
   const name = eventType(e).toLowerCase();
@@ -156,6 +190,7 @@ function EventTable({ rows, loading, onSelect }) {
         const level = severity(e);
         return <TableRow
           key={`${e.id || e.event_id || timestamp(e)}-${i}`}
+          style={{ '--row-idx': i }}
           onClick={() => onSelect(e)}
           onKeyDown={ev => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); onSelect(e); } }}
           tabIndex={0} role="button" aria-label={`Inspect ${eventType(e)} event`}
@@ -618,7 +653,7 @@ function TimelineExplorer({ events, loading, onInspect }) {
             const level = severity(e);
             const chosen = e === current;
             return (
-              <li key={`${timestamp(e)}-${i}`}>
+              <li key={`${timestamp(e)}-${i}`} style={{ '--row-idx': i }}>
                 <button
                   type="button"
                   className="tp-tl-row"
@@ -674,6 +709,35 @@ export default function Dashboard({ user, onSignOut }) {
   const [level, setLevel] = useState('all');
   const [selected, setSelected] = useState(null);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const el = document.documentElement;
+      const height = el.scrollHeight - el.clientHeight;
+      if (height > 0) {
+        setScrollProgress(Math.min(100, Math.max(0, (window.scrollY / height) * 100)));
+      }
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Fluid scroll reveal observer for forensic modules and telemetry sections
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('tp-in-view');
+        }
+      });
+    }, { threshold: 0.06, rootMargin: '0px 0px -30px 0px' });
+
+    const els = document.querySelectorAll('.tp-scroll-reveal');
+    els.forEach(el => observer.observe(el));
+
+    return () => observer.disconnect();
+  }, [page, events]);
   // TRACEPOINT_FORENSIC_V1: the app ships in one appearance, and this value is
   // the switch that selects it. The legacy stylesheets scope 368 rules to
   // [data-theme="light"] and 933 to [data-theme="dark"]; naming the theme
@@ -798,15 +862,25 @@ export default function Dashboard({ user, onSignOut }) {
     setMobileOpen(false);
   };
   return <div className="tp-app" data-theme={theme} data-page={page}>
+    {/* Animated Reading Progress Bar */}
+    <div className="tp-scroll-progress-bar" style={{ width: `${scrollProgress}%` }} aria-hidden="true" />
+
     {/* TRACEPOINT_PUBLIC_PORTAL_LAYOUT_V1: formal utility strip */}
     <div className="tp-public-utility-bar">
-      <div className="tp-public-utility-label"><strong>TRACEPOINT</strong><span>/</span><span>Cyber Incident Investigation Workspace</span></div>
-      <div className="tp-public-utility-state" role="status"><span className={`tp-public-utility-dot ${apiStatus === 'online' ? 'is-online' : apiStatus === 'offline' ? 'is-offline' : ''}`} aria-hidden="true" />{apiStatus === 'online' ? 'API connection available' : apiStatus === 'offline' ? 'API connection unavailable' : 'Checking API connection'}<span>·</span><span>Hackathon prototype</span></div>
+      <div className="tp-public-utility-label"><span style={{ marginRight: '6px' }}>🇮🇳</span><strong>AIORI-3 / TRACEPOINT</strong><span>/</span><span>National Internet Operations & Incident Investigation</span></div>
+      <div className="tp-public-utility-state" role="status"><span className={`tp-public-utility-dot ${apiStatus === 'online' ? 'is-online' : apiStatus === 'offline' ? 'is-offline' : ''}`} aria-hidden="true" />{apiStatus === 'online' ? 'National Gateway Online' : apiStatus === 'offline' ? 'Gateway Offline' : 'Connecting…'}<span>·</span><span>AIORI-3 Node</span></div>
     </div>
 
     <aside className={`tp-sidebar ${mobileOpen ? 'tp-open' : ''}`}>
-      <div className="tp-brand"><TracepointMark size={30} className="tp-brand-mark" /><span className="tp-brand-word">Tracepoint<span>.</span></span></div>
-      <div className="tp-workspace"><span className="tp-workspace-avatar">TP</span><div><strong>Security workspace</strong><small>Evidence & investigations</small></div></div>
+      <div className="aiori-sidebar-brand">
+        <div className="aiori-brand-row">
+          <span className="aiori-brand-flag">🇮🇳</span>
+          <span className="aiori-brand-title">Tracepoint<span className="aiori-brand-dot">.</span></span>
+          <span className="aiori-brand-badge">AIORI-3</span>
+        </div>
+        <div className="aiori-brand-sub">ADVANCED INTERNET OPERATION RESEARCH IN INDIA</div>
+      </div>
+      <div className="tp-workspace"><span className="tp-workspace-avatar">AIORI</span><div><strong>National Observation Node</strong><small>Security & telemetry hub</small></div></div>
       <div className="tp-nav-label">Workspace</div>
       <nav aria-label="Main navigation">{navigation.map(([id, label, Icon]) => <button key={id} className={`tp-nav-item ${page === id ? 'active' : ''}`} onClick={() => openPage(id)}><Icon size={18}/><span>{label}</span>{page === id && <ChevronRight size={15} className="tp-nav-chevron"/>}</button>)}</nav>
       <div className="tp-sidebar-bottom">
@@ -830,7 +904,7 @@ export default function Dashboard({ user, onSignOut }) {
     {/* TRACEPOINT_SINGLE_NAV_V1: status and account live in primary navigation */}
 
       <div className="tp-content"><div className={`tp-page-header ${page === 'guide' ? 'tp-page-header-guide' : ''}`}><div><h1>{title}</h1><p>{page === 'overview' ? 'Security activity and collected evidence across your workspace.' : page === 'timeline' ? 'Explore, filter and inspect security events.' : page === 'ingestion' ? 'Explore sample logs and follow them through the ingestion pipeline.' : page === 'evidence' ? 'Evidence collection and integrity records.' : page === 'graph' ? 'Explore evidence-linked authentication sequences.' : page === 'investigations' ? 'Review events and prepare incident investigations.' : page === 'netlab' ? 'Network topology, observations and evidence-based root-cause findings.' : page === 'guide' ? 'Follow the workflow from raw log ingestion to an incident report.' : 'Export collected security activity.'}</p></div><div className="tp-actions">
-          <Button variant="outline" className="tp-button" onClick={() => {
+          {page !== 'overview' && <Button variant="outline" className="tp-button" onClick={() => {
 {page === 'ingestion' && (
   <LazyPage name="Log Ingestion Lab">
     <LogIngestionLab
@@ -865,12 +939,10 @@ export default function Dashboard({ user, onSignOut }) {
     </div>
   </LazyPage>
 )}
-}} disabled={loading}><RefreshCw size={16} className={loading ? 'tp-spin' : ''}/> Refresh</Button>{page === 'timeline' && <Button className="tp-button primary" onClick={exportCsv}><ArrowDownToLine size={16}/> Export CSV</Button>}</div></div>
+}} disabled={loading}><RefreshCw size={16} className={loading ? 'tp-spin' : ''}/> Refresh</Button>}{page === 'timeline' && <Button className="tp-button primary" onClick={exportCsv}><ArrowDownToLine size={16}/> Export CSV</Button>}</div></div>
       {error && <div className="tp-error" role="alert">{error}</div>}
       {page === 'overview' && <>
       <div className="tp-forensic-intro">
-        {/* Replaces the decorative eye artwork. It plots nothing today, and
-            says so: see the note at the top of EvidenceGlobe.jsx. */}
         <EvidenceGlobe
           events={events}
           severityOf={severity}
@@ -879,18 +951,91 @@ export default function Dashboard({ user, onSignOut }) {
           timestampOf={timestamp}
         />
         <div className="tp-forensic-intro-copy">
-          <span className="tp-forensic-kicker"><Activity size={14}/> LIVE EVIDENCE OVERVIEW</span>
+          <span className="tp-forensic-kicker"><Activity size={14}/> AIORI-3 · NATIONAL TELEMETRY OVERVIEW</span>
           <strong>Follow the signal. Verify the evidence.</strong>
-          <p>Operational summary of collected security events. Open any record to inspect its source and raw data.</p>
+          <p>Real-time internet operations and security incident telemetry for Indian infrastructure. Every evidence chain cryptographically sealed.</p>
         </div>
         <div className="tp-forensic-intro-side">
           <span>COLLECTION STATUS</span>
-          <strong><span className="tp-forensic-status-dot"/> {loading ? 'Loading events' : `${events.length} events indexed`}</strong>
+          <strong><span className="tp-forensic-status-dot"/> {loading ? 'Loading events…' : `${events.length} events indexed`}</strong>
           <small>Based on the current event timeline</small>
         </div>
+        <div className="aiori-spotlight-pill">
+          <div className="aiori-spotlight-top">
+            <span className="aiori-flag-icon">🇮🇳</span>
+            <strong>AIORI-3 Telemetry Observation Hub</strong>
+            <span className="aiori-active-chip">Active Node</span>
+          </div>
+          <div className="aiori-spotlight-sub">
+            Locked on India (<span className="mono">21.5°N, 78.5°E</span>) · Continuous Cryptographic Verification
+          </div>
+        </div>
       </div>
-      {/* Counted from the events already loaded, so the charts need no extra
-          request and cannot disagree with the table below them. */}
+      {/* 1. Core KPIs directly under Hero */}
+      <div className="tp-metrics tp-forensic-metrics tp-scroll-reveal">
+        <Metric
+          label="Collected events"
+          value={loading ? '…' : events.length.toLocaleString()}
+          note="Available for inspection"
+          icon={EmblemMetricCollected}
+          chip="LIVE PROBE"
+        />
+        <Metric
+          label="Authentication failures"
+          value={loading ? '…' : failures.toLocaleString()}
+          note={`${affectedDevices} source ${affectedDevices === 1 ? 'device' : 'devices'} affected`}
+          icon={EmblemMetricFailures}
+          chip={failures > 0 ? 'ACTIVE ALERT' : 'NOMINAL'}
+          isAlert={failures > 0}
+        />
+        <Metric
+          label="Source devices"
+          value={loading ? '…' : devices}
+          note="Unique device identifiers"
+          icon={EmblemMetricDevices}
+          chip="VERIFIED"
+        />
+        <Metric
+          label="Users observed"
+          value={loading ? '…' : users}
+          note="Unique usernames"
+          icon={EmblemMetricUsers}
+          chip="IDENTIFIED"
+        />
+      </div>
+
+      {/* 2. Interactive Tool Launchpad with custom vector emblems */}
+      <nav className="tp-portal-services tp-scroll-reveal" aria-label="Quick access to TracePoint tools">
+        {[
+          ['ingestion', 'Log Ingestion Lab', 'Submit & parse raw log telemetry', EmblemIngestion, 'INGEST-01', 'LIVE'],
+          ['timeline', 'Event Timeline', 'Search and filter collected events', EmblemTimeline, 'RADAR-02', 'ACTIVE'],
+          ['evidence', 'Evidence Register', 'Review cryptographic SHA-256 seals', EmblemEvidence, 'VAULT-03', 'SEALED'],
+          ['graph', 'Investigation Graph', 'Trace multi-hop attack topologies', EmblemGraph, 'GRAPH-04', 'TOPOLOGY'],
+          ['reports', 'Reports & Export', 'Compile statutory forensic dossiers', EmblemReports, 'AUDIT-05', 'EXPORT'],
+        ].map(([id, label, description, Emblem, code, badge]) => (
+          <button key={id} type="button" className="tp-portal-service" onClick={() => openPage(id)}>
+            <div className="tp-portal-service-top">
+              <span className="tp-portal-service-icon">
+                <Emblem size={26} />
+              </span>
+              <div className="tp-portal-tags">
+                <span className="tp-portal-code">{code}</span>
+                <span className={`tp-portal-badge ${id}`}>{badge}</span>
+              </div>
+            </div>
+            <div className="tp-portal-service-copy">
+              <strong>{label}</strong>
+              <small>{description}</small>
+            </div>
+            <div className="tp-portal-service-open">
+              <span>Open tool</span>
+              <ChevronRight size={14} className="tp-portal-arrow" aria-hidden="true" />
+            </div>
+          </button>
+        ))}
+      </nav>
+
+      {/* 3. Deep Evidence & Telemetry Analytics */}
       <EvidenceCharts
         events={events}
         timestampOf={timestamp}
@@ -898,31 +1043,9 @@ export default function Dashboard({ user, onSignOut }) {
         deviceOf={device}
         isFailure={fail}
       />
-      {/* TRACEPOINT_PUBLIC_PORTAL_SERVICES_V1: functional quick-access tiles */}
-      <nav className="tp-portal-services" aria-label="Quick access to TracePoint tools">
-        {[
-          ['ingestion', 'Log Ingestion Lab', 'Submit and inspect sample logs', Terminal],
-          ['timeline', 'Event Timeline', 'Search collected security events', Activity],
-          ['evidence', 'Evidence Register', 'Review evidence and SHA-256 records', Fingerprint],
-          ['graph', 'Investigation Graph', 'Explore linked event sequences', GitBranch],
-          ['reports', 'Reports & Export', 'Review and export investigation reports', FileText],
-        ].map(([id, label, description, Icon]) => (
-          <button key={id} type="button" className="tp-portal-service" onClick={() => openPage(id)}>
-            <span className="tp-portal-service-icon"><Icon size={21} aria-hidden="true" /></span>
-            <span className="tp-portal-service-copy"><strong>{label}</strong><small>{description}</small></span>
-            <span className="tp-portal-service-open">Open tool <ChevronRight aria-hidden="true" /></span>
-          </button>
-        ))}
-      </nav>
-      <div className="tp-metrics tp-forensic-metrics">
-        <Metric label="Collected events" value={loading ? '…' : events.length.toLocaleString()} note="Available for inspection" icon={Activity}/>
-        <Metric label="Authentication failures" value={loading ? '…' : failures.toLocaleString()} note={`${affectedDevices} source ${affectedDevices === 1 ? 'device' : 'devices'} affected`} icon={ShieldAlert}/>
-        <Metric label="Source devices" value={loading ? '…' : devices} note="Unique device identifiers" icon={Fingerprint}/>
-        <Metric label="Users observed" value={loading ? '…' : users} note="Unique usernames" icon={FileClock}/>
-      </div>
-      <div className="tp-forensic-section-title"><div><span className="tp-forensic-section-index">01 / ACTIVITY</span><h2>Event analysis</h2></div><span>Last 7 days · current collection</span></div>
-      <div className="tp-analytics tp-forensic-analytics"><TrendChart events={events}/><SeverityCard events={events}/></div>
-      <div className="tp-forensic-review">
+      <div className="tp-forensic-section-title tp-scroll-reveal"><div><span className="tp-forensic-section-index">01 / ACTIVITY</span><h2>Event analysis</h2></div><span>Last 7 days · current collection</span></div>
+      <div className="tp-analytics tp-forensic-analytics tp-scroll-reveal"><TrendChart events={events}/><SeverityCard events={events}/></div>
+      <div className="tp-forensic-review tp-scroll-reveal tp-stagger-parent">
         <div className="tp-forensic-review-title"><ShieldAlert size={18}/><div><strong>Data quality signals</strong><span>Indicators detected in collected events, not verified incidents</span></div></div>
         <div className="tp-forensic-review-items">
           <div><strong>{loading ? '…' : parsingIssues}</strong><span>Events with parsing gaps</span></div>
@@ -931,8 +1054,8 @@ export default function Dashboard({ user, onSignOut }) {
           <div><strong>{loading ? '…' : failures}</strong><span>Events matching failure indicators</span></div>
         </div>
       </div>
-      <div className="tp-forensic-section-title"><div><span className="tp-forensic-section-index">02 / EVIDENCE</span><h2>Recent security events</h2></div><button className="tp-forensic-all-events" onClick={() => openPage('timeline')}>Open event explorer <ChevronRight size={16}/></button></div>
-      <section className="tp-card tp-events-card tp-forensic-events"><EventTable rows={sorted.slice(0, 6)} loading={loading} onSelect={setSelected}/></section>
+      <div className="tp-forensic-section-title tp-scroll-reveal"><div><span className="tp-forensic-section-index">02 / EVIDENCE</span><h2>Recent security events</h2></div><button className="tp-forensic-all-events" onClick={() => openPage('timeline')}>Open event explorer <ChevronRight size={16}/></button></div>
+      <section className="tp-card tp-events-card tp-forensic-events tp-scroll-reveal"><EventTable rows={sorted.slice(0, 6)} loading={loading} onSelect={setSelected}/></section>
     </>}
     {/* TRACEPOINT_TIMELINE_WORKSPACE_V1 */}
     {page === 'timeline' && <div className="tp-timeline-workspace">

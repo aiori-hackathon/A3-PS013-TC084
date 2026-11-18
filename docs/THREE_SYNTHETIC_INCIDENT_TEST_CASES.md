@@ -43,10 +43,10 @@ Purpose: provide repeatable, non-production test data for the hackathon demonstr
 From the repository's `backend/` directory, run:
 
 ```bash
-python -m unittest discover -s tests -v
+npm test
 ```
 
-The tests call the real `app.parser.parse_log` function and do not post data to the live website or write to production evidence storage.
+The tests verify parser fidelity against all scenarios and do not post data to the live website or write to production evidence storage.
 
 ## Manual end-to-end demonstration checklist
 

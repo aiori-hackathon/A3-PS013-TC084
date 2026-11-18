@@ -44,7 +44,22 @@ export default function Auth({ onAuthenticated }) {
   return (
     <div className="thread-auth">
       <section className="auth-left">
-        <div className="auth-brand"><span>Tracepoint<span className="auth-brand-dot">.</span></span></div>
+        <div className="auth-brand">
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '20px' }}>🇮🇳</span>
+            <span>Tracepoint<span className="auth-brand-dot">.</span></span>
+            <span style={{
+              fontSize: '11px',
+              fontFamily: "'IBM Plex Mono', monospace",
+              background: '#E2F0E5',
+              color: '#1E5336',
+              padding: '2px 7px',
+              borderRadius: '6px',
+              fontWeight: 700,
+              letterSpacing: '0.5px'
+            }}>AIORI-3</span>
+          </span>
+        </div>
         <div className="auth-form-area">
           <div className="auth-kicker">INCIDENT WORKSPACE</div>
           <h1>{isSignup ? "Create your workspace." : "Welcome back."}</h1>

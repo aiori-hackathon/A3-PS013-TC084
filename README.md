@@ -19,11 +19,11 @@ TracePoint is a cybersecurity investigation platform developed by **Team The Mis
 
 ## 🛠️ Tech Stack
 
-React · Vite · Python · FastAPI · Grok AI · AWS EC2 · Nginx
+React · Vite · Node.js · Express · Groq AI · AWS EC2 · Nginx
 
 ## 🏗️ Architecture
 
-Python Agent → FastAPI Backend → Evidence Storage & Event Analysis → React Dashboard
+Node.js Agent → Express Backend → Evidence Storage & Event Analysis → React Dashboard
 
 ## 🎥 Hackathon Orientation Video
 

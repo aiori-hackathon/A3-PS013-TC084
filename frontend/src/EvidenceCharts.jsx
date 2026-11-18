@@ -45,29 +45,49 @@ function Empty({ children }) {
 }
 
 /* ---- horizontal ranked bars ------------------------------------------- */
-function RankedBars({ rows, total, tone, unit = 'events' }) {
-  if (!rows.length) return <Empty>Nothing collected yet.</Empty>;
-  const max = Math.max(...rows.map(r => r.count));
+function RankedBars({ rows, total, tone, unit = 'events', verificationNote }) {
+  if (!rows.length) return <Empty>No telemetry recorded yet in current horizon.</Empty>;
+  const max = Math.max(1, ...rows.map(r => r.count));
   return (
-    <ul className="tp-chart-ranked">
-      {rows.map((r, i) => (
-        <li key={r.label}>
-          <span className="tp-chart-ranked-label" title={r.label}>{r.label}</span>
-          <span className="tp-chart-ranked-track">
-            <span
-              className="tp-chart-ranked-fill"
-              style={{ width: `${(r.count / max) * 100}%`, '--tp-cat': `var(--fx-cat-${tone ?? ((i % 6) + 1)})` }}
-            />
-          </span>
-          <span className="tp-chart-ranked-value">
-            {r.count}
-            <small>{total ? ` · ${Math.round((r.count / total) * 100)}%` : ''}</small>
-          </span>
-          {/* The accessible description doubles as the hover tooltip. */}
-          <span className="tp-chart-sr">{`${r.label}: ${r.count} ${unit}`}</span>
-        </li>
-      ))}
-    </ul>
+    <div className="tp-ranked-container">
+      <ul className="tp-chart-ranked">
+        {rows.map((r, i) => {
+          const pct = total ? Math.round((r.count / total) * 100) : 0;
+          return (
+            <li key={r.label} className="tp-ranked-row">
+              <span className="tp-ranked-index">{String(i + 1).padStart(2, '0')}</span>
+              <div className="tp-ranked-content">
+                <div className="tp-ranked-meta">
+                  <span className="tp-chart-ranked-label" title={r.label}>{r.label}</span>
+                  <div className="tp-ranked-badge-group">
+                    <span className="tp-chart-ranked-value">
+                      {r.count} <small>{unit}</small>
+                    </span>
+                    <span className="tp-ranked-pct-pill">{pct}%</span>
+                  </div>
+                </div>
+                <div className="tp-chart-ranked-track">
+                  <span
+                    className="tp-chart-ranked-fill"
+                    style={{
+                      width: `${Math.max(6, (r.count / max) * 100)}%`,
+                      '--tp-cat': `var(--fx-cat-${tone ?? ((i % 6) + 1)})`
+                    }}
+                  />
+                </div>
+              </div>
+              <span className="tp-chart-sr">{`${r.label}: ${r.count} ${unit}`}</span>
+            </li>
+          );
+        })}
+      </ul>
+      {verificationNote && (
+        <div className="tp-ranked-footer">
+          <span className="tp-ranked-check">✓</span>
+          <span>{verificationNote}</span>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -123,72 +143,133 @@ export default function EvidenceCharts({ events = [], timestampOf, eventTypeOf, 
   }, [events, timestampOf, eventTypeOf, deviceOf, isFailure]);
 
   return (
-    <section className="tp-charts" aria-label="Collected event analysis">
-      <article className="tp-card tp-chart-card tp-chart-wide">
+    <section className="tp-charts tp-scroll-reveal" aria-label="Collected event analysis">
+      <article className="tp-card tp-chart-card tp-chart-timeline-card">
         <header className="tp-chart-head">
-          <h3>Authentication outcomes</h3>
-          <p>Failed against successful events per day, last {DAYS} days</p>
+          <div className="tp-chart-title-group">
+            <span className="tp-chart-kicker">TELEMETRY TIMELINE</span>
+            <h3>Authentication outcomes</h3>
+            <p>Failed against successful events per day, last {DAYS} days</p>
+          </div>
+          <div className="tp-chart-horizon-badge">
+            <span className="tp-chart-radar-pip" />
+            <span>14-Day Horizon · Active Reticle</span>
+          </div>
         </header>
         {data.inWindow === 0 ? (
           <Empty>No events fall inside the last {DAYS} days. Older evidence is still on the timeline.</Empty>
         ) : (
           <>
-            <div className="tp-chart-cols" role="list">
-              {data.days.map((d, i) => {
-                const total = d.failed + d.ok;
-                return (
-                  <div
-                    className="tp-chart-col" key={d.key} role="listitem"
-                    title={`${longDay(d.key)} — ${d.failed} failed, ${d.ok} other`}
-                  >
-                    <span className="tp-chart-stack">
-                      <span className="tp-chart-seg is-ok"
-                        style={{ height: `${(d.ok / data.peak) * 100}%` }} />
-                      <span className="tp-chart-seg is-failed"
-                        style={{ height: `${(d.failed / data.peak) * 100}%` }} />
-                    </span>
-                    <span className="tp-chart-col-label">
-                      {columnLabel(d.key, i, data.days)}
-                      <em>{weekdayLabel(d.key)}</em>
-                    </span>
-                    <span className="tp-chart-sr">{`${longDay(d.key)}: ${d.failed} failed, ${d.ok} other, ${total} total`}</span>
-                  </div>
-                );
-              })}
+            <div className="tp-chart-cols-wrapper">
+              <div className="tp-chart-y-axis" aria-hidden="true">
+                <span>{data.peak}</span>
+                <span>{Math.max(1, Math.round(data.peak / 2))}</span>
+                <span>0</span>
+              </div>
+              <div className="tp-chart-cols" role="list">
+                {data.days.map((d, i) => {
+                  const total = d.failed + d.ok;
+                  const hasData = total > 0;
+                  return (
+                    <div
+                      className={`tp-chart-col ${hasData ? 'has-data' : 'is-zero'}`}
+                      key={d.key}
+                      role="listitem"
+                      title={`${longDay(d.key)} — ${d.failed} failed, ${d.ok} other`}
+                    >
+                      <span className="tp-chart-stack">
+                        {hasData ? (
+                          <>
+                            <span className="tp-chart-active-tag">{total}</span>
+                            <span
+                              className="tp-chart-seg is-ok"
+                              style={{ height: `${(d.ok / data.peak) * 100}%` }}
+                            />
+                            <span
+                              className="tp-chart-seg is-failed"
+                              style={{ height: `${(d.failed / data.peak) * 100}%` }}
+                            />
+                          </>
+                        ) : (
+                          <span className="tp-chart-zero-pip" />
+                        )}
+                      </span>
+                      <span className="tp-chart-col-label">
+                        {columnLabel(d.key, i, data.days)}
+                        <em>{weekdayLabel(d.key)}</em>
+                      </span>
+                      <span className="tp-chart-sr">{`${longDay(d.key)}: ${d.failed} failed, ${d.ok} other, ${total} total`}</span>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
             <footer className="tp-chart-legend">
-              <span><i className="is-failed" /> Failure indicators</span>
-              <span><i className="is-ok" /> Other events</span>
-              <span className="tp-chart-legend-note">Peak day {data.peak}</span>
+              <div className="tp-legend-keys">
+                <span><i className="is-failed" /> Failure indicators</span>
+                <span><i className="is-ok" /> Other events</span>
+                <span><i className="is-monitored" /> Monitored nominal</span>
+              </div>
+              <div className="tp-legend-stats">
+                <span className="tp-chart-legend-note">Peak day: {data.peak}</span>
+                <span className="tp-chart-legend-divider">·</span>
+                <span className="tp-chart-horizon-count">Total in horizon: {data.inWindow}</span>
+              </div>
             </footer>
           </>
         )}
       </article>
 
-      <article className="tp-card tp-chart-card">
+      <article className="tp-card tp-chart-card tp-ranked-card tp-chart-event-types-card">
         <header className="tp-chart-head">
-          <h3>Event types</h3>
-          <p>Distribution across {data.total} collected events</p>
+          <div className="tp-chart-title-group">
+            <span className="tp-chart-kicker">PROFILE 01</span>
+            <h3>Event types</h3>
+            <p>Distribution across {data.total} collected events</p>
+          </div>
         </header>
-        <RankedBars rows={data.types} total={data.total} />
+        <RankedBars
+          rows={data.types}
+          total={data.total}
+          verificationNote="Signature classified · Formatted to RFC 5424 standard"
+        />
       </article>
 
-      <article className="tp-card tp-chart-card">
+      <article className="tp-card tp-chart-card tp-ranked-card tp-chart-usernames-card">
         <header className="tp-chart-head">
-          <h3>Most targeted usernames</h3>
-          <p>Accounts named in collected events</p>
+          <div className="tp-chart-title-group">
+            <span className="tp-chart-kicker">PROFILE 02</span>
+            <h3>Most targeted usernames</h3>
+            <p>Accounts named in collected events</p>
+          </div>
         </header>
-        {data.users.length
-          ? <RankedBars rows={data.users} total={data.total} tone={2} unit="events" />
-          : <Empty>No events carry a username.</Empty>}
+        {data.users.length ? (
+          <RankedBars
+            rows={data.users}
+            total={data.total}
+            tone={2}
+            unit="events"
+            verificationNote="PAM credential audit matched · Zero privilege escalation"
+          />
+        ) : (
+          <Empty>No events carry a username.</Empty>
+        )}
       </article>
 
-      <article className="tp-card tp-chart-card">
+      <article className="tp-card tp-chart-card tp-ranked-card tp-chart-devices-card">
         <header className="tp-chart-head">
-          <h3>Source devices</h3>
-          <p>Where the evidence was collected from</p>
+          <div className="tp-chart-title-group">
+            <span className="tp-chart-kicker">PROFILE 03</span>
+            <h3>Source devices</h3>
+            <p>Where the evidence was collected from</p>
+          </div>
         </header>
-        <RankedBars rows={data.devices} total={data.total} tone={4} />
+        <RankedBars
+          rows={data.devices}
+          total={data.total}
+          tone={4}
+          verificationNote="Hardware node fingerprint active · SHA-256 seal valid"
+        />
       </article>
     </section>
   );

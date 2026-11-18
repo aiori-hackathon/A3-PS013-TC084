@@ -13,7 +13,9 @@ backend/data/
 
 # Agent runtime files
 agent/agent-state.json
+agent/agent-state-*.json
 agent/pending-batch.json
+agent/pending-batch-*.json
 agent/sample.log
 
 # macOS
