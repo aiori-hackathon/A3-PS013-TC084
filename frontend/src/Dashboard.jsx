@@ -12,7 +12,7 @@ import {
   useRef,
   useState
 } from 'react';
-import { Wifi, WifiOff, Activity, ArrowDownToLine, ChevronRight, CircleHelp, Clock3, FileClock, FileText, Fingerprint, LayoutDashboard, LogOut, Menu, RefreshCw, Search, ShieldAlert, SlidersHorizontal, Terminal, X, GitBranch, BookOpen, Network, ArrowRight, ArrowUp } from 'lucide-react';
+import { Wifi, WifiOff, Activity, ArrowDownToLine, ChevronRight, CircleHelp, Clock3, FileClock, FileText, Fingerprint, LayoutDashboard, LogOut, Menu, RefreshCw, Search, ShieldAlert, SlidersHorizontal, Terminal, X, GitBranch, BookOpen, Network, ArrowRight, ArrowUp, Users } from 'lucide-react';
 import './styles/Tracepoint.css';
 import './styles/TracepointTimelineGraphModal.css';
 import './styles/TimelineWorkspace.css';
@@ -21,6 +21,7 @@ import './styles/TracepointPublicSector.css';
 import './styles/TracepointWorkflowGuide.css';
 
 import LazyPage from './LazyPage';
+import AboutUs from './AboutUs';
 const InvestigationGraph = lazy(() => import('./InvestigationGraph'));
 const Reports = lazy(() => import('./Reports'));
 const Investigations = lazy(() => import('./Investigations'));
@@ -60,6 +61,7 @@ const navigation = [
   ['evidence', 'Evidence', Fingerprint],
   ['investigations', 'Investigations', ShieldAlert],
   ['graph', 'Investigation Graph', GitBranch],
+  ['about', 'About Us', Users],
   // ['netlab', 'Network Lab', Network],
   // ['guide', 'Workflow Guide', BookOpen],
 ];
@@ -939,8 +941,8 @@ export default function Dashboard({ user, onSignOut }) {
     <main className="tp-main">
     {/* TRACEPOINT_SINGLE_NAV_V1: status and account live in primary navigation */}
 
-      <div className="tp-content"><div className={`tp-page-header ${page === 'guide' ? 'tp-page-header-guide' : ''}`}><div><h1>{title}</h1><p>{page === 'overview' ? 'Security activity and collected evidence across your workspace.' : page === 'timeline' ? 'Explore, filter and inspect security events.' : page === 'ingestion' ? 'Explore sample logs and follow them through the ingestion pipeline.' : page === 'evidence' ? 'Evidence collection and integrity records.' : page === 'graph' ? 'Explore evidence-linked authentication sequences.' : page === 'investigations' ? 'Review events and prepare incident investigations.' : page === 'netlab' ? 'Network topology, observations and evidence-based root-cause findings.' : page === 'guide' ? 'Follow the workflow from raw log ingestion to an incident report.' : 'Export collected security activity.'}</p></div><div className="tp-actions">
-          {page !== 'overview' && (
+      <div className="tp-content"><div className={`tp-page-header ${page === 'guide' ? 'tp-page-header-guide' : ''}`}><div><h1>{title}</h1><p>{page === 'overview' ? 'Security activity and collected evidence across your workspace.' : page === 'timeline' ? 'Explore, filter and inspect security events.' : page === 'ingestion' ? 'Explore sample logs and follow them through the ingestion pipeline.' : page === 'evidence' ? 'Evidence collection and integrity records.' : page === 'graph' ? 'Explore evidence-linked authentication sequences.' : page === 'investigations' ? 'Review events and prepare incident investigations.' : page === 'about' ? 'Meet the engineering and research team behind TracePoint, and discover the platform architecture.' : page === 'netlab' ? 'Network topology, observations and evidence-based root-cause findings.' : page === 'guide' ? 'Follow the workflow from raw log ingestion to an incident report.' : 'Export collected security activity.'}</p></div><div className="tp-actions">
+          {page !== 'overview' && page !== 'about' && (
             <Button
               variant="outline"
               className="tp-button"
@@ -1139,6 +1141,9 @@ export default function Dashboard({ user, onSignOut }) {
           <InvestigationGraph theme={theme} />
         </div>
       </LazyPage>
+    )}
+    {page === 'about' && (
+      <AboutUs onNavigate={openPage} />
     )}
     {/* page === 'guide' && (
       <section className="tp-workflow-guide" aria-label="TracePoint workflow guide">
