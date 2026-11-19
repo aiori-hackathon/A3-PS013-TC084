@@ -230,7 +230,7 @@ export default function AboutUs() {
                   title="GitHub Profile"
                   aria-label="GitHub Profile"
                 >
-                  <GithubIcon size={15} />
+                  <GithubIcon size={13} />
                 </a>
                 <a
                   href="https://www.linkedin.com/in/aditishukla40"
@@ -240,7 +240,7 @@ export default function AboutUs() {
                   title="LinkedIn Profile"
                   aria-label="LinkedIn Profile"
                 >
-                  <LinkedinIcon size={15} />
+                  <LinkedinIcon size={13} />
                 </a>
                 <a
                   href="mailto:aditishukla29700@gmail.com"
@@ -248,7 +248,7 @@ export default function AboutUs() {
                   title="Email Aditi Shukla"
                   aria-label="Email Aditi Shukla"
                 >
-                  <Mail size={15} />
+                  <Mail size={13} />
                 </a>
               </div>
 
@@ -259,7 +259,7 @@ export default function AboutUs() {
                 className="tp-team-profile-link"
               >
                 <span>Full profile</span>
-                <ArrowUpRight size={14} />
+                <ArrowUpRight size={12} />
               </a>
             </div>
           </div>
@@ -317,7 +317,7 @@ export default function AboutUs() {
                   title="GitHub Profile"
                   aria-label="GitHub Profile"
                 >
-                  <GithubIcon size={15} />
+                  <GithubIcon size={13} />
                 </a>
                 <a
                   href="https://www.linkedin.com/in/prince-yadav-794706325/"
@@ -327,7 +327,7 @@ export default function AboutUs() {
                   title="LinkedIn Profile"
                   aria-label="LinkedIn Profile"
                 >
-                  <LinkedinIcon size={15} />
+                  <LinkedinIcon size={13} />
                 </a>
                 <a
                   href="mailto:py4149560@gmail.com"
@@ -335,7 +335,7 @@ export default function AboutUs() {
                   title="Email Prince Yadav"
                   aria-label="Email Prince Yadav"
                 >
-                  <Mail size={15} />
+                  <Mail size={13} />
                 </a>
               </div>
 
@@ -346,7 +346,7 @@ export default function AboutUs() {
                 className="tp-team-profile-link prince"
               >
                 <span>Full profile</span>
-                <ArrowUpRight size={13} />
+                <ArrowUpRight size={12} />
               </a>
             </div>
           </div>
