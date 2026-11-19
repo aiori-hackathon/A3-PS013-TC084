@@ -343,10 +343,10 @@ export default function AboutUs() {
                 href="https://www.linkedin.com/in/prince-yadav-794706325/"
                 target="_blank"
                 rel="noreferrer"
-                className="tp-team-profile-link"
+                className="tp-team-profile-link prince"
               >
                 <span>Full profile</span>
-                <ArrowUpRight size={14} />
+                <ArrowUpRight size={13} />
               </a>
             </div>
           </div>
