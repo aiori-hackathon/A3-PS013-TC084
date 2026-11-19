@@ -157,6 +157,40 @@ export function extractUsername(line) {
   return found ? found[1].replace(/[.-]+$/, '') || null : null;
 }
 
+/*
+ * An authentication attempt, as opposed to the rest of what lands in auth.log:
+ * cron sessions, sudo, systemd user slices. These are the same phrases the
+ * backend parser classifies as successful_login / failed_login, so a line the
+ * agent keeps here is a line the timeline will label as a login.
+ */
+const LOGIN_PATTERNS = [
+  /failed password/i,
+  /failed to log on/i,
+  /accepted\s+(?:password|publickey)/i,
+  /successfully logged on/i,
+];
+
+export function isLoginAttempt(line) {
+  return LOGIN_PATTERNS.some(re => re.test(line));
+}
+
+export function parseEventFilter(raw) {
+  const value = (raw || '').trim().toLowerCase();
+  return value === 'login' ? 'login' : null;
+}
+
+/*
+ * Apply the username scope and the event scope together. Skipped is counted
+ * against the whole input so the log reports everything the agent declined to
+ * collect, not just what one of the two filters rejected.
+ */
+export function applyScope(lines, userFilter, eventFilter) {
+  const byUser = applyUserFilter(lines, userFilter);
+  if (!eventFilter) return byUser;
+  const kept = byUser.kept.filter(line => eventFilter !== 'login' || isLoginAttempt(line));
+  return { kept, skipped: lines.length - kept.length };
+}
+
 export function parseUserFilter(raw) {
   if (!raw) return null;
   const users = raw
@@ -194,6 +228,7 @@ export function collectNewLines({
   sourceTimezone,
   maxLines,
   userFilter = null,
+  eventFilter = null,
   filterLabel = null,
 }) {
   if (!fs.existsSync(logFile)) {
@@ -208,7 +243,7 @@ export function collectNewLines({
     return;
   }
 
-  const { kept, skipped } = applyUserFilter(lines, userFilter);
+  const { kept, skipped } = applyScope(lines, userFilter, eventFilter);
   if (skipped > 0) {
     console.log(`Skipped ${skipped} line(s) outside the collection scope (${filterLabel})`);
   }
@@ -273,9 +308,12 @@ export async function main() {
   const pollInterval = parseInt(process.env.TRACEPOINT_POLL_SECONDS || '5', 10);
   const maxLines = parseInt(process.env.TRACEPOINT_MAX_LINES || '100', 10);
 
-  const rawUserFilter = process.env.TRACEPOINT_USER_FILTER || '';
-  const userFilter = parseUserFilter(rawUserFilter);
-  const filterLabel = userFilter ? `username in [${[...userFilter].join(', ')}]` : null;
+  const userFilter = parseUserFilter(process.env.TRACEPOINT_USER_FILTER || '');
+  const eventFilter = parseEventFilter(process.env.TRACEPOINT_EVENT_FILTER || '');
+  const scopeParts = [];
+  if (userFilter) scopeParts.push(`username in [${[...userFilter].join(', ')}]`);
+  if (eventFilter === 'login') scopeParts.push('login attempts only');
+  const filterLabel = scopeParts.length ? scopeParts.join(', ') : null;
 
   console.log('The Missing Links Agent started');
   console.log(`Watching:  ${logFile}`);
@@ -313,6 +351,7 @@ export async function main() {
           sourceTimezone,
           maxLines,
           userFilter,
+          eventFilter,
           filterLabel,
         });
       }

@@ -107,7 +107,8 @@ export function parseLog(
     if (lower.includes('failed password') || lower.includes('failed to log on')) {
       event.event_type = 'failed_login';
       event.severity = 'warning';
-    } else if (lower.includes('accepted password') || lower.includes('successfully logged on')) {
+    } else if (/accepted\s+(?:password|publickey)/.test(lower) || lower.includes('successfully logged on')) {
+      // A key-based login is still a login; previously only passwords matched.
       event.event_type = 'successful_login';
     } else if (lower.includes('invalid user')) {
       event.event_type = 'invalid_user';

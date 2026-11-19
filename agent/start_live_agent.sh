@@ -41,6 +41,12 @@ export TRACEPOINT_START_AT_END="${TRACEPOINT_START_AT_END:-1}"
 # agent prints how many it skipped on every cycle.
 export TRACEPOINT_USER_FILTER="${TRACEPOINT_USER_FILTER:-root}"
 
+# Restrict further to authentication attempts -- successful and failed logins
+# only. Without this, everything else attributed to the account above is also
+# collected: cron sessions, sudo, systemd user slices. Set to empty to collect
+# every line belonging to those accounts.
+export TRACEPOINT_EVENT_FILTER="${TRACEPOINT_EVENT_FILTER-login}"
+
 mkdir -p "$TRACEPOINT_STATE_DIR"
 
 cd "$(dirname "$0")"

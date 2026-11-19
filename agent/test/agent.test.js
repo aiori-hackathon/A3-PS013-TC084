@@ -13,6 +13,9 @@ import {
   extractUsername,
   parseUserFilter,
   applyUserFilter,
+  parseEventFilter,
+  isLoginAttempt,
+  applyScope,
 } from '../agent.js';
 
 describe('agent.js unit tests', () => {
@@ -230,5 +233,48 @@ describe('collection scope filtering', () => {
     assert.equal(pending.payload.collection_filter, 'username in [root]');
 
     fs.rmSync(dir, { recursive: true, force: true });
+  });
+});
+
+describe('login-attempt scope', () => {
+  const ROOT = parseUserFilter('root');
+  const LOGIN = parseEventFilter('login');
+
+  it('keeps only root login attempts out of a realistic auth.log mix', () => {
+    const keep = [
+      'sshd[1]: Accepted password for root from 137.97.136.22 port 51234 ssh2',
+      'sshd[1]: Accepted publickey for root from 137.97.136.22 port 51235 ssh2',
+      'sshd[2]: Failed password for root from 137.97.136.22 port 51240 ssh2',
+    ];
+    const drop = [
+      'sshd[4]: Failed password for invalid user abhi from 45.1.1.1 port 1 ssh2',
+      'sshd[1]: pam_unix(sshd:session): session opened for user root(uid=0) by root(uid=0)',
+      'CRON[9]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)',
+      'sudo: deploy : TTY=pts/0 ; PWD=/srv ; USER=root ; COMMAND=/bin/ls',
+      'systemd[1]: Started Session 99 of User root.',
+      'sshd[5]: Accepted password for nirikshak from 1.2.3.4 port 2 ssh2',
+    ];
+
+    const { kept, skipped } = applyScope([...keep, ...drop], ROOT, LOGIN);
+    assert.deepEqual(kept, keep);
+    assert.equal(skipped, drop.length);
+  });
+
+  it('cannot separate a bot targeting root from the operator, and does not pretend to', () => {
+    const bot = 'sshd[3]: Failed password for root from 218.92.0.112 port 22011 ssh2';
+    const { kept } = applyScope([bot], ROOT, LOGIN);
+    assert.deepEqual(kept, [bot], 'a failed root login is collected whoever sent it');
+  });
+
+  it('treats a publickey login as a login attempt', () => {
+    assert.equal(isLoginAttempt('Accepted publickey for root from 1.2.3.4 port 1 ssh2'), true);
+    assert.equal(isLoginAttempt('session opened for user root(uid=0)'), false);
+  });
+
+  it('ignores an unrecognised event filter rather than silently dropping everything', () => {
+    assert.equal(parseEventFilter('nonsense'), null);
+    const lines = ['CRON[9]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)'];
+    const { kept } = applyScope(lines, ROOT, parseEventFilter('nonsense'));
+    assert.deepEqual(kept, lines, 'falls back to the username scope alone');
   });
 });
