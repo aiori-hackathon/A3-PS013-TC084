@@ -293,7 +293,11 @@ export default function Investigations({ events = [] }) {
       </div>
       <div className="tp-toolbar"><label className="tp-search"><Search size={18}/><input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search investigations" aria-label="Search investigations"/></label></div>
       {loading ? <div className="tp-inv-empty">Loading investigations…</div> : visible.length === 0 ?
-        <div className="tp-inv-empty"><ShieldAlert size={25}/><strong>{cases.length ? 'No matching cases' : 'No investigations yet'}</strong><p>{cases.length ? 'Try another search.' : 'Create your first case to begin documenting an incident.'}</p></div> :
+        <div className="tp-inv-empty">
+          <img src="/icons/3d/checklist-book.png" alt="" className="tp-3d-empty-icon" aria-hidden="true" />
+          <strong>{cases.length ? 'No matching cases' : 'No investigations yet'}</strong>
+          <p>{cases.length ? 'Try another search.' : 'Create your first case to begin documenting an incident.'}</p>
+        </div> :
         <div className="tp-ev-table-wrap"><table className="tp-ev-table tp-inv-phase5-table"><thead><tr><th>Case</th><th>Severity</th><th>Status</th><th>Events</th><th>Updated</th></tr></thead><tbody>
           {visible.map(c => <tr key={c.id} className="tp-inv-clickable" tabIndex={0} role="button" onClick={() => openCase(c.id)} onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openCase(c.id); } }}><td><strong className="tp-inv-case">TP-{String(c.id).padStart(4, '0')}</strong><div className="tp-inv-title">{c.title}</div></td><td><span className={`tp-inv-pill ${c.severity}`}>{c.severity}</span></td><td><span className={`tp-inv-pill ${c.status}`}>{c.status}</span></td><td>{c.event_count}</td><td>{stamp(c.updated_at)}</td></tr>)}
         </tbody></table></div>}

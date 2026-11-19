@@ -100,11 +100,47 @@ export default function InvestigationGraph() {
 
   const gaps = nodes.filter(node => node.parse_status === 'partial' || !node.timestamp_utc);
   return <section className="tp-graph-root tp-graph-phase5">
-    <div className="tp-graph-intro tp-card tp-graph-phase5-hero"><div><h2><GitBranch size={19}/> Investigation Graph</h2><p>Explainable correlations between collected security events. Each node references a stored evidence batch and line.</p></div><button className="tp-button" onClick={load} disabled={loading}><RefreshCw size={16} className={loading ? 'tp-spin' : ''}/> Refresh graph</button></div>
+    <div className="tp-graph-intro tp-card tp-graph-phase5-hero">
+      <div>
+        <h2>
+          <img src="/icons/3d/network-mesh.png" alt="" className="tp-3d-title-icon" aria-hidden="true" />
+          Investigation Graph
+        </h2>
+        <p>Explainable correlations between collected security events. Each node references a stored evidence batch and line.</p>
+      </div>
+      <button className="tp-button" onClick={load} disabled={loading}><RefreshCw size={16} className={loading ? 'tp-spin' : ''}/> Refresh graph</button>
+    </div>
+    <div className="tp-graph-banner">
+      <img src="/icons/3d/checklist-book.png" alt="" className="tp-3d-banner-icon" aria-hidden="true" />
+      <span>Correlations are investigative leads, not proof of compromise. Each node references a stored cryptographic evidence batch and line.</span>
+    </div>
     {error && <div className="tp-error" role="alert">{error}</div>}
-    <div className="tp-graph-stats"><div className="tp-card" data-tooltip="Number of event records represented in the loaded graph." title="Evidence-linked event count"><Activity size={19}/><strong><AnimatedMetricCount value={nodes.length} /></strong><span>Evidence-linked events</span></div><div className="tp-card" data-tooltip="Connections inferred from event sequence and available identifiers; review each relationship reason before drawing conclusions." title="Potential connections"><GitBranch size={19}/><strong><AnimatedMetricCount value={edges.length} /></strong><span>Potential connections</span></div><div className="tp-card" data-tooltip="Events with partial parsing or no normalized timestamp that need analyst review." title="Parsing or timestamp gaps"><AlertTriangle size={19}/><strong><AnimatedMetricCount value={gaps.length} /></strong><span>Parsing or timestamp gaps</span></div></div>
-    <div className="tp-card tp-graph-panel tp-graph-phase5-panel"><div className="tp-graph-panel-head"><div><h3>Authentication sequences</h3><p>Failed logins followed by successful logins for the same username within 30 minutes.</p></div><span className="tp-graph-legend"><i/> Tentative cross-device link</span></div>
-      {!loading && !edges.length && <div className="tp-graph-empty"><ShieldAlert size={29}/><strong>No correlated authentication sequences found</strong><p>Try ingesting a sequence of failed and successful logins for the same user with valid timestamps.</p></div>}
+    <div className="tp-graph-stats">
+      <div className="tp-card" data-tooltip="Number of event records represented in the loaded graph." title="Evidence-linked event count">
+        <img src="/icons/3d/evidence-chart.png" alt="" className="tp-3d-stat-icon" aria-hidden="true" />
+        <strong><AnimatedMetricCount value={nodes.length} /></strong>
+        <span>Evidence-linked events</span>
+      </div>
+      <div className="tp-card" data-tooltip="Connections inferred from event sequence and available identifiers; review each relationship reason before drawing conclusions." title="Potential connections">
+        <img src="/icons/3d/network-mesh.png" alt="" className="tp-3d-stat-icon" aria-hidden="true" />
+        <strong><AnimatedMetricCount value={edges.length} /></strong>
+        <span>Potential connections</span>
+      </div>
+      <div className="tp-card" data-tooltip="Events with partial parsing or no normalized timestamp that need analyst review." title="Parsing or timestamp gaps">
+        <img src="/icons/3d/warning-triangle.png" alt="" className="tp-3d-stat-icon" aria-hidden="true" />
+        <strong><AnimatedMetricCount value={gaps.length} /></strong>
+        <span>Parsing or timestamp gaps</span>
+      </div>
+    </div>
+    <div className="tp-card tp-graph-panel tp-graph-phase5-panel">
+      <div className="tp-graph-panel-head"><div><h3>Authentication sequences</h3><p>Failed logins followed by successful logins for the same username within 30 minutes.</p></div><span className="tp-graph-legend"><i/> Tentative cross-device link</span></div>
+      {!loading && !edges.length && (
+        <div className="tp-graph-empty">
+          <img src="/icons/3d/error-folder.png" alt="" className="tp-3d-empty-icon" aria-hidden="true" />
+          <strong>No correlated authentication sequences found</strong>
+          <p>Try ingesting a sequence of failed and successful logins for the same user with valid timestamps.</p>
+        </div>
+      )}
       <div className="tp-graph-sequences">{edges.map((edge, index) => {
         const source = lookup.get(edge.source), target = lookup.get(edge.target);
         if (!source || !target) return null;
@@ -124,7 +160,13 @@ export default function InvestigationGraph() {
         </div>;
       })}</div>
     </div>
-    <div className="tp-card tp-graph-gaps tp-graph-phase5-gaps"><h3><AlertTriangle size={17}/> Evidence requiring review</h3><p>Incomplete or un-timestamped events are preserved but cannot establish reliable temporal connections.</p>{gaps.length ? gaps.slice(0, 12).map(node => <button key={node.id} onClick={() => setSelected(node)}><span>{node.device_id} · line {node.line_number}</span><small>{(node.parse_warnings || []).join(', ') || 'Timestamp unavailable'}</small><ArrowRight size={15}/></button>) : <div className="tp-graph-no-gaps">No parsing or timestamp gaps among loaded events.</div>}</div>
+    <div className="tp-card tp-graph-gaps tp-graph-phase5-gaps">
+      <h3>
+        <img src="/icons/3d/document-error.png" alt="" className="tp-3d-heading-icon" aria-hidden="true" />
+        Evidence requiring review
+      </h3>
+      <p>Incomplete or un-timestamped events are preserved but cannot establish reliable temporal connections.</p>{gaps.length ? gaps.slice(0, 12).map(node => <button key={node.id} onClick={() => setSelected(node)}><span>{node.device_id} · line {node.line_number}</span><small>{(node.parse_warnings || []).join(', ') || 'Timestamp unavailable'}</small><ArrowRight size={15}/></button>) : <div className="tp-graph-no-gaps">No parsing or timestamp gaps among loaded events.</div>}
+    </div>
     {data?.truncated && <p className="tp-graph-caution">Graph limited to the first 1,500 timeline events. Results are not exhaustive.</p>}
     <p className="tp-graph-caution">Correlations are investigative leads, not proof of compromise. No AI is used.</p>
     {selected && createPortal(<div className="tp-overlay tp-graph-modal-overlay" data-theme={pageTheme} onMouseDown={() => setSelected(null)}><aside className="tp-drawer tp-graph-event-modal" role="dialog" aria-modal="true" aria-label="Graph event details" onMouseDown={e => e.stopPropagation()}><div className="tp-drawer-header"><div><span>Evidence-linked event</span><h2>{(selected.event_type || 'Unknown event').replaceAll('_', ' ')}</h2></div><button onClick={() => setSelected(null)} aria-label="Close details">✕</button></div><div className="tp-drawer-body"><h3><Fingerprint size={16}/> Evidence reference</h3>{[['Device', selected.device_id], ['Batch ID', selected.batch_id], ['Line number', selected.line_number], ['UTC timestamp', selected.timestamp_utc || 'Unavailable'], ['Username', selected.username || 'Unavailable'], ['Parse status', selected.parse_status || 'Unknown']].map(([label, value]) => <div className="tp-detail" key={label}><span>{label}</span><strong>{value}</strong></div>)}<TrustScoreDetails

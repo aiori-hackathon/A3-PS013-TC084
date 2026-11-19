@@ -63,17 +63,17 @@ function TiltCard({ children, className = '', style = {}, maxTilt = 12, maxTrans
     const percentX = Math.max(-1, Math.min(1, (x - centerX) / centerX));
     const percentY = Math.max(-1, Math.min(1, (y - centerY) / centerY));
 
-    // Natural 3D tilt: face rotates toward cursor position
-    const rotX = -percentY * maxTilt;
+    // Horizontal-only 3D tilt: face rotates ONLY right and left (rotateY), NOT up and down (rotateX = 0)
+    const rotX = 0;
     const rotY = percentX * maxTilt;
 
-    // Subtle translation follow
+    // Subtle horizontal translation follow (no vertical offset)
     const transX = percentX * maxTranslate;
-    const transY = percentY * maxTranslate;
+    const transY = 0;
 
-    // Dynamic specular glare coordinates (0% to 100%)
+    // Dynamic specular glare coordinates (tracks cursor horizontally across card)
     const glareX = (x / rect.width) * 100;
-    const glareY = (y / rect.height) * 100;
+    const glareY = 50; // Centered vertically for a clean horizontal specular sweep
 
     cancelAnimationFrame(rafId.current);
     rafId.current = requestAnimationFrame(() => {
@@ -81,22 +81,21 @@ function TiltCard({ children, className = '', style = {}, maxTilt = 12, maxTrans
       cardRef.current.style.setProperty('transition', 'transform 0.08s ease-out, box-shadow 0.15s ease-out, border-color 0.2s ease');
       cardRef.current.style.setProperty(
         'transform',
-        `perspective(1000px) rotateX(${rotX.toFixed(2)}deg) rotateY(${rotY.toFixed(2)}deg) translate3d(${transX.toFixed(1)}px, ${transY.toFixed(1)}px, 0) scale3d(${scale}, ${scale}, ${scale})`,
+        `perspective(1000px) rotateX(0deg) rotateY(${rotY.toFixed(2)}deg) translate3d(${transX.toFixed(1)}px, 0px, 0) scale3d(${scale}, ${scale}, ${scale})`,
         'important'
       );
 
-      // Dynamic reactive drop shadow shifting opposite the tilt angle
+      // Reactive drop shadow shifting horizontally opposite the tilt angle
       const shadowX = (-rotY * 1.6).toFixed(1);
-      const shadowY = (rotX * 1.6 + 18).toFixed(1);
       cardRef.current.style.setProperty(
         'box-shadow',
-        `${shadowX}px ${shadowY}px 36px -10px rgba(99, 102, 241, 0.24), 0 4px 12px rgba(0, 0, 0, 0.05)`,
+        `${shadowX}px 14px 32px -8px rgba(99, 102, 241, 0.22), 0 4px 12px rgba(0, 0, 0, 0.05)`,
         'important'
       );
 
       if (glareRef.current) {
         glareRef.current.style.opacity = '1';
-        glareRef.current.style.background = `radial-gradient(circle at ${glareX.toFixed(1)}% ${glareY.toFixed(1)}%, rgba(255, 255, 255, 0.9) 0%, rgba(129, 140, 248, 0.2) 32%, rgba(255, 255, 255, 0) 70%)`;
+        glareRef.current.style.background = `radial-gradient(circle at ${glareX.toFixed(1)}% 50%, rgba(255, 255, 255, 0.9) 0%, rgba(129, 140, 248, 0.22) 32%, rgba(255, 255, 255, 0) 70%)`;
       }
     });
   };

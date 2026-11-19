@@ -1076,7 +1076,10 @@ export default function Dashboard({ user, onSignOut }) {
       <div className="tp-forensic-section-title tp-scroll-reveal"><div><span className="tp-forensic-section-index">01 / ACTIVITY</span><h2>Event analysis</h2></div><span>Last 7 days · current collection</span></div>
       <div className="tp-analytics tp-forensic-analytics tp-scroll-reveal tp-stagger-parent"><TrendChart events={events}/><SeverityCard events={events}/></div>
       <div className="tp-forensic-review tp-scroll-reveal tp-stagger-parent">
-        <div className="tp-forensic-review-title"><ShieldAlert size={18}/><div><strong>Data quality signals</strong><span>Indicators detected in collected events, not verified incidents</span></div></div>
+        <div className="tp-forensic-review-title">
+          <img src="/icons/3d/warning-triangle.png" alt="" className="tp-3d-inline-icon" aria-hidden="true" />
+          <div><strong>Data quality signals</strong><span>Indicators detected in collected events, not verified incidents</span></div>
+        </div>
         <div className="tp-forensic-review-items">
           <div><strong>{loading ? '…' : parsingIssues}</strong><span>Events with parsing gaps</span></div>
           <div><strong>{loading ? '…' : timestampIssues}</strong><span>Inferred or conflicting timestamps</span></div>
