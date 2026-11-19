@@ -712,7 +712,7 @@ export default function Dashboard({ user, onSignOut }) {
   const [level, setLevel] = useState('all');
   const [selected, setSelected] = useState(null);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [scrollProgress, setScrollProgress] = useState(0);
+  const progressBarRef = useRef(null);
   const [backToTopVisible, setBackToTopVisible] = useState(false);
 
   // InvertisPrep-style Lenis smooth inertial scrolling engine
@@ -722,10 +722,11 @@ export default function Dashboard({ user, onSignOut }) {
     const handleScroll = (scrollY) => {
       const el = document.documentElement;
       const height = el.scrollHeight - el.clientHeight;
-      if (height > 0) {
-        setScrollProgress(Math.min(100, Math.max(0, (scrollY / height) * 100)));
+      if (progressBarRef.current && height > 0) {
+        progressBarRef.current.style.width = `${Math.min(100, Math.max(0, (scrollY / height) * 100))}%`;
       }
-      setBackToTopVisible(scrollY > 280);
+      const pastThreshold = scrollY > 280;
+      setBackToTopVisible(prev => (prev !== pastThreshold ? pastThreshold : prev));
     };
 
     const nativeScrollHandler = () => {
@@ -744,13 +745,13 @@ export default function Dashboard({ user, onSignOut }) {
 
     try {
       lenis = new Lenis({
-        duration: 1.15,
+        duration: 0.85,
         easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
         orientation: 'vertical',
         gestureOrientation: 'vertical',
         smoothWheel: true,
-        wheelMultiplier: 1.0,
-        touchMultiplier: 1.5,
+        wheelMultiplier: 0.9,
+        touchMultiplier: 1.0,
         infinite: false,
       });
 
@@ -779,43 +780,34 @@ export default function Dashboard({ user, onSignOut }) {
     };
   }, []);
 
-  // InvertisPrep-style dynamic fluid scroll reveal observer
+  // Hardware-accelerated dynamic fluid scroll reveal observer (zero-overhead, no layout thrashing)
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           entry.target.classList.add('tp-in-view');
+          observer.unobserve(entry.target);
         }
       });
-    }, { threshold: 0.15, rootMargin: '0px 0px -20px 0px' });
+    }, { threshold: 0.08, rootMargin: '0px 0px -10px 0px' });
 
-    const observeAll = () => {
+    const observeTargets = () => {
       const targets = document.querySelectorAll(
         '.tp-scroll-reveal, .tp-reveal-up, .tp-reveal-left, .tp-reveal-right, .tp-reveal-scale, .tp-stagger-parent'
       );
       targets.forEach(el => {
-        observer.observe(el);
-        const rect = el.getBoundingClientRect();
-        if (rect.top < window.innerHeight + 30) {
-          el.classList.add('tp-in-view');
+        if (!el.classList.contains('tp-in-view')) {
+          observer.observe(el);
         }
       });
     };
 
-    observeAll();
-    const t1 = setTimeout(observeAll, 120);
-    const t2 = setTimeout(observeAll, 400);
-
-    const mutObserver = new MutationObserver(() => {
-      observeAll();
-    });
-    mutObserver.observe(document.body, { childList: true, subtree: true });
+    observeTargets();
+    const timer = setTimeout(observeTargets, 150);
 
     return () => {
-      clearTimeout(t1);
-      clearTimeout(t2);
+      clearTimeout(timer);
       observer.disconnect();
-      mutObserver.disconnect();
     };
   }, [page, events]);
   // TRACEPOINT_FORENSIC_V1: the app ships in one appearance, and this value is
@@ -956,7 +948,7 @@ export default function Dashboard({ user, onSignOut }) {
   };
   return <div className="tp-app" data-theme={theme} data-page={page}>
     {/* Animated Reading Progress Bar */}
-    <div className="tp-scroll-progress-bar" style={{ width: `${scrollProgress}%` }} aria-hidden="true" />
+    <div ref={progressBarRef} className="tp-scroll-progress-bar" style={{ width: '0%' }} aria-hidden="true" />
 
     {/* TRACEPOINT_PUBLIC_PORTAL_LAYOUT_V1: formal utility strip */}
     <div className="tp-public-utility-bar">

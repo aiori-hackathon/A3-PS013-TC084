@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, memo } from 'react';
 import {
   ResponsiveContainer,
   BarChart,
@@ -158,7 +158,7 @@ function RankedBarChart({ rows = [], total = 0, unit = 'events', verificationNot
   );
 }
 
-export default function EvidenceCharts({ events = [], timestampOf, eventTypeOf, deviceOf, isFailure }) {
+function EvidenceCharts({ events = [], timestampOf, eventTypeOf, deviceOf, isFailure }) {
   const data = useMemo(() => {
     const today = new Date();
     today.setUTCHours(0, 0, 0, 0);
@@ -349,3 +349,6 @@ export default function EvidenceCharts({ events = [], timestampOf, eventTypeOf, 
     </section>
   );
 }
+
+const MemoizedEvidenceCharts = memo(EvidenceCharts);
+export default MemoizedEvidenceCharts;

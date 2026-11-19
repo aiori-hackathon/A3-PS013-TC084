@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useMemo, useRef, useState, useCallback, memo } from 'react';
 import { isLand } from './landmask';
 import handImg from './assets/pointing-hand.png';
 import './styles/EvidenceGlobe.css';
@@ -86,7 +86,7 @@ function eventPosition(event, index) {
   };
 }
 
-export default function EvidenceGlobe({
+function EvidenceGlobe({
   events = [],
   severityOf = e => e.severity,
   deviceOf = e => e.device_id,
@@ -527,3 +527,6 @@ export default function EvidenceGlobe({
     </figure>
   );
 }
+
+const MemoizedEvidenceGlobe = memo(EvidenceGlobe);
+export default MemoizedEvidenceGlobe;

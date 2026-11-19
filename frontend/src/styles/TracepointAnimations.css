@@ -1199,47 +1199,39 @@ html.lenis body {
 
 /* ===========================================================================
    FLUID SCROLL REVEAL & STAGGERED TELEMETRY ANIMATIONS
-   (InvertisPrep-Inspired Spring Easing, Scale & Subtle Blur Elimination)
+   (Hardware-Accelerated Zero-Lag Compositor Transforms)
    =========================================================================== */
 .tp-scroll-reveal,
 .tp-reveal-up {
   opacity: 0;
-  transform: translateY(28px) scale(0.985);
-  filter: blur(4px);
-  transition: opacity 0.75s var(--tp-ease-spring),
-              transform 0.75s var(--tp-ease-spring),
-              filter 0.75s var(--tp-ease-spring);
-  will-change: opacity, transform, filter;
+  transform: translateY(24px);
+  transition: opacity 0.55s var(--tp-ease-spring),
+              transform 0.55s var(--tp-ease-spring);
+  will-change: opacity, transform;
 }
 
 .tp-reveal-left {
   opacity: 0;
-  transform: translateX(-26px) scale(0.985);
-  filter: blur(4px);
-  transition: opacity 0.75s var(--tp-ease-spring),
-              transform 0.75s var(--tp-ease-spring),
-              filter 0.75s var(--tp-ease-spring);
-  will-change: opacity, transform, filter;
+  transform: translateX(-24px);
+  transition: opacity 0.55s var(--tp-ease-spring),
+              transform 0.55s var(--tp-ease-spring);
+  will-change: opacity, transform;
 }
 
 .tp-reveal-right {
   opacity: 0;
-  transform: translateX(26px) scale(0.985);
-  filter: blur(4px);
-  transition: opacity 0.75s var(--tp-ease-spring),
-              transform 0.75s var(--tp-ease-spring),
-              filter 0.75s var(--tp-ease-spring);
-  will-change: opacity, transform, filter;
+  transform: translateX(24px);
+  transition: opacity 0.55s var(--tp-ease-spring),
+              transform 0.55s var(--tp-ease-spring);
+  will-change: opacity, transform;
 }
 
 .tp-reveal-scale {
   opacity: 0;
-  transform: scale(0.94);
-  filter: blur(4px);
-  transition: opacity 0.75s var(--tp-ease-spring),
-              transform 0.75s var(--tp-ease-spring),
-              filter 0.75s var(--tp-ease-spring);
-  will-change: opacity, transform, filter;
+  transform: scale(0.96);
+  transition: opacity 0.55s var(--tp-ease-spring),
+              transform 0.55s var(--tp-ease-spring);
+  will-change: opacity, transform;
 }
 
 .tp-scroll-reveal.tp-in-view,
@@ -1249,25 +1241,21 @@ html.lenis body {
 .tp-reveal-scale.tp-in-view {
   opacity: 1 !important;
   transform: translateY(0) scale(1) !important;
-  filter: blur(0) !important;
 }
 
 /* Staggered Children inside Grid/Flex Modules */
 .tp-stagger-parent > * {
   opacity: 0;
-  transform: translateY(20px) scale(0.985);
-  filter: blur(3px);
-  transition: opacity 0.65s var(--tp-ease-spring),
-              transform 0.65s var(--tp-ease-spring),
-              filter 0.65s var(--tp-ease-spring);
-  transition-delay: calc(var(--card-idx, var(--row-idx, var(--rank-idx, var(--stagger-idx, 0)))) * 70ms);
-  will-change: opacity, transform, filter;
+  transform: translateY(24px);
+  transition: opacity 0.55s var(--tp-ease-spring),
+              transform 0.55s var(--tp-ease-spring);
+  transition-delay: calc(var(--card-idx, var(--row-idx, var(--rank-idx, var(--stagger-idx, 0)))) * 80ms);
+  will-change: opacity, transform;
 }
 
 .tp-stagger-parent.tp-in-view > * {
   opacity: 1 !important;
   transform: translateY(0) scale(1) !important;
-  filter: blur(0) !important;
 }
 
 /* Automatic child fallback cascade */
