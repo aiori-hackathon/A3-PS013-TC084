@@ -60,8 +60,8 @@ const navigation = [
   ['evidence', 'Evidence', Fingerprint],
   ['investigations', 'Investigations', ShieldAlert],
   ['graph', 'Investigation Graph', GitBranch],
-  ['netlab', 'Network Lab', Network],
-  ['guide', 'Workflow Guide', BookOpen],
+  // ['netlab', 'Network Lab', Network],
+  // ['guide', 'Workflow Guide', BookOpen],
 ];
 /* Every timestamp on screen is rendered in one fixed zone rather than the
    zone of whichever machine happens to be showing it. The records are stored
@@ -1116,11 +1116,11 @@ export default function Dashboard({ user, onSignOut }) {
         <Investigations events={events} />
       </LazyPage>
     )}
-    {page === 'netlab' && (
+    {/* page === 'netlab' && (
       <LazyPage name="Network Lab">
         <NetworkLab />
       </LazyPage>
-    )}
+    ) */}
     {page === 'graph' && (
       <LazyPage name="Investigation Graph">
         <div className="tp-graph-page">
@@ -1128,7 +1128,7 @@ export default function Dashboard({ user, onSignOut }) {
         </div>
       </LazyPage>
     )}
-    {page === 'guide' && (
+    {/* page === 'guide' && (
       <section className="tp-workflow-guide" aria-label="TracePoint workflow guide">
         <div className="tp-workflow-intro">
           <span className="tp-workflow-kicker">INVESTIGATION WORKFLOW</span>
@@ -1182,7 +1182,7 @@ export default function Dashboard({ user, onSignOut }) {
         </div>
         <p className="tp-workflow-footnote">Tip: a normal-looking timeline does not prove that every record was parsed. Check evidence and parsing gaps before drawing conclusions.</p>
       </section>
-    )}
+    ) */}
 
     {page === 'reports' && (
       <LazyPage name="Reports">
