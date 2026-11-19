@@ -146,6 +146,45 @@ export function readNewLines(filePath, offset, maxLines = 100) {
   }
 }
 
+/*
+ * Username extraction, deliberately identical to the rule the backend parser
+ * uses (backend/src/parser.js). The agent and the server must agree on who a
+ * line belongs to, otherwise a filter here would drop lines the timeline would
+ * have attributed to someone else.
+ */
+export function extractUsername(line) {
+  const found = /(?:\bfor\s+(?:invalid\s+user\s+|user\s+)?|\buser[\s=]+)(?!from\b|port\b|by\b|on\b)([a-zA-Z0-9_.-]+)/i.exec(line);
+  return found ? found[1].replace(/[.-]+$/, '') || null : null;
+}
+
+export function parseUserFilter(raw) {
+  if (!raw) return null;
+  const users = raw
+    .split(',')
+    .map(part => part.trim().toLowerCase())
+    .filter(Boolean);
+  return users.length ? new Set(users) : null;
+}
+
+/*
+ * Scope collection to named accounts. Lines that do not belong to one of them
+ * are never collected, so they never become evidence. That is a narrowing of
+ * what this agent witnesses, not a cleanup of what it found: the skipped count
+ * is logged every cycle and the scope is recorded on the batch so a reader can
+ * see the register is partial rather than assuming the host was quiet.
+ */
+export function applyUserFilter(lines, userFilter) {
+  if (!userFilter) return { kept: lines, skipped: 0 };
+  const kept = [];
+  let skipped = 0;
+  for (const line of lines) {
+    const username = extractUsername(line);
+    if (username && userFilter.has(username.toLowerCase())) kept.push(line);
+    else skipped += 1;
+  }
+  return { kept, skipped };
+}
+
 export function collectNewLines({
   logFile,
   stateFile,
@@ -154,6 +193,8 @@ export function collectNewLines({
   logType,
   sourceTimezone,
   maxLines,
+  userFilter = null,
+  filterLabel = null,
 }) {
   if (!fs.existsSync(logFile)) {
     console.log(`Log file not found: ${logFile}`);
@@ -167,20 +208,39 @@ export function collectNewLines({
     return;
   }
 
+  const { kept, skipped } = applyUserFilter(lines, userFilter);
+  if (skipped > 0) {
+    console.log(`Skipped ${skipped} line(s) outside the collection scope (${filterLabel})`);
+  }
+
+  /*
+   * Every line we read has to move the offset forward, including the ones the
+   * filter dropped. Otherwise the agent re-reads them on the next poll and
+   * never reaches the lines that are in scope.
+   */
+  if (kept.length === 0) {
+    saveJsonAtomic(stateFile, { offset: nextOffset });
+    return;
+  }
+
   const payload = {
     device_id: deviceId,
     batch_id: crypto.randomUUID(),
     log_type: logType,
     source_timezone: sourceTimezone,
-    lines,
+    lines: kept,
   };
+
+  if (filterLabel) {
+    payload.collection_filter = filterLabel;
+  }
 
   saveJsonAtomic(pendingFile, {
     payload,
     next_offset: nextOffset,
   });
 
-  console.log(`Collected ${lines.length} new log lines`);
+  console.log(`Collected ${kept.length} new log lines`);
 }
 
 export function sleep(ms) {
@@ -213,12 +273,21 @@ export async function main() {
   const pollInterval = parseInt(process.env.TRACEPOINT_POLL_SECONDS || '5', 10);
   const maxLines = parseInt(process.env.TRACEPOINT_MAX_LINES || '100', 10);
 
+  const rawUserFilter = process.env.TRACEPOINT_USER_FILTER || '';
+  const userFilter = parseUserFilter(rawUserFilter);
+  const filterLabel = userFilter ? `username in [${[...userFilter].join(', ')}]` : null;
+
   console.log('The Missing Links Agent started');
   console.log(`Watching:  ${logFile}`);
   console.log(`Device:    ${deviceId}`);
   console.log(`Server:    ${serverUrl}`);
   console.log(`Timezone:  ${sourceTimezone}`);
   console.log(`State:     ${stateFile}`);
+  if (filterLabel) {
+    console.log(`Scope:     ${filterLabel} -- all other lines on this host are NOT collected`);
+  } else {
+    console.log('Scope:     every line in the file');
+  }
   console.log(`Polling every ${pollInterval} seconds`);
 
   let running = true;
@@ -243,6 +312,8 @@ export async function main() {
           logType,
           sourceTimezone,
           maxLines,
+          userFilter,
+          filterLabel,
         });
       }
     } catch (error) {
