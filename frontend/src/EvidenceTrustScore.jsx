@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { ShieldCheck, AlertTriangle } from 'lucide-react';
 import './styles/EvidenceTrustScore.css';
 
@@ -11,11 +12,25 @@ export function TrustScoreBadge({ result }) {
 }
 
 export function TrustScoreDetails({ result, error }) {
+  const [fill, setFill] = useState(0);
+
+  useEffect(() => {
+    if (result && typeof result.score === 'number') {
+      const timer = setTimeout(() => {
+        setFill(result.score);
+      }, 50);
+      return () => clearTimeout(timer);
+    }
+    setFill(0);
+  }, [result]);
+
   if (!result) return <section className="tp-trust-details"><h3>Evidence Trust Score</h3><p>{error || 'Calculating evidence quality…'}</p></section>;
   return <section className="tp-trust-details">
     <h3>Evidence Trust Score</h3>
     <div className="tp-trust-summary"><strong>{result.score}<small>/100</small></strong><TrustScoreBadge result={result} /></div>
-    <div className="tp-trust-track"><div style={{ width: `${result.score}%` }} /></div>
+    <div className="tp-trust-track">
+      <div style={{ width: `${fill}%` }} className="tp-trust-fill" />
+    </div>
     <p className="tp-trust-integrity">Integrity: <strong>{result.integrity.replaceAll('_', ' ')}</strong></p>
     {(result.breakdown || []).map(item => <div className="tp-trust-row" key={item.name}>
       <div><strong>{item.name}</strong><small>{item.reason}</small></div><span>{item.earned}/{item.maximum}</span>

@@ -371,9 +371,9 @@ html .tp-app .aiori-spotlight-sub .mono,
   text-align: left !important;
   text-transform: none !important;
   cursor: pointer !important;
-  transition: transform 0.26s cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 0.26s cubic-bezier(0.16, 1, 0.3, 1),
-              border-color 0.22s ease !important;
+  transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.24s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.24s ease-out !important;
 }
 
 /* Pinterest-grade Top Border Sheen Highlight on Hover */
@@ -385,7 +385,7 @@ html .tp-app .aiori-spotlight-sub .mono,
   width: 100% !important;
   height: 2.5px !important;
   background: linear-gradient(90deg, transparent, #52B788, #138808, transparent) !important;
-  transition: left 0.55s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  transition: left 0.5s cubic-bezier(0.16, 1, 0.3, 1) !important;
   pointer-events: none !important;
 }
 
@@ -394,9 +394,9 @@ html .tp-app .aiori-spotlight-sub .mono,
 }
 
 .tp-portal-services button.tp-portal-service:hover {
-  transform: translateY(-5px) !important;
-  border-color: #2D6A4F !important;
-  box-shadow: 0 14px 34px -6px rgba(19, 42, 30, 0.18), 0 4px 12px -2px rgba(19, 42, 30, 0.08) !important;
+  transform: translateY(-2px) !important;
+  border-color: #52B788 !important;
+  box-shadow: 0 10px 26px -6px rgba(19, 42, 30, 0.14), 0 2px 8px rgba(19, 42, 30, 0.06) !important;
 }
 
 .tp-portal-service-top {
@@ -683,46 +683,38 @@ body *::-moz-selection,
 }
 
 /* ===========================================================================
-   TELEMETRY CHARTS & PROFILE CARDS (PINTEST CRAFT DESIGN — ZERO WASTED SPACE)
+   TELEMETRY CHARTS & PROFILE CARDS (RECHARTS RESPONSIVE 3-COLUMN GRID)
    =========================================================================== */
 .tp-charts {
   display: grid !important;
-  grid-template-columns: repeat(6, 1fr) !important;
-  gap: 14px !important;
-  margin: 0 0 24px !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 16px !important;
+  margin: 16px 0 24px !important;
 }
 
 .tp-chart-timeline-card {
-  grid-column: span 4 !important;
+  grid-column: 1 / -1 !important;
   background: #FFFFFF !important;
   border: 1px solid #D4E5D9 !important;
   border-radius: 14px !important;
   padding: 16px 18px 14px !important;
   box-shadow: 0 2px 10px rgba(19, 42, 30, 0.04) !important;
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: space-between !important;
-  min-height: 215px !important;
+  min-height: 280px !important;
 }
 
-.tp-chart-event-types-card {
-  grid-column: span 2 !important;
-  min-height: 215px !important;
-}
-
-.tp-chart-usernames-card {
-  grid-column: span 3 !important;
-}
-
+.tp-chart-event-types-card,
+.tp-chart-usernames-card,
 .tp-chart-devices-card {
-  grid-column: span 3 !important;
+  grid-column: span 1 !important;
+  min-height: 250px !important;
 }
 
 @media (max-width: 1080px) {
-  .tp-chart-timeline-card { grid-column: span 6 !important; }
-  .tp-chart-event-types-card { grid-column: span 6 !important; }
-  .tp-chart-usernames-card { grid-column: span 3 !important; }
-  .tp-chart-devices-card { grid-column: span 3 !important; }
+  .tp-charts { grid-template-columns: repeat(2, 1fr) !important; }
+  .tp-chart-timeline-card { grid-column: 1 / -1 !important; }
+  .tp-chart-event-types-card { grid-column: 1 / -1 !important; }
+  .tp-chart-usernames-card,
+  .tp-chart-devices-card { grid-column: span 1 !important; }
 }
 
 @media (max-width: 680px) {
@@ -1366,20 +1358,15 @@ html.lenis body {
 /* ===========================================================================
    FORENSIC ANALYTICS & CHARTS POLISH — ELIMINATE EMPTY VOIDS
    =========================================================================== */
-.tp-charts {
-  margin: 0 0 28px !important;
-  gap: 14px !important;
-}
-
 .tp-chart-card {
   background: #FFFFFF !important;
   border: 1px solid #CFE2D4 !important;
   border-radius: 12px !important;
   box-shadow: 0 4px 14px rgba(35, 84, 58, 0.05) !important;
   padding: 18px 20px 16px !important;
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1),
-              border-color 0.2s ease !important;
+  transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.24s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.24s ease-out !important;
 }
 
 .tp-chart-card:hover {

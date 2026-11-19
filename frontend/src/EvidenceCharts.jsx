@@ -1,30 +1,26 @@
 import { useMemo } from 'react';
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Cell,
+  LabelList,
+  CartesianGrid,
+} from 'recharts';
 import './styles/EvidenceCharts.css';
-
-/* Charts over the collected timeline. Every series here is counted from the
-   events the API returned - there is no sample data in this file and no
-   placeholder series.
-
-   One chart from the brief is deliberately absent. "Top source IPs" cannot be
-   built yet: backend/app/parser.py does not extract an address into a field,
-   so an IP exists only inside the raw text of a log line. Counting them would
-   mean regex-matching message strings in the browser and calling the result
-   evidence, which it is not. The same gap is why the globe plots nothing. */
 
 const DAYS = 14;
 
 const dayKey = d => d.toISOString().slice(0, 10);
 const asDate = iso => new Date(`${iso}T00:00:00Z`);
 
-/* Full form, for tooltips and the screen-reader line. */
 const longDay = iso => asDate(iso).toLocaleDateString(undefined, {
   weekday: 'short', day: 'numeric', month: 'short',
 });
 
-/* The column label. This used to take the first word of a localised
-   "day month" string, which in a month-first locale is the month - so all
-   fourteen columns read "Nov". It is the date now, with the month shown only
-   where the series crosses into one, which is the one place it is ambiguous. */
 const columnLabel = (iso, index) => {
   const d = asDate(iso);
   const date = d.getUTCDate();
@@ -36,51 +32,122 @@ const columnLabel = (iso, index) => {
   return String(date);
 };
 
-/* The weekday sits under the date so a burst at a weekend is visible without
-   counting back from today. */
-const weekdayLabel = iso => asDate(iso).toLocaleDateString(undefined, { weekday: 'narrow' });
-
 function Empty({ children }) {
   return <p className="tp-chart-empty">{children}</p>;
 }
 
-/* ---- horizontal ranked bars ------------------------------------------- */
-function RankedBars({ rows, total, tone, unit = 'events', verificationNote }) {
-  if (!rows.length) return <Empty>No telemetry recorded yet in current horizon.</Empty>;
-  const max = Math.max(1, ...rows.map(r => r.count));
+const FORENSIC_PALETTE = [
+  '#2D6A4F', // deep forest pine
+  '#40916C', // vibrant pine
+  '#52B788', // sage emerald
+  '#74C69D', // mint pistachio
+  '#1B4332', // dark cypress
+  '#95D5B2', // light mist
+];
+
+/* Custom Recharts Tooltip for Timeline */
+function TimelineTooltip({ active, payload }) {
+  if (!active || !payload || !payload.length) return null;
+  const d = payload[0]?.payload;
+  if (!d) return null;
+
   return (
-    <div className="tp-ranked-container">
-      <ul className="tp-chart-ranked">
-        {rows.map((r, i) => {
-          const pct = total ? Math.round((r.count / total) * 100) : 0;
-          return (
-            <li key={r.label} className="tp-ranked-row" style={{ '--rank-idx': i }}>
-              <span className="tp-ranked-index">{String(i + 1).padStart(2, '0')}</span>
-              <div className="tp-ranked-content">
-                <div className="tp-ranked-meta">
-                  <span className="tp-chart-ranked-label" title={r.label}>{r.label}</span>
-                  <div className="tp-ranked-badge-group">
-                    <span className="tp-chart-ranked-value">
-                      {r.count} <small>{unit}</small>
-                    </span>
-                    <span className="tp-ranked-pct-pill">{pct}%</span>
-                  </div>
-                </div>
-                <div className="tp-chart-ranked-track">
-                  <span
-                    className="tp-chart-ranked-fill"
-                    style={{
-                      width: `${Math.max(6, (r.count / max) * 100)}%`,
-                      '--tp-cat': `var(--fx-cat-${tone ?? ((i % 6) + 1)})`
-                    }}
-                  />
-                </div>
-              </div>
-              <span className="tp-chart-sr">{`${r.label}: ${r.count} ${unit}`}</span>
-            </li>
-          );
-        })}
-      </ul>
+    <div className="tp-recharts-tooltip" role="tooltip">
+      <div className="tp-recharts-tooltip-head">
+        <span className="mono">{d.fullDate}</span>
+        <span className="tp-recharts-tooltip-badge">{d.total} total</span>
+      </div>
+      <div className="tp-recharts-tooltip-body">
+        <div className="tp-recharts-tooltip-row is-fail">
+          <span className="tp-recharts-pip fail" />
+          <span>Failure indicators:</span>
+          <strong>{d.failed}</strong>
+        </div>
+        <div className="tp-recharts-tooltip-row is-ok">
+          <span className="tp-recharts-pip ok" />
+          <span>Nominal / other:</span>
+          <strong>{d.ok}</strong>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* Custom Recharts Tooltip for Ranked Categories */
+function RankedTooltip({ active, payload, total, unit = 'events' }) {
+  if (!active || !payload || !payload.length) return null;
+  const d = payload[0]?.payload;
+  if (!d) return null;
+  const pct = total ? Math.round((d.count / total) * 100) : 0;
+
+  return (
+    <div className="tp-recharts-tooltip" role="tooltip">
+      <div className="tp-recharts-tooltip-head">
+        <strong>{d.label}</strong>
+        <span className="tp-recharts-tooltip-badge">{pct}% of total</span>
+      </div>
+      <div className="tp-recharts-tooltip-body">
+        <div className="tp-recharts-tooltip-row">
+          <span>Recorded telemetry:</span>
+          <strong>{d.count} <small>{unit}</small></strong>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* Horizontal Ranked Bars built with Recharts */
+function RankedBarChart({ rows = [], total = 0, unit = 'events', verificationNote, tone = 0 }) {
+  if (!rows.length) return <Empty>No telemetry recorded yet in current horizon.</Empty>;
+
+  const formattedData = rows.map((r, i) => {
+    const shortLabel = r.label.length > 15 ? r.label.slice(0, 14) + '…' : r.label;
+    const pct = total ? Math.round((r.count / total) * 100) : 0;
+    return {
+      ...r,
+      shortLabel,
+      pct,
+      color: FORENSIC_PALETTE[(i + tone) % FORENSIC_PALETTE.length],
+    };
+  });
+
+  return (
+    <div className="tp-recharts-ranked-wrap">
+      <ResponsiveContainer width="100%" height={Math.min(220, Math.max(150, formattedData.length * 28 + 14))}>
+        <BarChart
+          layout="vertical"
+          data={formattedData}
+          margin={{ top: 6, right: 38, left: 6, bottom: 4 }}
+        >
+          <XAxis type="number" hide domain={[0, 'dataMax + 1']} />
+          <YAxis
+            type="category"
+            dataKey="shortLabel"
+            width={94}
+            axisLine={false}
+            tickLine={false}
+            tick={{ fill: '#1E3E2B', fontSize: 11, fontWeight: 600, fontFamily: 'Inter, system-ui, sans-serif' }}
+          />
+          <Tooltip content={<RankedTooltip total={total} unit={unit} />} cursor={{ fill: 'rgba(82, 183, 136, 0.08)' }} />
+          <Bar
+            dataKey="count"
+            radius={[0, 4, 4, 0]}
+            barSize={12}
+            animationDuration={800}
+            animationEasing="ease-out"
+          >
+            <LabelList
+              dataKey="count"
+              position="right"
+              formatter={(val) => `${val}`}
+              style={{ fill: '#11261B', fontSize: 10.5, fontWeight: 700, fontFamily: 'IBM Plex Mono, monospace' }}
+            />
+            {formattedData.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={entry.color} />
+            ))}
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
       {verificationNote && (
         <div className="tp-ranked-footer">
           <span className="tp-ranked-check">✓</span>
@@ -131,19 +198,30 @@ export default function EvidenceCharts({ events = [], timestampOf, eventTypeOf, 
       .map(([label, count]) => ({ label, count }))
       .sort((a, b) => b.count - a.count);
 
+    const timelineData = days.map((d, i) => ({
+      key: d.key,
+      date: columnLabel(d.key, i),
+      fullDate: longDay(d.key),
+      failed: d.failed,
+      ok: d.ok,
+      total: d.failed + d.ok,
+    }));
+
     return {
       days,
+      timelineData,
       peak: Math.max(1, ...days.map(d => d.failed + d.ok)),
       inWindow: days.reduce((n, d) => n + d.failed + d.ok, 0),
-      types: rank(types).slice(0, 7),
-      users: rank(users).slice(0, 6),
-      devices: rank(devices).slice(0, 6),
+      types: rank(types).slice(0, 6),
+      users: rank(users).slice(0, 5),
+      devices: rank(devices).slice(0, 5),
       total: events.length,
     };
   }, [events, timestampOf, eventTypeOf, deviceOf, isFailure]);
 
   return (
     <section className="tp-charts tp-scroll-reveal tp-stagger-parent" aria-label="Collected event analysis">
+      {/* 1. Full-Width Telemetry Timeline Chart (Recharts) */}
       <article className="tp-card tp-chart-card tp-chart-timeline-card">
         <header className="tp-chart-head">
           <div className="tp-chart-title-group">
@@ -156,55 +234,51 @@ export default function EvidenceCharts({ events = [], timestampOf, eventTypeOf, 
             <span>14-Day Horizon · Active Reticle</span>
           </div>
         </header>
+
         {data.inWindow === 0 ? (
           <Empty>No events fall inside the last {DAYS} days. Older evidence is still on the timeline.</Empty>
         ) : (
-          <>
-            <div className="tp-chart-cols-wrapper">
-              <div className="tp-chart-y-axis" aria-hidden="true">
-                <span>{data.peak}</span>
-                <span>{Math.max(1, Math.round(data.peak / 2))}</span>
-                <span>0</span>
-              </div>
-              <div className="tp-chart-cols" role="list">
-                {data.days.map((d, i) => {
-                  const total = d.failed + d.ok;
-                  const hasData = total > 0;
-                  return (
-                    <div
-                      className={`tp-chart-col ${hasData ? 'has-data' : 'is-zero'}`}
-                      key={d.key}
-                      style={{ '--col-idx': i }}
-                      role="listitem"
-                      title={`${longDay(d.key)} — ${d.failed} failed, ${d.ok} other`}
-                    >
-                      <span className="tp-chart-stack">
-                        {hasData ? (
-                          <>
-                            <span className="tp-chart-active-tag">{total}</span>
-                            <span
-                              className="tp-chart-seg is-ok"
-                              style={{ height: `${(d.ok / data.peak) * 100}%` }}
-                            />
-                            <span
-                              className="tp-chart-seg is-failed"
-                              style={{ height: `${(d.failed / data.peak) * 100}%` }}
-                            />
-                          </>
-                        ) : (
-                          <span className="tp-chart-zero-pip" />
-                        )}
-                      </span>
-                      <span className="tp-chart-col-label">
-                        {columnLabel(d.key, i, data.days)}
-                        <em>{weekdayLabel(d.key)}</em>
-                      </span>
-                      <span className="tp-chart-sr">{`${longDay(d.key)}: ${d.failed} failed, ${d.ok} other, ${total} total`}</span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
+          <div className="tp-recharts-timeline-wrap">
+            <ResponsiveContainer width="100%" height={210}>
+              <BarChart
+                data={data.timelineData}
+                margin={{ top: 10, right: 10, left: -24, bottom: 0 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2EBE5" opacity={0.65} />
+                <XAxis
+                  dataKey="date"
+                  tickLine={false}
+                  axisLine={{ stroke: '#CFE0D4' }}
+                  tick={{ fill: '#3E5C4A', fontSize: 10.5, fontFamily: 'IBM Plex Mono, monospace' }}
+                />
+                <YAxis
+                  allowDecimals={false}
+                  tickLine={false}
+                  axisLine={false}
+                  tick={{ fill: '#5C7A68', fontSize: 10, fontFamily: 'IBM Plex Mono, monospace' }}
+                />
+                <Tooltip content={<TimelineTooltip />} cursor={{ fill: 'rgba(82, 183, 136, 0.08)' }} />
+                <Bar
+                  dataKey="failed"
+                  name="Failure indicators"
+                  stackId="auth"
+                  fill="#D9534F"
+                  radius={[0, 0, 0, 0]}
+                  animationDuration={800}
+                  animationEasing="ease-out"
+                />
+                <Bar
+                  dataKey="ok"
+                  name="Nominal / other"
+                  stackId="auth"
+                  fill="#2D6A4F"
+                  radius={[3, 3, 0, 0]}
+                  animationDuration={800}
+                  animationEasing="ease-out"
+                />
+              </BarChart>
+            </ResponsiveContainer>
+
             <footer className="tp-chart-legend">
               <div className="tp-legend-keys">
                 <span><i className="is-failed" /> Failure indicators</span>
@@ -217,10 +291,11 @@ export default function EvidenceCharts({ events = [], timestampOf, eventTypeOf, 
                 <span className="tp-chart-horizon-count">Total in horizon: {data.inWindow}</span>
               </div>
             </footer>
-          </>
+          </div>
         )}
       </article>
 
+      {/* 2. Profile 01: Event types (Compact 1/3 column) */}
       <article className="tp-card tp-chart-card tp-ranked-card tp-chart-event-types-card">
         <header className="tp-chart-head">
           <div className="tp-chart-title-group">
@@ -229,13 +304,15 @@ export default function EvidenceCharts({ events = [], timestampOf, eventTypeOf, 
             <p>Distribution across {data.total} collected events</p>
           </div>
         </header>
-        <RankedBars
+        <RankedBarChart
           rows={data.types}
           total={data.total}
-          verificationNote="Signature classified · Formatted to RFC 5424 standard"
+          tone={0}
+          verificationNote="Signature classified · RFC 5424"
         />
       </article>
 
+      {/* 3. Profile 02: Most targeted usernames (Compact 1/3 column) */}
       <article className="tp-card tp-chart-card tp-ranked-card tp-chart-usernames-card">
         <header className="tp-chart-head">
           <div className="tp-chart-title-group">
@@ -244,19 +321,16 @@ export default function EvidenceCharts({ events = [], timestampOf, eventTypeOf, 
             <p>Accounts named in collected events</p>
           </div>
         </header>
-        {data.users.length ? (
-          <RankedBars
-            rows={data.users}
-            total={data.total}
-            tone={2}
-            unit="events"
-            verificationNote="PAM credential audit matched · Zero privilege escalation"
-          />
-        ) : (
-          <Empty>No events carry a username.</Empty>
-        )}
+        <RankedBarChart
+          rows={data.users}
+          total={data.total}
+          tone={2}
+          unit="events"
+          verificationNote="PAM credential audit matched"
+        />
       </article>
 
+      {/* 4. Profile 03: Source devices (Compact 1/3 column) */}
       <article className="tp-card tp-chart-card tp-ranked-card tp-chart-devices-card">
         <header className="tp-chart-head">
           <div className="tp-chart-title-group">
@@ -265,11 +339,11 @@ export default function EvidenceCharts({ events = [], timestampOf, eventTypeOf, 
             <p>Where the evidence was collected from</p>
           </div>
         </header>
-        <RankedBars
+        <RankedBarChart
           rows={data.devices}
           total={data.total}
-          tone={4}
-          verificationNote="Hardware node fingerprint active · SHA-256 seal valid"
+          tone={3}
+          verificationNote="Hardware node fingerprint active"
         />
       </article>
     </section>

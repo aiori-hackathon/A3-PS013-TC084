@@ -139,9 +139,9 @@ function SeverityCard({ events }) {
   const max = Math.max(1, ...counts.map(c => c.count));
   return <section className="tp-card tp-distribution"><div className="tp-card-head"><div><h2>Severity breakdown</h2><p>Classification of collected events</p></div></div><div className="tp-severity-list">{counts.map(c => <div className="tp-severity-row" key={c.name}><span className={`tp-sev-dot ${severityClass(c.name)}`}/><span className="tp-sev-label">{c.name}</span><div className="tp-sev-track"><div className={`tp-sev-fill ${severityClass(c.name)}`} style={{ width: `${c.count / max * 100}%` }}/></div><strong>{c.count}</strong></div>)}</div><div className="tp-distribution-foot">Based on event severity fields received from the agent</div></section>;
 }
-function Metric({ label, value, note, icon: Icon, chip, isAlert }) {
+function Metric({ label, value, note, icon: Icon, chip, isAlert, style }) {
   return (
-    <div className={`tp-metric ${isAlert ? 'is-alert-metric' : ''}`}>
+    <div className={`tp-metric ${isAlert ? 'is-alert-metric' : ''}`} style={style}>
       <div className="tp-metric-header">
         <span className="tp-metric-label">{label}</span>
         {Icon ? (
@@ -787,7 +787,7 @@ export default function Dashboard({ user, onSignOut }) {
           entry.target.classList.add('tp-in-view');
         }
       });
-    }, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
+    }, { threshold: 0.15, rootMargin: '0px 0px -20px 0px' });
 
     const observeAll = () => {
       const targets = document.querySelectorAll(
@@ -1046,6 +1046,7 @@ export default function Dashboard({ user, onSignOut }) {
       {/* 1. Core KPIs directly under Hero */}
       <div className="tp-metrics tp-forensic-metrics tp-scroll-reveal tp-stagger-parent">
         <Metric
+          style={{ '--card-idx': 0 }}
           label="Collected events"
           value={loading ? '…' : <AnimatedCount value={events.length} />}
           note="Available for inspection"
@@ -1053,6 +1054,7 @@ export default function Dashboard({ user, onSignOut }) {
           chip="LIVE PROBE"
         />
         <Metric
+          style={{ '--card-idx': 1 }}
           label="Authentication failures"
           value={loading ? '…' : <AnimatedCount value={failures} />}
           note={`${affectedDevices} source ${affectedDevices === 1 ? 'device' : 'devices'} affected`}
@@ -1061,6 +1063,7 @@ export default function Dashboard({ user, onSignOut }) {
           isAlert={failures > 0}
         />
         <Metric
+          style={{ '--card-idx': 2 }}
           label="Source devices"
           value={loading ? '…' : <AnimatedCount value={devices} />}
           note="Unique device identifiers"
@@ -1068,6 +1071,7 @@ export default function Dashboard({ user, onSignOut }) {
           chip="VERIFIED"
         />
         <Metric
+          style={{ '--card-idx': 3 }}
           label="Users observed"
           value={loading ? '…' : <AnimatedCount value={users} />}
           note="Unique usernames"
