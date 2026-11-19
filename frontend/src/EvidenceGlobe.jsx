@@ -181,24 +181,6 @@ function EvidenceGlobe({
     };
   }, [startIntroSequence]);
 
-  // Gentle breathing oscillation around India when locked
-  useEffect(() => {
-    if (introState !== 'locked' || dragging) return undefined;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
-
-    let last = performance.now();
-    const idleTick = now => {
-      if (!dragging && now - last > 75) {
-        const osc = Math.sin(now * 0.0007) * 0.06;
-        setSpin(s => s + osc);
-        last = now;
-      }
-      raf.current = requestAnimationFrame(idleTick);
-    };
-    raf.current = requestAnimationFrame(idleTick);
-    return () => cancelAnimationFrame(raf.current);
-  }, [introState, dragging]);
-
   // Pointer drag gestures
   const onPointerDown = e => {
     e.currentTarget.setPointerCapture(e.pointerId);

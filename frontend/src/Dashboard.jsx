@@ -13,8 +13,6 @@ import {
   useState
 } from 'react';
 import { Wifi, WifiOff, Activity, ArrowDownToLine, ChevronRight, CircleHelp, Clock3, FileClock, FileText, Fingerprint, LayoutDashboard, LogOut, Menu, RefreshCw, Search, ShieldAlert, SlidersHorizontal, Terminal, X, GitBranch, BookOpen, Network, ArrowRight, ArrowUp } from 'lucide-react';
-import Lenis from 'lenis';
-import 'lenis/dist/lenis.css';
 import './styles/Tracepoint.css';
 import './styles/TracepointTimelineGraphModal.css';
 import './styles/TimelineWorkspace.css';
@@ -715,72 +713,33 @@ export default function Dashboard({ user, onSignOut }) {
   const progressBarRef = useRef(null);
   const [backToTopVisible, setBackToTopVisible] = useState(false);
 
-  // InvertisPrep-style Lenis smooth inertial scrolling engine
+  // Ultra-lightweight native scroll progress & back-to-top handler (zero JS friction)
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    const handleScroll = (scrollY) => {
-      const el = document.documentElement;
-      const height = el.scrollHeight - el.clientHeight;
-      if (progressBarRef.current && height > 0) {
-        progressBarRef.current.style.width = `${Math.min(100, Math.max(0, (scrollY / height) * 100))}%`;
-      }
-      const pastThreshold = scrollY > 280;
-      setBackToTopVisible(prev => (prev !== pastThreshold ? pastThreshold : prev));
-    };
-
-    const nativeScrollHandler = () => {
-      handleScroll(window.scrollY);
-    };
-
-    window.addEventListener('scroll', nativeScrollHandler, { passive: true });
-
-    // If user prefers reduced motion, rely on native scrolling
-    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      return () => window.removeEventListener('scroll', nativeScrollHandler);
-    }
-
-    let lenis = null;
-    let rafId = null;
-
-    try {
-      lenis = new Lenis({
-        duration: 0.85,
-        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-        orientation: 'vertical',
-        gestureOrientation: 'vertical',
-        smoothWheel: true,
-        wheelMultiplier: 0.9,
-        touchMultiplier: 1.0,
-        infinite: false,
-      });
-
-      window.__lenis = lenis;
-
-      lenis.on('scroll', (e) => {
-        handleScroll(e.scroll);
-      });
-
-      const raf = (time) => {
-        lenis?.raf(time);
-        rafId = requestAnimationFrame(raf);
-      };
-      rafId = requestAnimationFrame(raf);
-    } catch (err) {
-      console.warn('Lenis smooth scrolling fallback to native:', err);
-    }
-
-    return () => {
-      window.removeEventListener('scroll', nativeScrollHandler);
-      if (rafId) cancelAnimationFrame(rafId);
-      if (lenis) {
-        lenis.destroy();
-        delete window.__lenis;
+    let ticking = false;
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const el = document.documentElement;
+          const height = el.scrollHeight - el.clientHeight;
+          const scrollY = window.scrollY;
+          if (progressBarRef.current && height > 0) {
+            progressBarRef.current.style.width = `${Math.min(100, Math.max(0, (scrollY / height) * 100))}%`;
+          }
+          const pastThreshold = scrollY > 240;
+          setBackToTopVisible(prev => (prev !== pastThreshold ? pastThreshold : prev));
+          ticking = false;
+        });
+        ticking = true;
       }
     };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Hardware-accelerated dynamic fluid scroll reveal observer (zero-overhead, no layout thrashing)
+  // Hardware-accelerated fluid scroll reveal observer (runs on compositor thread)
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
@@ -789,7 +748,7 @@ export default function Dashboard({ user, onSignOut }) {
           observer.unobserve(entry.target);
         }
       });
-    }, { threshold: 0.08, rootMargin: '0px 0px -10px 0px' });
+    }, { threshold: 0.05, rootMargin: '0px 0px 40px 0px' });
 
     const observeTargets = () => {
       const targets = document.querySelectorAll(
@@ -803,7 +762,7 @@ export default function Dashboard({ user, onSignOut }) {
     };
 
     observeTargets();
-    const timer = setTimeout(observeTargets, 150);
+    const timer = setTimeout(observeTargets, 100);
 
     return () => {
       clearTimeout(timer);
@@ -932,19 +891,11 @@ export default function Dashboard({ user, onSignOut }) {
     try { window.sessionStorage.setItem('tracepoint.activePage', id); } catch { /* storage unavailable */ }
     setSelected(null);
     setMobileOpen(false);
-    if (window.__lenis) {
-      window.__lenis.scrollTo(0, { immediate: true });
-    } else {
-      window.scrollTo(0, 0);
-    }
+    window.scrollTo(0, 0);
   };
 
   const scrollToTop = () => {
-    if (window.__lenis) {
-      window.__lenis.scrollTo(0, { duration: 1.15 });
-    } else {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
   return <div className="tp-app" data-theme={theme} data-page={page}>
     {/* Animated Reading Progress Bar */}
