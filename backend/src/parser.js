@@ -119,8 +119,15 @@ export function parseLog(
   }
 
   if (!event.username) {
-    const found = /(?:for|user)\s+(?:invalid user\s+)?([a-zA-Z0-9_.-]+)/.exec(message);
-    if (found) event.username = found[1];
+    /*
+     * "for root", "for user root", "for invalid user abhi", "Invalid user abhi",
+     * "USER=root". The optional "user" after "for" matters: without it, a pam
+     * line reading "session opened for user root" is attributed to an account
+     * literally named "user", which is how root sessions went missing from the
+     * per-user breakdown.
+     */
+    const found = /(?:\bfor\s+(?:invalid\s+user\s+|user\s+)?|\buser[\s=]+)(?!from\b|port\b|by\b|on\b)([a-zA-Z0-9_.-]+)/i.exec(message);
+    if (found) event.username = found[1].replace(/[.-]+$/, '') || null;
   }
 
   if (event.log_format === 'unknown') event.parse_warnings.push('Unrecognized log format');

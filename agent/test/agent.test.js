@@ -10,6 +10,9 @@ import {
   readNewLines,
   collectNewLines,
   sendPendingBatch,
+  extractUsername,
+  parseUserFilter,
+  applyUserFilter,
 } from '../agent.js';
 
 describe('agent.js unit tests', () => {
@@ -136,5 +139,96 @@ describe('agent.js unit tests', () => {
     } finally {
       globalThis.fetch = origFetch;
     }
+  });
+});
+
+describe('collection scope filtering', () => {
+  it('attributes a pam session line to the account, not the word "user"', () => {
+    assert.equal(
+      extractUsername('sshd-session[1]: pam_unix(sshd:session): session opened for user root(uid=0) by root(uid=0)'),
+      'root'
+    );
+  });
+
+  it('reads the account out of the common sshd and systemd shapes', () => {
+    const cases = [
+      ['sshd[1]: Accepted password for root from 10.0.0.1 port 22 ssh2', 'root'],
+      ['sshd[1]: Failed password for invalid user abhi from 45.1.1.1 port 1 ssh2', 'abhi'],
+      ['sshd[1]: Invalid user abhi from 45.1.1.1 port 40122', 'abhi'],
+      ['sshd[1]: Failed password for user from 92.1.1.1 port 51002 ssh2', 'user'],
+      ['systemd[1]: Started Session 4012 of User nirikshak.', 'nirikshak'],
+      ['sudo: deploy : TTY=pts/0 ; PWD=/srv ; USER=root ; COMMAND=/bin/ls', 'root'],
+    ];
+    for (const [line, expected] of cases) {
+      assert.equal(extractUsername(line), expected, line);
+    }
+  });
+
+  it('keeps only lines belonging to the named accounts', () => {
+    const lines = [
+      'sshd[1]: Accepted password for root from 10.0.0.1 port 22 ssh2',
+      'sshd[1]: Failed password for invalid user abhi from 45.1.1.1 port 1 ssh2',
+      'CRON[2]: pam_unix(cron:session): session opened for user nirikshak(uid=1001) by (uid=0)',
+    ];
+    const { kept, skipped } = applyUserFilter(lines, parseUserFilter('root'));
+    assert.deepEqual(kept, [lines[0]]);
+    assert.equal(skipped, 2);
+  });
+
+  it('collects every line when no scope is configured', () => {
+    const lines = ['anything at all', 'and another'];
+    const { kept, skipped } = applyUserFilter(lines, parseUserFilter(''));
+    assert.deepEqual(kept, lines);
+    assert.equal(skipped, 0);
+  });
+
+  it('advances past skipped lines so the agent does not stall on them', () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'agent-filter-'));
+    const logFile = path.join(dir, 'auth.log');
+    const stateFile = path.join(dir, 'state.json');
+    const pendingFile = path.join(dir, 'pending.json');
+
+    fs.writeFileSync(
+      logFile,
+      'sshd[1]: Failed password for invalid user abhi from 45.1.1.1 port 1 ssh2\n' +
+        'CRON[2]: pam_unix(cron:session): session opened for user nirikshak(uid=1001) by (uid=0)\n'
+    );
+
+    collectNewLines({
+      logFile,
+      stateFile,
+      pendingFile,
+      deviceId: 'test-host',
+      logType: 'auth',
+      sourceTimezone: 'Asia/Kolkata',
+      maxLines: 100,
+      userFilter: parseUserFilter('root'),
+      filterLabel: 'username in [root]',
+    });
+
+    assert.equal(fs.existsSync(pendingFile), false, 'nothing in scope, so no batch');
+    const state = JSON.parse(fs.readFileSync(stateFile, 'utf-8'));
+    assert.equal(state.offset, fs.statSync(logFile).size, 'offset must clear the skipped lines');
+
+    fs.appendFileSync(logFile, 'sshd[3]: Accepted password for root from 10.0.0.1 port 22 ssh2\n');
+
+    collectNewLines({
+      logFile,
+      stateFile,
+      pendingFile,
+      deviceId: 'test-host',
+      logType: 'auth',
+      sourceTimezone: 'Asia/Kolkata',
+      maxLines: 100,
+      userFilter: parseUserFilter('root'),
+      filterLabel: 'username in [root]',
+    });
+
+    const pending = JSON.parse(fs.readFileSync(pendingFile, 'utf-8'));
+    assert.equal(pending.payload.lines.length, 1);
+    assert.match(pending.payload.lines[0], /Accepted password for root/);
+    assert.equal(pending.payload.collection_filter, 'username in [root]');
+
+    fs.rmSync(dir, { recursive: true, force: true });
   });
 });

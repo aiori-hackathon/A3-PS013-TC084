@@ -32,6 +32,12 @@ export const LogBatchSchema = z.object({
   log_type: z.string().regex(/^[a-zA-Z0-9_-]{1,32}$/),
   lines: z.array(z.string()).min(1).max(MAX_LOG_LINES),
   source_timezone: z.string().min(1).max(64).default('Asia/Kolkata'),
+  /*
+   * Set by an agent that was told to collect only part of a log file. It is
+   * recorded on the batch so the register shows the collection was scoped,
+   * rather than letting a partial capture read as a complete one.
+   */
+  collection_filter: z.string().min(1).max(200).optional(),
 });
 
 function isValidTimezone(tz) {
@@ -167,6 +173,7 @@ export function storeLogBatch(payload, rawBytes, ownerUserId) {
     sha256,
     received_at: utcNowIso(),
     evidence_file: path.basename(evidencePath),
+    collection_filter: payload.collection_filter || null,
   };
 
   const metaFd = fs.openSync(metadataPath, 'wx');
