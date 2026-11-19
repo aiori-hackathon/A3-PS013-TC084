@@ -84,6 +84,13 @@
   transform-style: preserve-3d;
   will-change: transform, box-shadow;
   transition: border-color 0.2s ease;
+  opacity: 1 !important;
+}
+
+.tp-tilt-card,
+.tp-stagger-parent > .tp-tilt-card,
+.tp-stagger-parent.tp-in-view > .tp-tilt-card {
+  opacity: 1 !important;
 }
 
 .tp-team-card:hover {
@@ -98,7 +105,6 @@
   pointer-events: none;
   z-index: 20;
   opacity: 0;
-  mix-blend-mode: overlay;
   transition: opacity 0.25s ease;
   will-change: background, opacity;
 }

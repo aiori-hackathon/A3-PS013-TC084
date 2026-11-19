@@ -422,81 +422,128 @@
 .tp-app[data-theme="dark"] .tp-graph-edge.tentative { color: #9fc2e4 !important; }
 
 
-/* TRACEPOINT_GRAPH_AMBER_LARGE_TYPE_V1
-   Investigation Graph only: Amazon-style amber text + larger type.
-   Light theme uses a deeper amber (AA contrast on white); dark/forensic
-   themes and the dark hero use the bright Amazon amber. */
+/* TRACEPOINT_GRAPH_CLEAN_SLATE_TYPE_V1
+   Investigation Graph: Crisp slate typography and professional forensic accents.
+   Replaced muddy yellow/amber colors with clean SOC colors. */
 html .tp-app .tp-graph-root.tp-graph-phase5 {
-  --gx-amber-strong: #9a5b00;   /* headings, numbers, node titles */
-  --gx-amber-soft:   #7d4e0a;   /* secondary / descriptive text   */
-  --gx-amber-accent: #c77700;   /* icons, links, edges            */
-  --gx-hero-strong:  #ffb84d;
-  --gx-hero-soft:    #ffd9a0;
+  --gx-amber-strong: #0F172A;   /* headings, numbers, node titles */
+  --gx-amber-soft:   #475569;   /* secondary / descriptive text   */
+  --gx-amber-accent: #4F46E5;   /* icons, links, edges            */
+  --gx-hero-strong:  #0F172A;
+  --gx-hero-soft:    #475569;
 }
 html .tp-app[data-theme="dark"] .tp-graph-root.tp-graph-phase5,
 html .tp-app[data-theme="forensic"] .tp-graph-root.tp-graph-phase5 {
-  --gx-amber-strong: #ffb84d;
-  --gx-amber-soft:   #f0c070;
-  --gx-amber-accent: #ff9900;
+  --gx-amber-strong: #F8FAFC;
+  --gx-amber-soft:   #94A3B8;
+  --gx-amber-accent: #818CF8;
 }
 
 /* ---- Hero ---- */
-html .tp-app .tp-graph-phase5 .tp-graph-phase5-hero h2 { color: var(--gx-hero-strong) !important; font-size: 30px !important; }
-html .tp-app .tp-graph-phase5 .tp-graph-phase5-hero h2 svg { color: #ff9900 !important; width: 26px; height: 26px; }
-html .tp-app .tp-graph-phase5 .tp-graph-phase5-hero p { color: var(--gx-hero-soft) !important; font-size: 16.5px !important; line-height: 1.7; max-width: 780px; }
-html .tp-app .tp-graph-phase5 .tp-graph-phase5-hero .tp-button { font-size: 15.5px !important; min-height: 46px; padding: 11px 20px; color: #7a4300 !important; font-weight: 700; }
+html .tp-app .tp-graph-phase5 .tp-graph-phase5-hero h2 { color: #0F172A !important; font-size: 26px !important; }
+html .tp-app .tp-graph-phase5 .tp-graph-phase5-hero h2 svg { color: #4F46E5 !important; width: 24px; height: 24px; }
+html .tp-app .tp-graph-phase5 .tp-graph-phase5-hero p { color: #64748B !important; font-size: 14px !important; line-height: 1.6; max-width: 780px; }
+html .tp-app .tp-graph-phase5 .tp-graph-phase5-hero .tp-button { font-size: 13.5px !important; min-height: 40px; padding: 9px 18px; color: #1E293B !important; font-weight: 700; }
 
 /* ---- Stat cards ---- */
-html .tp-app .tp-graph-phase5 .tp-graph-stats > .tp-card strong { color: var(--gx-amber-strong) !important; font-size: 40px !important; }
-html .tp-app .tp-graph-phase5 .tp-graph-stats > .tp-card span { color: var(--gx-amber-soft) !important; font-size: 15.5px !important; font-weight: 650; }
-html .tp-app .tp-graph-phase5 .tp-graph-stats > .tp-card > svg { color: var(--gx-amber-accent) !important; width: 23px; height: 23px; }
+html .tp-app .tp-graph-phase5 .tp-graph-stats > .tp-card strong { color: #0F172A !important; font-size: 34px !important; }
+html .tp-app .tp-graph-phase5 .tp-graph-stats > .tp-card span { color: #64748B !important; font-size: 13px !important; font-weight: 600; }
+html .tp-app .tp-graph-phase5 .tp-graph-stats > .tp-card:nth-child(1) > svg { color: #4F46E5 !important; width: 22px; height: 22px; }
+html .tp-app .tp-graph-phase5 .tp-graph-stats > .tp-card:nth-child(2) > svg { color: #0284C7 !important; width: 22px; height: 22px; }
+html .tp-app .tp-graph-phase5 .tp-graph-stats > .tp-card:nth-child(3) > svg { color: #DC2626 !important; width: 22px; height: 22px; }
 
 /* ---- Panel + section headings ---- */
 html .tp-app .tp-graph-phase5 .tp-graph-panel-head h3,
-html .tp-app .tp-graph-phase5 .tp-graph-gaps h3 { color: var(--gx-amber-strong) !important; font-size: 23px !important; }
-html .tp-app .tp-graph-phase5 .tp-graph-gaps h3 > svg { color: var(--gx-amber-accent) !important; width: 21px; height: 21px; }
+html .tp-app .tp-graph-phase5 .tp-graph-gaps h3 { color: #0F172A !important; font-size: 20px !important; }
+html .tp-app .tp-graph-phase5 .tp-graph-gaps h3 > svg { color: #DC2626 !important; width: 20px; height: 20px; }
 html .tp-app .tp-graph-phase5 .tp-graph-panel-head p,
-html .tp-app .tp-graph-phase5 .tp-graph-gaps > p { color: var(--gx-amber-soft) !important; font-size: 15.5px !important; line-height: 1.7; }
-html .tp-app .tp-graph-phase5 .tp-graph-legend { color: var(--gx-amber-soft) !important; font-size: 14px !important; }
-html .tp-app .tp-graph-phase5 .tp-graph-legend i { border-top-color: var(--gx-amber-accent) !important; }
+html .tp-app .tp-graph-phase5 .tp-graph-gaps > p { color: #64748B !important; font-size: 13px !important; line-height: 1.6; }
+html .tp-app .tp-graph-phase5 .tp-graph-legend { color: #64748B !important; font-size: 12px !important; }
+html .tp-app .tp-graph-phase5 .tp-graph-legend i { border-top-color: #64748B !important; }
 
 /* ---- Sequence nodes ---- */
-html .tp-app .tp-graph-phase5 .tp-graph-node > span { color: var(--gx-amber-soft) !important; font-size: 14px !important; }
-html .tp-app .tp-graph-phase5 .tp-graph-node strong { color: var(--gx-amber-strong) !important; font-size: 19px !important; }
-html .tp-app .tp-graph-phase5 .tp-graph-node small { color: var(--gx-amber-soft) !important; font-size: 14.5px !important; line-height: 1.7; }
+html .tp-app .tp-graph-phase5 .tp-graph-sequence {
+  background: #FFFFFF !important;
+  border: 1.5px solid #E2E8F0 !important;
+  box-shadow: 0 4px 14px -4px rgba(0, 0, 0, 0.04) !important;
+  border-radius: 12px !important;
+  grid-template-columns: minmax(0,1fr) 150px minmax(0,1fr);
+  padding: 18px !important;
+}
+
+html .tp-app .tp-graph-phase5 .tp-graph-node {
+  min-height: 120px;
+  background: #FFFFFF !important;
+  border: 1.5px solid #E2E8F0 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03) !important;
+  border-radius: 10px !important;
+}
+
+html .tp-app .tp-graph-phase5 .tp-graph-node.failure {
+  border-left: 4px solid #EF4444 !important;
+}
+html .tp-app .tp-graph-phase5 .tp-graph-node.failure > span {
+  color: #DC2626 !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+}
+
+html .tp-app .tp-graph-phase5 .tp-graph-node.success {
+  border-left: 4px solid #10B981 !important;
+}
+html .tp-app .tp-graph-phase5 .tp-graph-node.success > span {
+  color: #059669 !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+}
+
+html .tp-app .tp-graph-phase5 .tp-graph-node strong {
+  color: #0F172A !important;
+  font-size: 17px !important;
+  font-weight: 800 !important;
+}
+html .tp-app .tp-graph-phase5 .tp-graph-node small {
+  color: #64748B !important;
+  font-size: 12px !important;
+  line-height: 1.6;
+  font-family: 'IBM Plex Mono', monospace !important;
+}
+
 html .tp-app .tp-graph-phase5 .tp-graph-edge,
-html .tp-app .tp-graph-phase5 .tp-graph-edge.tentative { color: var(--gx-amber-accent) !important; font-size: 14px !important; }
-html .tp-app .tp-graph-phase5 .tp-graph-edge svg { width: 30px; height: 30px; }
-html .tp-app .tp-graph-phase5 .tp-graph-reason { color: var(--gx-amber-soft) !important; font-size: 15px !important; line-height: 1.7; }
-.tp-graph-phase5 .tp-graph-sequence { grid-template-columns: minmax(0,1fr) 150px minmax(0,1fr); }
-.tp-graph-phase5 .tp-graph-node { min-height: 140px; }
+html .tp-app .tp-graph-phase5 .tp-graph-edge.tentative {
+  color: #4F46E5 !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+}
+html .tp-app .tp-graph-phase5 .tp-graph-edge svg { width: 24px; height: 24px; color: #4F46E5 !important; }
+html .tp-app .tp-graph-phase5 .tp-graph-reason { color: #64748B !important; font-size: 13px !important; line-height: 1.6; }
 
 /* ---- Evidence requiring review ---- */
-html .tp-app .tp-graph-phase5 .tp-graph-gaps > button { min-height: 62px; }
-html .tp-app .tp-graph-phase5 .tp-graph-gaps > button span { color: var(--gx-amber-strong) !important; font-size: 16px !important; min-width: 220px; }
-html .tp-app .tp-graph-phase5 .tp-graph-gaps > button small { color: var(--gx-amber-soft) !important; font-size: 14.5px !important; }
-html .tp-app .tp-graph-phase5 .tp-graph-gaps > button > svg { color: var(--gx-amber-accent) !important; }
-html .tp-app .tp-graph-phase5 .tp-graph-gaps > button:hover span { color: var(--gx-amber-accent) !important; }
-html .tp-app .tp-graph-phase5 .tp-graph-no-gaps { color: var(--gx-amber-soft) !important; font-size: 16px !important; }
+html .tp-app .tp-graph-phase5 .tp-graph-gaps > button { min-height: 52px; border-color: #F1F5F9 !important; }
+html .tp-app .tp-graph-phase5 .tp-graph-gaps > button span { color: #0F172A !important; font-size: 14px !important; min-width: 220px; font-weight: 600 !important; }
+html .tp-app .tp-graph-phase5 .tp-graph-gaps > button small { color: #64748B !important; font-size: 13px !important; }
+html .tp-app .tp-graph-phase5 .tp-graph-gaps > button > svg { color: #4F46E5 !important; }
+html .tp-app .tp-graph-phase5 .tp-graph-gaps > button:hover span { color: #4F46E5 !important; }
+html .tp-app .tp-graph-phase5 .tp-graph-no-gaps { color: #64748B !important; font-size: 14px !important; }
 
 /* ---- Empty state + cautions ---- */
-html .tp-app .tp-graph-phase5 .tp-graph-empty strong { color: var(--gx-amber-strong) !important; font-size: 18px; }
+html .tp-app .tp-graph-phase5 .tp-graph-empty strong { color: #0F172A !important; font-size: 17px; }
 html .tp-app .tp-graph-phase5 .tp-graph-empty p,
-html .tp-app .tp-graph-phase5 .tp-graph-empty > svg { color: var(--gx-amber-soft) !important; font-size: 15px; }
-html .tp-app .tp-graph-phase5 .tp-graph-caution { color: var(--gx-amber-soft) !important; font-size: 14.5px !important; }
+html .tp-app .tp-graph-phase5 .tp-graph-empty > svg { color: #64748B !important; font-size: 14px; }
+html .tp-app .tp-graph-phase5 .tp-graph-caution { color: #64748B !important; font-size: 13px !important; }
 
 /* ---- Event details modal (portal under <body>) ---- */
-html .tp-overlay.tp-graph-modal-overlay .tp-graph-event-modal { --gx-m-strong:#9a5b00; --gx-m-soft:#7d4e0a; }
+html .tp-overlay.tp-graph-modal-overlay .tp-graph-event-modal { --gx-m-strong:#0F172A; --gx-m-soft:#64748B; }
 html .tp-overlay.tp-graph-modal-overlay[data-theme="dark"] .tp-graph-event-modal,
-html .tp-overlay.tp-graph-modal-overlay[data-theme="forensic"] .tp-graph-event-modal { --gx-m-strong:#ffb84d; --gx-m-soft:#f0c070; }
-html .tp-overlay.tp-graph-modal-overlay .tp-drawer-header h2 { color: var(--gx-m-strong) !important; font-size: 26px !important; }
+html .tp-overlay.tp-graph-modal-overlay[data-theme="forensic"] .tp-graph-event-modal { --gx-m-strong:#F8FAFC; --gx-m-soft:#94A3B8; }
+html .tp-overlay.tp-graph-modal-overlay .tp-drawer-header h2 { color: var(--gx-m-strong) !important; font-size: 24px !important; }
 html .tp-overlay.tp-graph-modal-overlay .tp-drawer-header span,
 html .tp-overlay.tp-graph-modal-overlay .tp-detail span,
 html .tp-overlay.tp-graph-modal-overlay .tp-drawer-body p,
-html .tp-overlay.tp-graph-modal-overlay .tp-graph-caution { color: var(--gx-m-soft) !important; font-size: 15px !important; }
-html .tp-overlay.tp-graph-modal-overlay .tp-drawer-body h3 { color: var(--gx-m-strong) !important; font-size: 19px !important; }
-html .tp-overlay.tp-graph-modal-overlay .tp-detail strong { color: var(--gx-m-strong) !important; font-size: 16.5px !important; }
-html .tp-overlay.tp-graph-modal-overlay .tp-drawer-body pre { font-size: 14px !important; line-height: 1.65; }
+html .tp-overlay.tp-graph-modal-overlay .tp-graph-caution { color: var(--gx-m-soft) !important; font-size: 14px !important; }
+html .tp-overlay.tp-graph-modal-overlay .tp-drawer-body h3 { color: var(--gx-m-strong) !important; font-size: 18px !important; }
+html .tp-overlay.tp-graph-modal-overlay .tp-detail strong { color: var(--gx-m-strong) !important; font-size: 15px !important; }
+html .tp-overlay.tp-graph-modal-overlay .tp-drawer-body pre { font-size: 13px !important; line-height: 1.65; }
 
 /* ---- Responsive ---- */
 @media (max-width: 1150px) {

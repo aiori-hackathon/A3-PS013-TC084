@@ -30,10 +30,11 @@ function LinkedinIcon({ size = 16 }) {
  * 3D Tilt / Parallax Mouse-Tracking Card Component
  * Uses direct DOM manipulation via requestAnimationFrame for silky 60/120fps with 0 React re-renders.
  */
-function TiltCard({ children, className = '', style = {}, maxTilt = 8, maxTranslate = 4, scale = 1.018 }) {
+function TiltCard({ children, className = '', style = {}, maxTilt = 12, maxTranslate = 5, scale = 1.025 }) {
   const cardRef = useRef(null);
   const glareRef = useRef(null);
   const rafId = useRef(null);
+  const boundsRef = useRef(null);
 
   useEffect(() => {
     return () => {
@@ -41,9 +42,18 @@ function TiltCard({ children, className = '', style = {}, maxTilt = 8, maxTransl
     };
   }, []);
 
+  const updateBounds = () => {
+    if (cardRef.current) {
+      boundsRef.current = cardRef.current.getBoundingClientRect();
+    }
+  };
+
   const handleMouseMove = (e) => {
     if (!cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
+    if (!boundsRef.current) updateBounds();
+    const rect = boundsRef.current;
+    if (!rect || rect.width === 0 || rect.height === 0) return;
+
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
     const centerX = rect.width / 2;
@@ -68,24 +78,33 @@ function TiltCard({ children, className = '', style = {}, maxTilt = 8, maxTransl
     cancelAnimationFrame(rafId.current);
     rafId.current = requestAnimationFrame(() => {
       if (!cardRef.current) return;
-      cardRef.current.style.transition = 'transform 0.08s ease-out, box-shadow 0.15s ease-out, border-color 0.2s ease';
-      cardRef.current.style.transform = `perspective(1000px) rotateX(${rotX.toFixed(2)}deg) rotateY(${rotY.toFixed(2)}deg) translate3d(${transX.toFixed(1)}px, ${transY.toFixed(1)}px, 0) scale3d(${scale}, ${scale}, ${scale})`;
+      cardRef.current.style.setProperty('transition', 'transform 0.08s ease-out, box-shadow 0.15s ease-out, border-color 0.2s ease');
+      cardRef.current.style.setProperty(
+        'transform',
+        `perspective(1000px) rotateX(${rotX.toFixed(2)}deg) rotateY(${rotY.toFixed(2)}deg) translate3d(${transX.toFixed(1)}px, ${transY.toFixed(1)}px, 0) scale3d(${scale}, ${scale}, ${scale})`,
+        'important'
+      );
 
       // Dynamic reactive drop shadow shifting opposite the tilt angle
-      const shadowX = (-rotY * 1.5).toFixed(1);
-      const shadowY = (rotX * 1.5 + 16).toFixed(1);
-      cardRef.current.style.boxShadow = `${shadowX}px ${shadowY}px 36px -10px rgba(99, 102, 241, 0.22), 0 4px 12px rgba(0, 0, 0, 0.05)`;
+      const shadowX = (-rotY * 1.6).toFixed(1);
+      const shadowY = (rotX * 1.6 + 18).toFixed(1);
+      cardRef.current.style.setProperty(
+        'box-shadow',
+        `${shadowX}px ${shadowY}px 36px -10px rgba(99, 102, 241, 0.24), 0 4px 12px rgba(0, 0, 0, 0.05)`,
+        'important'
+      );
 
       if (glareRef.current) {
         glareRef.current.style.opacity = '1';
-        glareRef.current.style.background = `radial-gradient(circle at ${glareX.toFixed(1)}% ${glareY.toFixed(1)}%, rgba(255, 255, 255, 0.42) 0%, rgba(255, 255, 255, 0.12) 35%, rgba(255, 255, 255, 0) 75%)`;
+        glareRef.current.style.background = `radial-gradient(circle at ${glareX.toFixed(1)}% ${glareY.toFixed(1)}%, rgba(255, 255, 255, 0.9) 0%, rgba(129, 140, 248, 0.2) 32%, rgba(255, 255, 255, 0) 70%)`;
       }
     });
   };
 
   const handleMouseEnter = () => {
+    updateBounds();
     if (!cardRef.current) return;
-    cardRef.current.style.transition = 'transform 0.15s ease-out, box-shadow 0.2s ease-out, border-color 0.2s ease';
+    cardRef.current.style.setProperty('transition', 'transform 0.15s ease-out, box-shadow 0.2s ease-out, border-color 0.2s ease');
     if (glareRef.current) {
       glareRef.current.style.opacity = '1';
     }
@@ -93,10 +112,11 @@ function TiltCard({ children, className = '', style = {}, maxTilt = 8, maxTransl
 
   const handleMouseLeave = () => {
     cancelAnimationFrame(rafId.current);
+    boundsRef.current = null;
     if (!cardRef.current) return;
-    cardRef.current.style.transition = 'transform 0.55s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.55s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease';
-    cardRef.current.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translate3d(0, 0, 0) scale3d(1, 1, 1)';
-    cardRef.current.style.boxShadow = '';
+    cardRef.current.style.setProperty('transition', 'transform 0.55s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.55s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease');
+    cardRef.current.style.setProperty('transform', 'perspective(1000px) rotateX(0deg) rotateY(0deg) translate3d(0, 0, 0) scale3d(1, 1, 1)', 'important');
+    cardRef.current.style.removeProperty('box-shadow');
     if (glareRef.current) {
       glareRef.current.style.opacity = '0';
     }
@@ -118,6 +138,25 @@ function TiltCard({ children, className = '', style = {}, maxTilt = 8, maxTransl
 }
 
 export default function AboutUs() {
+  const videoRef = useRef(null);
+
+  useEffect(() => {
+    // Autostart video on every page mount / reload
+    if (videoRef.current) {
+      videoRef.current.currentTime = 0;
+      const playPromise = videoRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(() => {
+          // Fallback to muted autoplay if browser policy blocks initial audio
+          if (videoRef.current) {
+            videoRef.current.muted = true;
+            videoRef.current.play().catch(() => {});
+          }
+        });
+      }
+    }
+  }, []);
+
   return (
     <div className="tp-about-page">
       {/* ---------------------------------------------------------------------
@@ -139,7 +178,7 @@ export default function AboutUs() {
       {/* ---------------------------------------------------------------------
           Team Members Grid (Compact 2-Column Side-by-Side Cards with 3D Tilt)
           --------------------------------------------------------------------- */}
-      <section className="tp-team-grid tp-scroll-reveal tp-stagger-parent" aria-label="Core Team Members">
+      <section className="tp-team-grid" aria-label="Core Team Members">
         {/* Member 1: Aditi Shukla */}
         <TiltCard style={{ '--card-idx': 0 }}>
           <div className="tp-team-photo-wrap">
@@ -346,9 +385,12 @@ export default function AboutUs() {
 
           <div className="tp-video-player-container">
             <video
-              controls
+              ref={videoRef}
+              autoPlay
+              muted
               playsInline
-              preload="metadata"
+              controls
+              preload="auto"
               title="Tracepoint Hackathon Demonstration Video"
             >
               <source src="/tracepoint-intro.mp4" type="video/mp4" />
