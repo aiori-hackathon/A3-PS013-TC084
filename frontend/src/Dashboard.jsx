@@ -12,7 +12,9 @@ import {
   useRef,
   useState
 } from 'react';
-import { Wifi, WifiOff, Activity, ArrowDownToLine, ChevronRight, CircleHelp, Clock3, FileClock, FileText, Fingerprint, LayoutDashboard, LogOut, Menu, RefreshCw, Search, ShieldAlert, SlidersHorizontal, Terminal, X, GitBranch, BookOpen, Network, ArrowRight } from 'lucide-react';
+import { Wifi, WifiOff, Activity, ArrowDownToLine, ChevronRight, CircleHelp, Clock3, FileClock, FileText, Fingerprint, LayoutDashboard, LogOut, Menu, RefreshCw, Search, ShieldAlert, SlidersHorizontal, Terminal, X, GitBranch, BookOpen, Network, ArrowRight, ArrowUp } from 'lucide-react';
+import Lenis from 'lenis';
+import 'lenis/dist/lenis.css';
 import './styles/Tracepoint.css';
 import './styles/TracepointTimelineGraphModal.css';
 import './styles/TimelineWorkspace.css';
@@ -519,7 +521,7 @@ function TimelineExplorer({ events, loading, onInspect }) {
     <div className="tp-tl-grid">
       {/* ---- where the evidence came from ---------------------------------- */}
       <div className="tp-tl-side">
-      <aside className="tp-card tp-tl-sources" aria-label="Investigation sources">
+      <aside className="tp-card tp-tl-sources tp-scroll-reveal" aria-label="Investigation sources">
         <div className="tp-tl-panel-head">
           <span>Investigation sources</span>
           <span className="tp-tl-panel-count">
@@ -561,7 +563,7 @@ function TimelineExplorer({ events, loading, onInspect }) {
       </aside>
 
       {/* The composition of whatever is selected. */}
-      <aside className="tp-card tp-tl-mix" aria-label="Event type breakdown">
+      <aside className="tp-card tp-tl-mix tp-scroll-reveal" aria-label="Event type breakdown">
         <div className="tp-tl-panel-head"><span>Event mix</span></div>
         {!mix.total && <p className="tp-tl-inspector-empty">Nothing in this selection.</p>}
         {mix.total > 0 && (
@@ -603,7 +605,7 @@ function TimelineExplorer({ events, loading, onInspect }) {
       </div>
 
       {/* ---- what happened there ------------------------------------------- */}
-      <section className="tp-card tp-tl-stream" aria-label="Activity stream">
+      <section className="tp-card tp-tl-stream tp-scroll-reveal" aria-label="Activity stream">
         <div className="tp-tl-panel-head">
           <span>Activity stream</span>
         </div>
@@ -711,20 +713,73 @@ export default function Dashboard({ user, onSignOut }) {
   const [selected, setSelected] = useState(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [backToTopVisible, setBackToTopVisible] = useState(false);
 
+  // InvertisPrep-style Lenis smooth inertial scrolling engine
   useEffect(() => {
-    const handleScroll = () => {
+    if (typeof window === 'undefined') return;
+
+    const handleScroll = (scrollY) => {
       const el = document.documentElement;
       const height = el.scrollHeight - el.clientHeight;
       if (height > 0) {
-        setScrollProgress(Math.min(100, Math.max(0, (window.scrollY / height) * 100)));
+        setScrollProgress(Math.min(100, Math.max(0, (scrollY / height) * 100)));
+      }
+      setBackToTopVisible(scrollY > 280);
+    };
+
+    const nativeScrollHandler = () => {
+      handleScroll(window.scrollY);
+    };
+
+    window.addEventListener('scroll', nativeScrollHandler, { passive: true });
+
+    // If user prefers reduced motion, rely on native scrolling
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return () => window.removeEventListener('scroll', nativeScrollHandler);
+    }
+
+    let lenis = null;
+    let rafId = null;
+
+    try {
+      lenis = new Lenis({
+        duration: 1.15,
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        orientation: 'vertical',
+        gestureOrientation: 'vertical',
+        smoothWheel: true,
+        wheelMultiplier: 1.0,
+        touchMultiplier: 1.5,
+        infinite: false,
+      });
+
+      window.__lenis = lenis;
+
+      lenis.on('scroll', (e) => {
+        handleScroll(e.scroll);
+      });
+
+      const raf = (time) => {
+        lenis?.raf(time);
+        rafId = requestAnimationFrame(raf);
+      };
+      rafId = requestAnimationFrame(raf);
+    } catch (err) {
+      console.warn('Lenis smooth scrolling fallback to native:', err);
+    }
+
+    return () => {
+      window.removeEventListener('scroll', nativeScrollHandler);
+      if (rafId) cancelAnimationFrame(rafId);
+      if (lenis) {
+        lenis.destroy();
+        delete window.__lenis;
       }
     };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Fluid scroll reveal observer for forensic modules and telemetry sections
+  // InvertisPrep-style dynamic fluid scroll reveal observer
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
@@ -732,18 +787,36 @@ export default function Dashboard({ user, onSignOut }) {
           entry.target.classList.add('tp-in-view');
         }
       });
-    }, { threshold: 0.05, rootMargin: '0px 0px -20px 0px' });
+    }, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
 
-    const els = document.querySelectorAll('.tp-scroll-reveal');
-    els.forEach(el => {
-      observer.observe(el);
-      const rect = el.getBoundingClientRect();
-      if (rect.top < window.innerHeight && rect.bottom > 0) {
-        el.classList.add('tp-in-view');
-      }
+    const observeAll = () => {
+      const targets = document.querySelectorAll(
+        '.tp-scroll-reveal, .tp-reveal-up, .tp-reveal-left, .tp-reveal-right, .tp-reveal-scale, .tp-stagger-parent'
+      );
+      targets.forEach(el => {
+        observer.observe(el);
+        const rect = el.getBoundingClientRect();
+        if (rect.top < window.innerHeight + 30) {
+          el.classList.add('tp-in-view');
+        }
+      });
+    };
+
+    observeAll();
+    const t1 = setTimeout(observeAll, 120);
+    const t2 = setTimeout(observeAll, 400);
+
+    const mutObserver = new MutationObserver(() => {
+      observeAll();
     });
+    mutObserver.observe(document.body, { childList: true, subtree: true });
 
-    return () => observer.disconnect();
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      observer.disconnect();
+      mutObserver.disconnect();
+    };
   }, [page, events]);
   // TRACEPOINT_FORENSIC_V1: the app ships in one appearance, and this value is
   // the switch that selects it. The legacy stylesheets scope 368 rules to
@@ -867,6 +940,19 @@ export default function Dashboard({ user, onSignOut }) {
     try { window.sessionStorage.setItem('tracepoint.activePage', id); } catch { /* storage unavailable */ }
     setSelected(null);
     setMobileOpen(false);
+    if (window.__lenis) {
+      window.__lenis.scrollTo(0, { immediate: true });
+    } else {
+      window.scrollTo(0, 0);
+    }
+  };
+
+  const scrollToTop = () => {
+    if (window.__lenis) {
+      window.__lenis.scrollTo(0, { duration: 1.15 });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
   return <div className="tp-app" data-theme={theme} data-page={page}>
     {/* Animated Reading Progress Bar */}
@@ -878,7 +964,7 @@ export default function Dashboard({ user, onSignOut }) {
       <div className="tp-public-utility-state" role="status"><span className={`tp-public-utility-dot ${apiStatus === 'online' ? 'is-online' : apiStatus === 'offline' ? 'is-offline' : ''}`} aria-hidden="true" />{apiStatus === 'online' ? 'National Gateway Online' : apiStatus === 'offline' ? 'Gateway Offline' : 'Connecting…'}<span>·</span><span>AIORI-3 Node</span></div>
     </div>
 
-    <aside className={`tp-sidebar ${mobileOpen ? 'tp-open' : ''}`}>
+    <aside className={`tp-sidebar ${mobileOpen ? 'tp-open' : ''}`} data-lenis-prevent="true">
       <div className="aiori-sidebar-brand">
         <div className="aiori-brand-row">
           <span className="aiori-brand-flag">🇮🇳</span>
@@ -911,42 +997,21 @@ export default function Dashboard({ user, onSignOut }) {
     {/* TRACEPOINT_SINGLE_NAV_V1: status and account live in primary navigation */}
 
       <div className="tp-content"><div className={`tp-page-header ${page === 'guide' ? 'tp-page-header-guide' : ''}`}><div><h1>{title}</h1><p>{page === 'overview' ? 'Security activity and collected evidence across your workspace.' : page === 'timeline' ? 'Explore, filter and inspect security events.' : page === 'ingestion' ? 'Explore sample logs and follow them through the ingestion pipeline.' : page === 'evidence' ? 'Evidence collection and integrity records.' : page === 'graph' ? 'Explore evidence-linked authentication sequences.' : page === 'investigations' ? 'Review events and prepare incident investigations.' : page === 'netlab' ? 'Network topology, observations and evidence-based root-cause findings.' : page === 'guide' ? 'Follow the workflow from raw log ingestion to an incident report.' : 'Export collected security activity.'}</p></div><div className="tp-actions">
-          {page !== 'overview' && <Button variant="outline" className="tp-button" onClick={() => {
-{page === 'ingestion' && (
-  <LazyPage name="Log Ingestion Lab">
-    <LogIngestionLab
-      onIngested={() => {
-        refresh();
-        setEvidenceRefresh(v => v + 1);
-      }}
-      onViewTimeline={() => openPage('timeline')}
-    />
-  </LazyPage>
-)}
-
-{page === 'investigations' && (
-  <LazyPage name="Investigations">
-    <Investigations events={events} />
-  </LazyPage>
-)}
-
-
-{page === 'graph' && (
-  <LazyPage name="Investigation Graph">
-    <div className="tp-graph-page">
-      <InvestigationGraph theme={theme} />
-    </div>
-  </LazyPage>
-)}
-
-{page === 'reports' && (
-  <LazyPage name="Reports">
-    <div className="tp-reports-page">
-      <Reports onExportCsv={exportCsv} />
-    </div>
-  </LazyPage>
-)}
-}} disabled={loading}><RefreshCw size={16} className={loading ? 'tp-spin' : ''}/> Refresh</Button>}{page === 'timeline' && <Button className="tp-button primary" onClick={exportCsv}><ArrowDownToLine size={16}/> Export CSV</Button>}</div></div>
+          {page !== 'overview' && (
+            <Button
+              variant="outline"
+              className="tp-button"
+              onClick={() => {
+                refresh();
+                setEvidenceRefresh(v => v + 1);
+              }}
+              disabled={loading}
+            >
+              <RefreshCw size={16} className={loading ? 'tp-spin' : ''}/> Refresh
+            </Button>
+          )}
+          {page === 'timeline' && <Button className="tp-button primary" onClick={exportCsv}><ArrowDownToLine size={16}/> Export CSV</Button>}
+        </div></div>
       {error && <div className="tp-error" role="alert">{error}</div>}
       {page === 'overview' && <>
       <div className="tp-forensic-intro">
@@ -979,7 +1044,7 @@ export default function Dashboard({ user, onSignOut }) {
         </div>
       </div>
       {/* 1. Core KPIs directly under Hero */}
-      <div className="tp-metrics tp-forensic-metrics tp-scroll-reveal">
+      <div className="tp-metrics tp-forensic-metrics tp-scroll-reveal tp-stagger-parent">
         <Metric
           label="Collected events"
           value={loading ? '…' : <AnimatedCount value={events.length} />}
@@ -1012,7 +1077,7 @@ export default function Dashboard({ user, onSignOut }) {
       </div>
 
       {/* 2. Interactive Tool Launchpad with custom vector emblems */}
-      <nav className="tp-portal-services tp-scroll-reveal" aria-label="Quick access to TracePoint tools">
+      <nav className="tp-portal-services tp-scroll-reveal tp-stagger-parent" aria-label="Quick access to TracePoint tools">
         {[
           ['ingestion', 'Log Ingestion Lab', 'Submit & parse raw log telemetry', EmblemIngestion, 'INGEST-01', 'LIVE'],
           ['timeline', 'Event Timeline', 'Search and filter collected events', EmblemTimeline, 'RADAR-02', 'ACTIVE'],
@@ -1051,7 +1116,7 @@ export default function Dashboard({ user, onSignOut }) {
         isFailure={fail}
       />
       <div className="tp-forensic-section-title tp-scroll-reveal"><div><span className="tp-forensic-section-index">01 / ACTIVITY</span><h2>Event analysis</h2></div><span>Last 7 days · current collection</span></div>
-      <div className="tp-analytics tp-forensic-analytics tp-scroll-reveal"><TrendChart events={events}/><SeverityCard events={events}/></div>
+      <div className="tp-analytics tp-forensic-analytics tp-scroll-reveal tp-stagger-parent"><TrendChart events={events}/><SeverityCard events={events}/></div>
       <div className="tp-forensic-review tp-scroll-reveal tp-stagger-parent">
         <div className="tp-forensic-review-title"><ShieldAlert size={18}/><div><strong>Data quality signals</strong><span>Indicators detected in collected events, not verified incidents</span></div></div>
         <div className="tp-forensic-review-items">
@@ -1066,7 +1131,7 @@ export default function Dashboard({ user, onSignOut }) {
     </>}
     {/* TRACEPOINT_TIMELINE_WORKSPACE_V1 */}
     {page === 'timeline' && <div className="tp-timeline-workspace">
-      <div className="tp-timeline-summary" aria-label="Timeline summary">
+      <div className="tp-timeline-summary tp-scroll-reveal tp-stagger-parent" aria-label="Timeline summary">
         <div><span>Events in view</span><strong>{timelineReady ? <AnimatedCount value={filtered.length} animationKey={timelineAnimationKey}/> : '…'}</strong><small>of {events.length.toLocaleString()} collected</small></div>
         <div className="is-signal"><span>Authentication failures</span><strong>{timelineReady ? <AnimatedCount value={filtered.filter(fail).length} animationKey={timelineAnimationKey}/> : '…'}</strong><small>matching failure indicators</small></div>
         <div><span>Source devices</span><strong>{timelineReady ? <AnimatedCount value={new Set(filtered.map(device).filter(d => d !== '—')).size} animationKey={timelineAnimationKey}/> : '…'}</strong><small>in the current results</small></div>
@@ -1078,7 +1143,7 @@ export default function Dashboard({ user, onSignOut }) {
           already reading "Event timeline / Explore, filter and inspect
           security events." - the same sentence twice, costing about 120px of
           the first screen before a single record appeared. */}
-      <section className="tp-card tp-events-card tp-timeline-panel tp-timeline-toolbar">
+      <section className="tp-card tp-events-card tp-timeline-panel tp-timeline-toolbar tp-scroll-reveal">
         <div className="tp-timeline-controls">
           <label className="tp-timeline-search"><Search size={18}/><input aria-label="Search events" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search events, devices, users or log content"/></label>
           <label className="tp-timeline-select"><SlidersHorizontal size={17}/><select aria-label="Filter by severity" value={level} onChange={e => setLevel(e.target.value)}><option value="all">All severities</option>{levels.map(v => <option value={v} key={v}>{v}</option>)}</select></label>
@@ -1224,6 +1289,19 @@ export default function Dashboard({ user, onSignOut }) {
       </footer>
 
     </main>
-    {selected && <div className="tp-overlay tp-timeline-event-overlay" onMouseDown={() => setSelected(null)}><aside className="tp-drawer tp-timeline-event-modal" onMouseDown={e => e.stopPropagation()} role="dialog" aria-modal="true" aria-label="Event details"><div className="tp-drawer-header"><div><span>Event inspection</span><h2>{eventType(selected)}</h2><div className={`tp-severity ${severityClass(severity(selected))}`}>{severity(selected)}</div></div><button onClick={() => setSelected(null)} aria-label="Close event details"><X size={21}/></button></div><div className="tp-drawer-body"><h3>Event information</h3>{[['Timestamp', fullDate(timestamp(selected))], ['Source device', device(selected)], ['Username', selected.username], ['Event type', eventType(selected)], ['Severity', severity(selected)], ['Message', message(selected)], ['Clock check', clockLabel(selected)]].map(([label, value]) => <div className="tp-detail" key={label}><span>{label}</span><strong>{text(value)}</strong></div>)}<h3>Raw event data</h3><pre>{JSON.stringify(selected, null, 2)}</pre></div></aside></div>}
+
+    {/* InvertisPrep-inspired Floating Back-to-Top Control */}
+    <button
+      type="button"
+      className={`tp-back-to-top ${backToTopVisible ? 'is-visible' : ''}`}
+      onClick={scrollToTop}
+      aria-label="Back to top"
+      title="Scroll back to top"
+    >
+      <ArrowUp size={16} aria-hidden="true" />
+      <span>Back to top</span>
+    </button>
+
+    {selected && <div className="tp-overlay tp-timeline-event-overlay" onMouseDown={() => setSelected(null)}><aside className="tp-drawer tp-timeline-event-modal" data-lenis-prevent="true" onMouseDown={e => e.stopPropagation()} role="dialog" aria-modal="true" aria-label="Event details"><div className="tp-drawer-header"><div><span>Event inspection</span><h2>{eventType(selected)}</h2><div className={`tp-severity ${severityClass(severity(selected))}`}>{severity(selected)}</div></div><button onClick={() => setSelected(null)} aria-label="Close event details"><X size={21}/></button></div><div className="tp-drawer-body"><h3>Event information</h3>{[['Timestamp', fullDate(timestamp(selected))], ['Source device', device(selected)], ['Username', selected.username], ['Event type', eventType(selected)], ['Severity', severity(selected)], ['Message', message(selected)], ['Clock check', clockLabel(selected)]].map(([label, value]) => <div className="tp-detail" key={label}><span>{label}</span><strong>{text(value)}</strong></div>)}<h3>Raw event data</h3><pre>{JSON.stringify(selected, null, 2)}</pre></div></aside></div>}
   </div>;
 }

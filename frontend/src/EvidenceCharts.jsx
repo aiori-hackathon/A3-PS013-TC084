@@ -143,7 +143,7 @@ export default function EvidenceCharts({ events = [], timestampOf, eventTypeOf, 
   }, [events, timestampOf, eventTypeOf, deviceOf, isFailure]);
 
   return (
-    <section className="tp-charts tp-scroll-reveal" aria-label="Collected event analysis">
+    <section className="tp-charts tp-scroll-reveal tp-stagger-parent" aria-label="Collected event analysis">
       <article className="tp-card tp-chart-card tp-chart-timeline-card">
         <header className="tp-chart-head">
           <div className="tp-chart-title-group">

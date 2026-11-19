@@ -206,7 +206,7 @@ export default function EvidenceLibrary({ refreshSignal = 0 }) {
           <small>Integrity checks run on demand</small>
         </div>
       </section>
-      <div className="tp-ev-stats tp-evidence-stats">
+      <div className="tp-ev-stats tp-evidence-stats tp-scroll-reveal tp-stagger-parent">
         <div className="tp-card tp-ev-stat">
           <span>Evidence batches</span>
           <strong><AnimatedEvidenceCount value={batches.length} /></strong>
@@ -224,7 +224,7 @@ export default function EvidenceLibrary({ refreshSignal = 0 }) {
         </div>
       </div>
 
-      <section className="tp-card tp-ev-card tp-evidence-register">
+      <section className="tp-card tp-ev-card tp-evidence-register tp-scroll-reveal">
         <div className="tp-card-head">
           <div>
             <h2>Collection register</h2>

@@ -280,14 +280,14 @@ export default function Investigations({ events = [] }) {
         events and prepare incident investigations", and its "N CASES IN
         REGISTER" figure is the "Total cases" tile directly below it. It cost
         about 170px before the first case. */}
-    <div className="tp-inv-metrics">
+    <div className="tp-inv-metrics tp-scroll-reveal tp-stagger-parent">
       {[['Total cases', counts.total], ['Open', counts.open], ['Investigating', counts.investigating], ['Resolved', counts.resolved]].map(([label, value]) =>
         <div className="tp-card tp-inv-metric" key={label}><span>{label}</span><strong><AnimatedMetricCount value={value} /></strong></div>
       )}
     </div>
 
     {error && <div className="tp-error" role="alert">{error}</div>}
-    <section className="tp-card tp-inv-card tp-inv-phase5-register">
+    <section className="tp-card tp-inv-card tp-inv-phase5-register tp-scroll-reveal">
       <div className="tp-card-head"><div><h2>Investigation cases</h2><p>Track incidents, evidence links, and analyst findings</p></div>
         <div className="tp-inv-head-actions"><button className="tp-button" onClick={loadCases} disabled={loading}><RefreshCw size={15}/> Refresh</button><button className="tp-button primary" onClick={() => setCreating(true)}><Plus size={16}/> New investigation</button></div>
       </div>
