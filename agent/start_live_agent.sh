@@ -23,7 +23,10 @@ export TRACEPOINT_SERVER="${TRACEPOINT_SERVER:-http://127.0.0.1:8000}"
 export TRACEPOINT_DEVICE_ID="${TRACEPOINT_DEVICE_ID:-aws-ec2-host-01}"
 export TRACEPOINT_LOG_FILE="${TRACEPOINT_LOG_FILE:-/var/log/auth.log}"
 export TRACEPOINT_LOG_TYPE="${TRACEPOINT_LOG_TYPE:-auth}"
-export TRACEPOINT_TIMEZONE="${TRACEPOINT_TIMEZONE:-Asia/Kolkata}"
+# The zone the SOURCE log is written in, not the zone we display in.
+# auth.log carries no offset, so this is how those timestamps are read.
+# The EC2 host runs on UTC; the frontend converts to IST for display.
+export TRACEPOINT_TIMEZONE="${TRACEPOINT_TIMEZONE:-UTC}"
 export TRACEPOINT_STATE_DIR="${TRACEPOINT_STATE_DIR:-/root/A3-PS013-TC084/agent/live-state}"
 export TRACEPOINT_POLL_SECONDS="${TRACEPOINT_POLL_SECONDS:-5}"
 
