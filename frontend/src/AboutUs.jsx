@@ -2,7 +2,6 @@ import React from 'react';
 import {
   ArrowUpRight,
   Mail,
-  Camera,
   Play,
   Activity,
   Sparkles
@@ -151,14 +150,12 @@ export default function AboutUs() {
               <ArrowUpRight size={16} />
             </a>
 
-            <div className="tp-team-placeholder">
-              <div className="tp-team-avatar-circle prince">
-                PY
-              </div>
-              <span className="tp-team-placeholder-badge">
-                <Camera size={12} /> Photograph Slot
-              </span>
-            </div>
+            <img
+              src="/prince-yadav.jpg"
+              alt="Prince Yadav"
+              className="tp-team-photo"
+              loading="lazy"
+            />
           </div>
 
           <div className="tp-team-content">
