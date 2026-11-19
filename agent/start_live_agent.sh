@@ -30,6 +30,12 @@ export TRACEPOINT_TIMEZONE="${TRACEPOINT_TIMEZONE:-UTC}"
 export TRACEPOINT_STATE_DIR="${TRACEPOINT_STATE_DIR:-/root/A3-PS013-TC084/agent/live-state}"
 export TRACEPOINT_POLL_SECONDS="${TRACEPOINT_POLL_SECONDS:-5}"
 
+# With no state file, begin at the END of the log rather than byte 0. Without
+# this, losing the state file replays the whole of auth.log back into evidence
+# -- which is how the register once filled with thousands of historical lines.
+# It only applies on a cold start; a existing state file always wins.
+export TRACEPOINT_START_AT_END="${TRACEPOINT_START_AT_END:-1}"
+
 # Collect only the accounts named here. Comma-separated; unset to collect
 # everything on the host. Lines outside the scope are never collected, and the
 # agent prints how many it skipped on every cycle.
