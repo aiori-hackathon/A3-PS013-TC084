@@ -5,7 +5,9 @@ import { utcNowIso } from './isotime.js';
 import { currentUser } from './auth.js';
 
 export const GENESIS_HASH = '0'.repeat(64);
-export const ACTIONS = new Set(['ingest', 'verify', 'link', 'export']);
+// 'prune' records the removal of evidence. Deleting a batch without an entry
+// in the chain would leave the register quietly smaller than it once was.
+export const ACTIONS = new Set(['ingest', 'verify', 'link', 'export', 'prune']);
 
 export const router = Router();
 
