@@ -95,7 +95,7 @@ function TiltCard({ children, className = '', style = {}, maxTilt = 12, maxTrans
 
       if (glareRef.current) {
         glareRef.current.style.opacity = '1';
-        glareRef.current.style.background = `radial-gradient(circle at ${glareX.toFixed(1)}% 50%, rgba(255, 255, 255, 0.9) 0%, rgba(129, 140, 248, 0.22) 32%, rgba(255, 255, 255, 0) 70%)`;
+        glareRef.current.style.background = `radial-gradient(circle at ${glareX.toFixed(1)}% 50%, rgba(99, 102, 241, 0.12) 0%, rgba(168, 85, 247, 0.05) 35%, transparent 70%)`;
       }
     });
   };
@@ -138,6 +138,14 @@ function TiltCard({ children, className = '', style = {}, maxTilt = 12, maxTrans
 
 export default function AboutUs() {
   const videoRef = useRef(null);
+
+  const handleExternalClick = (url) => (e) => {
+    e.stopPropagation();
+    if (e.button === 0) {
+      e.preventDefault();
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+  };
 
   useEffect(() => {
     // Autostart video on every page mount / reload
@@ -184,10 +192,11 @@ export default function AboutUs() {
             <a
               href="https://www.linkedin.com/in/aditishukla40"
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
               className="tp-team-card-link-badge"
               title="View Aditi's LinkedIn Profile"
               aria-label="View Aditi's LinkedIn Profile"
+              onClick={handleExternalClick('https://www.linkedin.com/in/aditishukla40')}
             >
               <ArrowUpRight size={16} />
             </a>
@@ -225,38 +234,44 @@ export default function AboutUs() {
                 <a
                   href="https://github.com/aditishukla297"
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
                   className="tp-team-social-btn"
-                  title="GitHub Profile"
+                  title="GitHub Profile (aditishukla297)"
                   aria-label="GitHub Profile"
+                  onClick={handleExternalClick('https://github.com/aditishukla297')}
                 >
-                  <GithubIcon size={13} />
+                  <GithubIcon size={14} />
                 </a>
                 <a
                   href="https://www.linkedin.com/in/aditishukla40"
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
                   className="tp-team-social-btn"
                   title="LinkedIn Profile"
                   aria-label="LinkedIn Profile"
+                  onClick={handleExternalClick('https://www.linkedin.com/in/aditishukla40')}
                 >
-                  <LinkedinIcon size={13} />
+                  <LinkedinIcon size={14} />
                 </a>
                 <a
-                  href="mailto:aditishukla29700@gmail.com"
+                  href="https://mail.google.com/mail/?view=cm&fs=1&to=aditishukla29700@gmail.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="tp-team-social-btn"
-                  title="Email Aditi Shukla"
-                  aria-label="Email Aditi Shukla"
+                  title="Email via Gmail (aditishukla29700@gmail.com)"
+                  aria-label="Email Aditi Shukla via Gmail"
+                  onClick={handleExternalClick('https://mail.google.com/mail/?view=cm&fs=1&to=aditishukla29700@gmail.com')}
                 >
-                  <Mail size={13} />
+                  <Mail size={14} />
                 </a>
               </div>
 
               <a
                 href="https://www.linkedin.com/in/aditishukla40"
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 className="tp-team-profile-link"
+                onClick={handleExternalClick('https://www.linkedin.com/in/aditishukla40')}
               >
                 <span>Full profile</span>
                 <ArrowUpRight size={12} />
@@ -271,10 +286,11 @@ export default function AboutUs() {
             <a
               href="https://www.linkedin.com/in/prince-yadav-794706325/"
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
               className="tp-team-card-link-badge"
               title="View Prince's LinkedIn Profile"
               aria-label="View Prince's LinkedIn Profile"
+              onClick={handleExternalClick('https://www.linkedin.com/in/prince-yadav-794706325/')}
             >
               <ArrowUpRight size={16} />
             </a>
@@ -312,38 +328,44 @@ export default function AboutUs() {
                 <a
                   href="https://github.com/princeyadav-oss"
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
                   className="tp-team-social-btn"
-                  title="GitHub Profile"
+                  title="GitHub Profile (princeyadav-oss)"
                   aria-label="GitHub Profile"
+                  onClick={handleExternalClick('https://github.com/princeyadav-oss')}
                 >
-                  <GithubIcon size={13} />
+                  <GithubIcon size={14} />
                 </a>
                 <a
                   href="https://www.linkedin.com/in/prince-yadav-794706325/"
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
                   className="tp-team-social-btn"
                   title="LinkedIn Profile"
                   aria-label="LinkedIn Profile"
+                  onClick={handleExternalClick('https://www.linkedin.com/in/prince-yadav-794706325/')}
                 >
-                  <LinkedinIcon size={13} />
+                  <LinkedinIcon size={14} />
                 </a>
                 <a
-                  href="mailto:py4149560@gmail.com"
+                  href="https://mail.google.com/mail/?view=cm&fs=1&to=py4149560@gmail.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="tp-team-social-btn"
-                  title="Email Prince Yadav"
-                  aria-label="Email Prince Yadav"
+                  title="Email via Gmail (py4149560@gmail.com)"
+                  aria-label="Email Prince Yadav via Gmail"
+                  onClick={handleExternalClick('https://mail.google.com/mail/?view=cm&fs=1&to=py4149560@gmail.com')}
                 >
-                  <Mail size={13} />
+                  <Mail size={14} />
                 </a>
               </div>
 
               <a
                 href="https://www.linkedin.com/in/prince-yadav-794706325/"
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 className="tp-team-profile-link prince"
+                onClick={handleExternalClick('https://www.linkedin.com/in/prince-yadav-794706325/')}
               >
                 <span>Full profile</span>
                 <ArrowUpRight size={12} />
