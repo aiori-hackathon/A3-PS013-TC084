@@ -245,10 +245,106 @@
   color: #5D7A6B;
 }
 
+/* --- Moving Forensic Telemetry Log Background Behind Globe --- */
+.tp-globe-log-stream {
+  position: absolute !important;
+  inset: -14px -40px !important;
+  z-index: 0 !important;
+  pointer-events: none !important;
+  overflow: hidden !important;
+  opacity: 0.14 !important;
+  mask-image: radial-gradient(ellipse 68% 62% at 54% 50%, black 15%, rgba(0,0,0,0.5) 55%, transparent 82%) !important;
+  -webkit-mask-image: radial-gradient(ellipse 68% 62% at 54% 50%, black 15%, rgba(0,0,0,0.5) 55%, transparent 82%) !important;
+}
+
+.tp-log-stream-track {
+  display: flex !important;
+  flex-direction: column !important;
+  animation: tp-log-drift 34s linear infinite !important;
+  will-change: transform !important;
+}
+
+@keyframes tp-log-drift {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-50%);
+  }
+}
+
+.tp-log-stream-content {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 3.5px !important;
+}
+
+.tp-log-line {
+  display: flex !important;
+  align-items: baseline !important;
+  gap: 7px !important;
+  padding: 1px 0 !important;
+  font-family: 'IBM Plex Mono', monospace !important;
+  font-size: 9.5px !important;
+  line-height: 1.45 !important;
+  white-space: nowrap !important;
+  color: #1B4D36 !important;
+  letter-spacing: -0.1px !important;
+  user-select: none !important;
+}
+
+.tp-log-tag {
+  color: #138808 !important;
+  font-weight: 750 !important;
+  flex-shrink: 0 !important;
+}
+
+.tp-log-time {
+  color: #4D6B58 !important;
+  font-weight: 500 !important;
+  flex-shrink: 0 !important;
+}
+
+.tp-log-text {
+  color: #13281E !important;
+  font-weight: 450 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  max-width: 540px !important;
+}
+
+.tp-log-chip {
+  font-size: 8px !important;
+  font-weight: 800 !important;
+  padding: 1px 4px !important;
+  border-radius: 3px !important;
+  text-transform: uppercase !important;
+  flex-shrink: 0 !important;
+}
+
+.tp-log-chip.alert {
+  background: #FDF0ED !important;
+  color: #D9381E !important;
+  border: 1px solid #F8C9BE !important;
+}
+
+.tp-log-chip.ok {
+  background: #E8F5EB !important;
+  color: #138808 !important;
+  border: 1px solid #A3D9B1 !important;
+}
+
+.tp-log-chip.info {
+  background: #EAF3EC !important;
+  color: #2D6A4F !important;
+  border: 1px solid #CFE2D4 !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .aiori-india-pulse circle,
   .center-chakra-dot,
-  .aiori-trail-dash {
+  .aiori-trail-dash,
+  .tp-log-stream-track {
     animation: none !important;
   }
 }
