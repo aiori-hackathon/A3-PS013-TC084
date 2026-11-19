@@ -26,8 +26,11 @@ if (!fs.existsSync(usersRoot)) {
   process.exit(2);
 }
 
-const counts = new Map(); // device -> Map(line -> occurrences)
-const batchesRead = new Map(); // device -> batch file count
+// Keyed by "<user id>/<device>", not device alone: the same device name can
+// exist under several accounts, and collapsing them makes one account's data
+// look like duplicates of another's.
+const counts = new Map(); // user/device -> Map(line -> occurrences)
+const batchesRead = new Map(); // user/device -> batch file count
 let total = 0;
 let unreadable = 0;
 
@@ -50,9 +53,10 @@ for (const user of fs.readdirSync(usersRoot)) {
         continue;
       }
 
-      batchesRead.set(device, (batchesRead.get(device) || 0) + 1);
-      if (!counts.has(device)) counts.set(device, new Map());
-      const seen = counts.get(device);
+      const key = `${user}/${device}`;
+      batchesRead.set(key, (batchesRead.get(key) || 0) + 1);
+      if (!counts.has(key)) counts.set(key, new Map());
+      const seen = counts.get(key);
 
       for (const line of batch.lines || []) {
         total += 1;
@@ -66,7 +70,7 @@ let distinct = 0;
 let extra = 0;
 const rows = [];
 
-for (const [device, seen] of counts) {
+for (const [key, seen] of counts) {
   let deviceTotal = 0;
   let deviceExtra = 0;
   for (const n of seen.values()) {
@@ -75,7 +79,7 @@ for (const [device, seen] of counts) {
   }
   distinct += seen.size;
   extra += deviceExtra;
-  rows.push({ device, batches: batchesRead.get(device) || 0, lines: deviceTotal, distinct: seen.size, extra: deviceExtra });
+  rows.push({ device: key, batches: batchesRead.get(key) || 0, lines: deviceTotal, distinct: seen.size, extra: deviceExtra });
 }
 
 console.log(`evidence dir : ${getEvidenceDir()}`);
@@ -86,14 +90,14 @@ if (unreadable) console.log(`unreadable   : ${unreadable} batch file(s)`);
 console.log('');
 
 for (const r of rows.sort((a, b) => b.lines - a.lines)) {
-  console.log(`  ${r.device.padEnd(24)} batches=${String(r.batches).padStart(4)}  lines=${String(r.lines).padStart(6)}  distinct=${String(r.distinct).padStart(6)}  extra=${r.extra}`);
+  console.log(`  ${r.device.padEnd(28)} batches=${String(r.batches).padStart(4)}  lines=${String(r.lines).padStart(6)}  distinct=${String(r.distinct).padStart(6)}  extra=${r.extra}`);
 }
 
 if (extra > 0 && show) {
   console.log('\nrepeated lines:');
-  for (const [device, seen] of counts) {
+  for (const [key, seen] of counts) {
     for (const [line, n] of seen) {
-      if (n > 1) console.log(`  x${n}  ${device}  ${line.slice(0, 120)}`);
+      if (n > 1) console.log(`  x${n}  ${key}  ${line.slice(0, 120)}`);
     }
   }
 }
