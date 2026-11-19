@@ -54,24 +54,22 @@ export default function AboutUs() {
         <article className="tp-team-card" style={{ '--card-idx': 0 }}>
           <div className="tp-team-photo-wrap">
             <a
-              href="https://github.com/aditishukla297"
+              href="https://www.linkedin.com/in/aditishukla40"
               target="_blank"
               rel="noreferrer"
               className="tp-team-card-link-badge"
-              title="View Aditi's GitHub"
-              aria-label="View Aditi's GitHub"
+              title="View Aditi's LinkedIn Profile"
+              aria-label="View Aditi's LinkedIn Profile"
             >
               <ArrowUpRight size={16} />
             </a>
 
-            <div className="tp-team-placeholder">
-              <div className="tp-team-avatar-circle">
-                AS
-              </div>
-              <span className="tp-team-placeholder-badge">
-                <Camera size={12} /> Photograph Slot
-              </span>
-            </div>
+            <img
+              src="/aditi-shukla.jpg"
+              alt="Aditi Shukla"
+              className="tp-team-photo"
+              loading="lazy"
+            />
           </div>
 
           <div className="tp-team-content">
@@ -107,7 +105,7 @@ export default function AboutUs() {
                   <GithubIcon size={15} />
                 </a>
                 <a
-                  href="https://linkedin.com"
+                  href="https://www.linkedin.com/in/aditishukla40"
                   target="_blank"
                   rel="noreferrer"
                   className="tp-team-social-btn"
@@ -127,7 +125,7 @@ export default function AboutUs() {
               </div>
 
               <a
-                href="https://github.com/aditishukla297"
+                href="https://www.linkedin.com/in/aditishukla40"
                 target="_blank"
                 rel="noreferrer"
                 className="tp-team-profile-link"
@@ -143,12 +141,12 @@ export default function AboutUs() {
         <article className="tp-team-card" style={{ '--card-idx': 1 }}>
           <div className="tp-team-photo-wrap">
             <a
-              href="https://github.com"
+              href="https://www.linkedin.com/in/prince-yadav-794706325/"
               target="_blank"
               rel="noreferrer"
               className="tp-team-card-link-badge"
-              title="View Prince's Profile"
-              aria-label="View Prince's Profile"
+              title="View Prince's LinkedIn Profile"
+              aria-label="View Prince's LinkedIn Profile"
             >
               <ArrowUpRight size={16} />
             </a>
@@ -186,7 +184,7 @@ export default function AboutUs() {
             <div className="tp-team-footer">
               <div className="tp-team-socials">
                 <a
-                  href="https://github.com"
+                  href="https://github.com/princeyadav-oss"
                   target="_blank"
                   rel="noreferrer"
                   className="tp-team-social-btn"
@@ -196,7 +194,7 @@ export default function AboutUs() {
                   <GithubIcon size={15} />
                 </a>
                 <a
-                  href="https://linkedin.com"
+                  href="https://www.linkedin.com/in/prince-yadav-794706325/"
                   target="_blank"
                   rel="noreferrer"
                   className="tp-team-social-btn"
@@ -206,7 +204,7 @@ export default function AboutUs() {
                   <LinkedinIcon size={15} />
                 </a>
                 <a
-                  href="mailto:contact@tracepoint.in"
+                  href="mailto:py4149560@gmail.com"
                   className="tp-team-social-btn"
                   title="Email Prince Yadav"
                   aria-label="Email Prince Yadav"
@@ -216,7 +214,7 @@ export default function AboutUs() {
               </div>
 
               <a
-                href="https://github.com"
+                href="https://www.linkedin.com/in/prince-yadav-794706325/"
                 target="_blank"
                 rel="noreferrer"
                 className="tp-team-profile-link"
