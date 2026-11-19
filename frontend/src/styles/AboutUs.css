@@ -59,13 +59,14 @@
 }
 
 /* ---------------------------------------------------------------------------
-   Side-by-Side 2-Column Team Member Cards
+   Side-by-Side 2-Column Team Member Cards with 3D Tilt & Parallax
    --------------------------------------------------------------------------- */
 .tp-team-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 24px;
   align-items: stretch;
+  perspective: 1200px;
 }
 
 .tp-team-card {
@@ -78,20 +79,31 @@
   border-radius: 24px;
   padding: 22px;
   box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.04), 0 2px 6px rgba(0, 0, 0, 0.02);
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-              border-color 0.2s ease;
   position: relative;
-  overflow: hidden;
+  /* preserve-3d enables children to translateZ into true 3D space */
+  transform-style: preserve-3d;
+  will-change: transform, box-shadow;
+  transition: border-color 0.2s ease;
 }
 
 .tp-team-card:hover {
-  transform: translateY(-3px);
   border-color: #818CF8;
-  box-shadow: 0 20px 40px -12px rgba(99, 102, 241, 0.16);
 }
 
-/* Left Photo Slot / Compact Placeholder */
+/* Specular Glare Layer: dynamic lighting shift tracking the cursor */
+.tp-tilt-glare {
+  position: absolute;
+  inset: 0;
+  border-radius: 23px;
+  pointer-events: none;
+  z-index: 20;
+  opacity: 0;
+  mix-blend-mode: overlay;
+  transition: opacity 0.25s ease;
+  will-change: background, opacity;
+}
+
+/* Left Photo Slot / Compact Placeholder with Parallax Elevation */
 .tp-team-photo-wrap {
   width: 100%;
   aspect-ratio: 1 / 1.25;
@@ -104,6 +116,15 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  transform-style: preserve-3d;
+  transform: translateZ(26px);
+  box-shadow: 0 8px 20px -6px rgba(15, 23, 42, 0.1);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.tp-team-card:hover .tp-team-photo-wrap {
+  transform: translateZ(32px);
+  box-shadow: 0 14px 28px -6px rgba(15, 23, 42, 0.16);
 }
 
 .tp-team-photo {
@@ -181,22 +202,25 @@
   color: #334155;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
-  z-index: 2;
+  z-index: 25;
   text-decoration: none;
+  transform: translateZ(42px);
 }
 
 .tp-team-card:hover .tp-team-card-link-badge {
-  transform: scale(1.08) translate(1px, -1px);
+  transform: translateZ(46px) scale(1.08) translate(1px, -1px);
   background: #4F46E5;
   color: #FFFFFF;
   border-color: #4F46E5;
 }
 
-/* Right Content */
+/* Right Content with Layered Parallax Depths */
 .tp-team-content {
   display: flex;
   flex-direction: column;
   min-width: 0;
+  transform-style: preserve-3d;
+  transform: translateZ(16px);
 }
 
 .tp-team-role-pill {
@@ -213,6 +237,7 @@
   letter-spacing: 0.02em;
   margin-bottom: 8px;
   width: fit-content;
+  transform: translateZ(30px);
 }
 
 .tp-team-role-pill.prince {
@@ -228,6 +253,7 @@
   margin: 0 0 4px 0;
   letter-spacing: -0.02em;
   line-height: 1.2;
+  transform: translateZ(26px);
 }
 
 .tp-team-tagline {
@@ -236,6 +262,7 @@
   color: #64748B;
   margin: 0 0 10px 0;
   line-height: 1.4;
+  transform: translateZ(20px);
 }
 
 .tp-team-bio {
@@ -247,6 +274,7 @@
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  transform: translateZ(16px);
 }
 
 .tp-team-skills {
@@ -254,6 +282,8 @@
   flex-wrap: wrap;
   gap: 6px;
   margin-bottom: 16px;
+  transform-style: preserve-3d;
+  transform: translateZ(22px);
 }
 
 .tp-team-skill-pill {
@@ -264,6 +294,7 @@
   border: 1px solid #E2E8F0;
   border-radius: 9999px;
   color: #334155;
+  transform: translateZ(6px);
 }
 
 .tp-team-footer {
@@ -273,6 +304,8 @@
   padding-top: 12px;
   border-top: 1px solid #F1F5F9;
   margin-top: auto;
+  transform-style: preserve-3d;
+  transform: translateZ(26px);
 }
 
 .tp-team-socials {
@@ -293,13 +326,14 @@
   color: #475569;
   transition: all 0.2s ease;
   text-decoration: none;
+  transform: translateZ(6px);
 }
 
 .tp-team-social-btn:hover {
   background: #0F172A;
   color: #FFFFFF;
   border-color: #0F172A;
-  transform: translateY(-2px);
+  transform: translateZ(12px) translateY(-2px);
 }
 
 .tp-team-profile-link {
@@ -310,12 +344,14 @@
   font-weight: 700;
   color: #4F46E5;
   text-decoration: none;
-  transition: gap 0.2s ease;
+  transition: gap 0.2s ease, transform 0.2s ease;
+  transform: translateZ(8px);
 }
 
 .tp-team-profile-link:hover {
   color: #4338CA;
   gap: 7px;
+  transform: translateZ(14px);
 }
 
 /* ---------------------------------------------------------------------------
@@ -446,5 +482,32 @@
   .tp-team-photo-wrap {
     max-width: 180px;
     margin: 0 auto;
+  }
+}
+
+/* Accessibility / Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .tp-tilt-card {
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .tp-tilt-glare {
+    display: none !important;
+  }
+
+  .tp-team-photo-wrap,
+  .tp-team-content,
+  .tp-team-card-link-badge,
+  .tp-team-role-pill,
+  .tp-team-name,
+  .tp-team-tagline,
+  .tp-team-bio,
+  .tp-team-skills,
+  .tp-team-skill-pill,
+  .tp-team-footer,
+  .tp-team-social-btn,
+  .tp-team-profile-link {
+    transform: none !important;
   }
 }

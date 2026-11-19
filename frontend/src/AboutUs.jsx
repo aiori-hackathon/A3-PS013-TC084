@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import {
   ArrowUpRight,
   Mail,
@@ -26,6 +26,97 @@ function LinkedinIcon({ size = 16 }) {
   );
 }
 
+/**
+ * 3D Tilt / Parallax Mouse-Tracking Card Component
+ * Uses direct DOM manipulation via requestAnimationFrame for silky 60/120fps with 0 React re-renders.
+ */
+function TiltCard({ children, className = '', style = {}, maxTilt = 8, maxTranslate = 4, scale = 1.018 }) {
+  const cardRef = useRef(null);
+  const glareRef = useRef(null);
+  const rafId = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (rafId.current) cancelAnimationFrame(rafId.current);
+    };
+  }, []);
+
+  const handleMouseMove = (e) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+
+    // Normalized offset from -1 to 1
+    const percentX = Math.max(-1, Math.min(1, (x - centerX) / centerX));
+    const percentY = Math.max(-1, Math.min(1, (y - centerY) / centerY));
+
+    // Natural 3D tilt: face rotates toward cursor position
+    const rotX = -percentY * maxTilt;
+    const rotY = percentX * maxTilt;
+
+    // Subtle translation follow
+    const transX = percentX * maxTranslate;
+    const transY = percentY * maxTranslate;
+
+    // Dynamic specular glare coordinates (0% to 100%)
+    const glareX = (x / rect.width) * 100;
+    const glareY = (y / rect.height) * 100;
+
+    cancelAnimationFrame(rafId.current);
+    rafId.current = requestAnimationFrame(() => {
+      if (!cardRef.current) return;
+      cardRef.current.style.transition = 'transform 0.08s ease-out, box-shadow 0.15s ease-out, border-color 0.2s ease';
+      cardRef.current.style.transform = `perspective(1000px) rotateX(${rotX.toFixed(2)}deg) rotateY(${rotY.toFixed(2)}deg) translate3d(${transX.toFixed(1)}px, ${transY.toFixed(1)}px, 0) scale3d(${scale}, ${scale}, ${scale})`;
+
+      // Dynamic reactive drop shadow shifting opposite the tilt angle
+      const shadowX = (-rotY * 1.5).toFixed(1);
+      const shadowY = (rotX * 1.5 + 16).toFixed(1);
+      cardRef.current.style.boxShadow = `${shadowX}px ${shadowY}px 36px -10px rgba(99, 102, 241, 0.22), 0 4px 12px rgba(0, 0, 0, 0.05)`;
+
+      if (glareRef.current) {
+        glareRef.current.style.opacity = '1';
+        glareRef.current.style.background = `radial-gradient(circle at ${glareX.toFixed(1)}% ${glareY.toFixed(1)}%, rgba(255, 255, 255, 0.42) 0%, rgba(255, 255, 255, 0.12) 35%, rgba(255, 255, 255, 0) 75%)`;
+      }
+    });
+  };
+
+  const handleMouseEnter = () => {
+    if (!cardRef.current) return;
+    cardRef.current.style.transition = 'transform 0.15s ease-out, box-shadow 0.2s ease-out, border-color 0.2s ease';
+    if (glareRef.current) {
+      glareRef.current.style.opacity = '1';
+    }
+  };
+
+  const handleMouseLeave = () => {
+    cancelAnimationFrame(rafId.current);
+    if (!cardRef.current) return;
+    cardRef.current.style.transition = 'transform 0.55s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.55s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease';
+    cardRef.current.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translate3d(0, 0, 0) scale3d(1, 1, 1)';
+    cardRef.current.style.boxShadow = '';
+    if (glareRef.current) {
+      glareRef.current.style.opacity = '0';
+    }
+  };
+
+  return (
+    <article
+      ref={cardRef}
+      className={`tp-team-card tp-tilt-card ${className}`}
+      style={style}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      <div className="tp-tilt-glare" ref={glareRef} aria-hidden="true" />
+      {children}
+    </article>
+  );
+}
+
 export default function AboutUs() {
   return (
     <div className="tp-about-page">
@@ -46,11 +137,11 @@ export default function AboutUs() {
       </header>
 
       {/* ---------------------------------------------------------------------
-          Team Members Grid (Compact 2-Column Side-by-Side Cards)
+          Team Members Grid (Compact 2-Column Side-by-Side Cards with 3D Tilt)
           --------------------------------------------------------------------- */}
       <section className="tp-team-grid tp-scroll-reveal tp-stagger-parent" aria-label="Core Team Members">
         {/* Member 1: Aditi Shukla */}
-        <article className="tp-team-card" style={{ '--card-idx': 0 }}>
+        <TiltCard style={{ '--card-idx': 0 }}>
           <div className="tp-team-photo-wrap">
             <a
               href="https://www.linkedin.com/in/aditishukla40"
@@ -134,10 +225,10 @@ export default function AboutUs() {
               </a>
             </div>
           </div>
-        </article>
+        </TiltCard>
 
         {/* Member 2: Prince Yadav */}
-        <article className="tp-team-card" style={{ '--card-idx': 1 }}>
+        <TiltCard style={{ '--card-idx': 1 }}>
           <div className="tp-team-photo-wrap">
             <a
               href="https://www.linkedin.com/in/prince-yadav-794706325/"
@@ -221,7 +312,7 @@ export default function AboutUs() {
               </a>
             </div>
           </div>
-        </article>
+        </TiltCard>
       </section>
 
       {/* ---------------------------------------------------------------------
