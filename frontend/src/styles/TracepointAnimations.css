@@ -356,6 +356,8 @@ html .tp-app .aiori-spotlight-sub .mono,
 }
 
 .tp-portal-services button.tp-portal-service {
+  position: relative !important;
+  overflow: hidden !important;
   display: flex !important;
   flex-direction: column !important;
   justify-content: space-between !important;
@@ -369,15 +371,32 @@ html .tp-app .aiori-spotlight-sub .mono,
   text-align: left !important;
   text-transform: none !important;
   cursor: pointer !important;
-  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+  transition: transform 0.26s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.26s cubic-bezier(0.16, 1, 0.3, 1),
               border-color 0.22s ease !important;
 }
 
+/* Pinterest-grade Top Border Sheen Highlight on Hover */
+.tp-portal-services button.tp-portal-service::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: -100% !important;
+  width: 100% !important;
+  height: 2.5px !important;
+  background: linear-gradient(90deg, transparent, #52B788, #138808, transparent) !important;
+  transition: left 0.55s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  pointer-events: none !important;
+}
+
+.tp-portal-services button.tp-portal-service:hover::before {
+  left: 100% !important;
+}
+
 .tp-portal-services button.tp-portal-service:hover {
-  transform: translateY(-3px) !important;
+  transform: translateY(-5px) !important;
   border-color: #2D6A4F !important;
-  box-shadow: 0 12px 30px -6px rgba(19, 42, 30, 0.16) !important;
+  box-shadow: 0 14px 34px -6px rgba(19, 42, 30, 0.18), 0 4px 12px -2px rgba(19, 42, 30, 0.08) !important;
 }
 
 .tp-portal-service-top {
@@ -397,14 +416,15 @@ html .tp-app .aiori-spotlight-sub .mono,
   background: linear-gradient(135deg, #132A1E 0%, #1A3F2C 100%) !important;
   border: 1px solid rgba(82, 183, 136, 0.35) !important;
   box-shadow: 0 2px 8px rgba(19, 42, 30, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.15) !important;
-  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+  transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease, border-color 0.2s ease !important;
   flex-shrink: 0 !important;
   margin: 0 !important;
 }
 
 .tp-portal-services button.tp-portal-service:hover .tp-portal-service-icon {
-  transform: scale(1.06) !important;
-  box-shadow: 0 4px 14px rgba(19, 42, 30, 0.35) !important;
+  transform: scale(1.1) rotate(2deg) !important;
+  border-color: #52B788 !important;
+  box-shadow: 0 6px 18px rgba(19, 42, 30, 0.35), 0 0 12px rgba(82, 183, 136, 0.35) !important;
 }
 
 .tp-portal-tags {
@@ -539,16 +559,34 @@ html .tp-app .aiori-spotlight-sub .mono,
   display: flex !important;
   flex-direction: column !important;
   justify-content: space-between !important;
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+  transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.24s cubic-bezier(0.16, 1, 0.3, 1),
               border-color 0.2s ease !important;
+}
+
+.tp-app.tp-app[data-theme='forensic'] .tp-forensic-metrics.tp-in-view .tp-metric:nth-child(1) {
+  animation: tpFadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.04s both !important;
+}
+.tp-app.tp-app[data-theme='forensic'] .tp-forensic-metrics.tp-in-view .tp-metric:nth-child(2) {
+  animation: tpFadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.11s both !important;
+}
+.tp-app.tp-app[data-theme='forensic'] .tp-forensic-metrics.tp-in-view .tp-metric:nth-child(3) {
+  animation: tpFadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.18s both !important;
+}
+.tp-app.tp-app[data-theme='forensic'] .tp-forensic-metrics.tp-in-view .tp-metric:nth-child(4) {
+  animation: tpFadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.25s both !important;
 }
 
 .tp-app.tp-app[data-theme='forensic'] .tp-forensic-metrics .tp-metric:hover,
 .tp-metrics.tp-forensic-metrics .tp-metric:hover {
-  transform: translateY(-2px) !important;
+  transform: translateY(-4px) !important;
   border-color: #52B788 !important;
-  box-shadow: 0 8px 20px -4px rgba(19, 42, 30, 0.1) !important;
+  box-shadow: 0 10px 24px -4px rgba(19, 42, 30, 0.12), 0 4px 10px -2px rgba(19, 42, 30, 0.05) !important;
+}
+
+.tp-metric:hover .tp-metric-icon-wrap {
+  transform: scale(1.1) rotate(2deg) !important;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
 }
 
 .tp-metric-header {
@@ -839,13 +877,38 @@ body *::-moz-selection,
   border-radius: 3px !important;
   border: 1px solid #2D6A4F !important;
   white-space: nowrap !important;
+  animation: tpActiveTagPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) calc(var(--col-idx, 0) * 35ms + 0.35s) both !important;
+}
+
+@keyframes tpActiveTagPop {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.6) translateY(5px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) scale(1) translateY(0);
+  }
 }
 
 .tp-chart-seg {
   display: block !important;
   width: 100% !important;
   border-radius: 2px 2px 0 0 !important;
-  transition: opacity 0.15s ease !important;
+  transform-origin: bottom !important;
+  animation: tpChartSegRise 0.65s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--col-idx, 0) * 35ms) both !important;
+  transition: opacity 0.15s ease, filter 0.15s ease !important;
+}
+
+@keyframes tpChartSegRise {
+  0% {
+    transform: scaleY(0);
+    opacity: 0.2;
+  }
+  100% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
 }
 
 .tp-chart-seg.is-failed {
@@ -856,8 +919,14 @@ body *::-moz-selection,
   background: linear-gradient(180deg, #52B788 0%, #2D6A4F 100%) !important;
 }
 
+.tp-chart-col.has-data:hover .tp-chart-stack {
+  transform: scaleY(1.05) translateY(-3px) !important;
+  filter: drop-shadow(0 4px 12px rgba(27, 77, 54, 0.25)) !important;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), filter 0.2s ease !important;
+}
+
 .tp-chart-col:hover .tp-chart-seg {
-  opacity: 0.85 !important;
+  opacity: 0.92 !important;
 }
 
 .tp-chart-col-label {
@@ -1059,6 +1128,30 @@ body *::-moz-selection,
   height: 100% !important;
   border-radius: 4px !important;
   background: linear-gradient(90deg, #2D6A4F 0%, #52B788 100%) !important;
+  transform-origin: left !important;
+  animation: tpRankedFillGrow 0.75s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--rank-idx, 0) * 45ms) both !important;
+}
+
+@keyframes tpRankedFillGrow {
+  0% {
+    transform: scaleX(0);
+    opacity: 0.3;
+  }
+  100% {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+}
+
+.tp-ranked-row {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.tp-ranked-row:hover {
+  transform: translateX(4px) !important;
 }
 
 .tp-ranked-footer {
@@ -1224,31 +1317,216 @@ body *::-moz-selection,
               border-color 0.2s ease !important;
 }
 
-.tp-button {
-  transition: all 0.15s ease !important;
+/* ===========================================================================
+   BESPOKE ANIMATION SUITE — TACTILE MICRO-INTERACTIONS & LIVING TELEMETRY
+   =========================================================================== */
+
+/* Silky View Entrance for Active Page Views */
+.tp-content > * {
+  animation: tpViewSlideIn 0.42s cubic-bezier(0.16, 1, 0.3, 1) both !important;
 }
 
-.tp-button:hover {
-  transform: translateY(-1px);
+@keyframes tpViewSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.tp-button:active {
-  transform: translateY(0);
+/* Living Radar Beacon for Gateway Online & Collection Status */
+.tp-public-utility-dot.is-online,
+.tp-forensic-status-dot {
+  position: relative !important;
+  display: inline-block !important;
+  border-radius: 50% !important;
+  animation: tpLivingBeacon 2.2s cubic-bezier(0.4, 0, 0.2, 1) infinite !important;
 }
 
-/* Utility Bar Indian Identity */
-.tp-public-utility-bar {
-  background: #EAF3EC !important;
-  border-bottom: 1px solid #D5E5D8 !important;
-  color: #2D543F !important;
+@keyframes tpLivingBeacon {
+  0% {
+    box-shadow: 0 0 0 0 rgba(19, 136, 8, 0.7);
+  }
+  60% {
+    box-shadow: 0 0 0 7px rgba(19, 136, 8, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(19, 136, 8, 0);
+  }
 }
 
-.tp-public-utility-dot.is-online {
+/* Metric Chip Telemetry Pips */
+.tp-metric-chip-pip {
+  display: inline-block !important;
+  width: 5px !important;
+  height: 5px !important;
+  border-radius: 50% !important;
+  margin-right: 4px !important;
+  flex-shrink: 0 !important;
+}
+
+.tp-metric-chip.normal .tp-metric-chip-pip {
   background: #138808 !important;
-  box-shadow: 0 0 8px rgba(19, 136, 8, 0.6) !important;
+  animation: tpPipPulseGreen 1.8s ease-in-out infinite !important;
 }
 
-/* Sidebar clean light styling */
+.tp-metric-chip.alert .tp-metric-chip-pip {
+  background: #D9381E !important;
+  animation: tpPipPulseRed 1.2s ease-in-out infinite !important;
+}
+
+@keyframes tpPipPulseGreen {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.35; transform: scale(0.85); }
+}
+
+@keyframes tpPipPulseRed {
+  0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 0 0 rgba(217, 56, 30, 0.6); }
+  50% { opacity: 0.5; transform: scale(1.15); box-shadow: 0 0 0 4px rgba(217, 56, 30, 0); }
+}
+
+/* Radar Reticle Blip on Timeline Header */
+.tp-chart-radar-pip {
+  animation: tpRadarBlip 1.8s ease-in-out infinite !important;
+}
+
+@keyframes tpRadarBlip {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.9;
+    box-shadow: 0 0 4px rgba(19, 136, 8, 0.6);
+  }
+  50% {
+    transform: scale(1.4);
+    opacity: 1;
+    box-shadow: 0 0 10px rgba(19, 136, 8, 0.9);
+  }
+}
+
+/* Ambient Radial Mesh Depth behind Hero */
+html .tp-app.tp-app[data-theme='forensic'] .tp-forensic-intro::before {
+  content: '' !important;
+  position: absolute !important;
+  inset: 0 !important;
+  border-radius: 20px !important;
+  background: radial-gradient(circle 560px at 78% 46%, rgba(82, 183, 136, 0.08) 0%, rgba(27, 77, 54, 0.015) 55%, transparent 80%) !important;
+  pointer-events: none !important;
+  animation: tpAmbientGlowPulse 7s ease-in-out infinite alternate !important;
+  z-index: 0 !important;
+}
+
+@keyframes tpAmbientGlowPulse {
+  0% {
+    opacity: 0.5;
+    transform: scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+}
+
+/* Floating Elevation for AIORI-3 Spotlight Badge */
+.aiori-spotlight-pill {
+  animation: aioriPillPop 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards,
+             tpSpotlightFloat 4.4s ease-in-out 0.6s infinite alternate !important;
+}
+
+@keyframes tpSpotlightFloat {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-5px);
+  }
+}
+
+/* 7-Day Trend Chart & Severity Fill Animations */
+.tp-bar-stack {
+  transform-origin: bottom !important;
+  animation: tpChartSegRise 0.6s cubic-bezier(0.16, 1, 0.3, 1) both !important;
+  transition: transform 0.2s ease !important;
+}
+
+.tp-bar-column:hover .tp-bar-stack {
+  transform: scaleY(1.05) translateY(-2px) !important;
+}
+
+.tp-sev-fill {
+  transform-origin: left !important;
+  animation: tpRankedFillGrow 0.7s cubic-bezier(0.16, 1, 0.3, 1) both !important;
+}
+
+.tp-severity-row {
+  transition: transform 0.18s ease !important;
+}
+
+.tp-severity-row:hover {
+  transform: translateX(3px) !important;
+}
+
+/* Review Items Micro Hover Physics */
+.tp-forensic-review-items > div {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.2s ease,
+              border-color 0.2s ease !important;
+}
+
+.tp-forensic-review-items > div:hover {
+  transform: translateY(-3px) !important;
+  border-color: #52B788 !important;
+  box-shadow: 0 6px 18px rgba(19, 42, 30, 0.08) !important;
+}
+
+/* Tactile Button Press Physics & Interactive Elevation */
+.tp-button,
+button.tp-portal-service,
+.tp-nav-item,
+.tp-forensic-all-events,
+.tp-signout {
+  cursor: pointer !important;
+}
+
+.tp-button:active,
+button.tp-portal-service:active,
+.tp-nav-item:active,
+.tp-forensic-all-events:active {
+  transform: scale(0.975) !important;
+  transition: transform 0.08s ease !important;
+}
+
+.tp-button.primary {
+  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.18s ease,
+              background-color 0.18s ease !important;
+}
+
+.tp-button.primary:hover {
+  transform: translateY(-1.5px) !important;
+  box-shadow: 0 4px 14px rgba(27, 77, 54, 0.25) !important;
+}
+
+.tp-forensic-all-events {
+  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), color 0.18s ease !important;
+}
+
+.tp-forensic-all-events:hover {
+  transform: translateX(4px) !important;
+  color: #138808 !important;
+}
+
+.tp-forensic-all-events svg {
+  transition: transform 0.18s ease !important;
+}
+
+.tp-forensic-all-events:hover svg {
+  transform: translateX(3px) !important;
+}
+
+/* Sidebar Navigation Micro-Interactions */
 html .tp-app.tp-app[data-theme='forensic'] .tp-sidebar {
   background: #FFFFFF !important;
   border-right: 1px solid #D5E5D8 !important;
@@ -1257,17 +1535,60 @@ html .tp-app.tp-app[data-theme='forensic'] .tp-sidebar {
 html .tp-app.tp-app[data-theme='forensic'] .tp-nav-item {
   color: #4D6B58 !important;
   font-weight: 600 !important;
+  transition: background-color 0.18s ease,
+              transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              color 0.18s ease !important;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-nav-item:hover {
+  transform: translateX(4px) !important;
+}
+
+.tp-nav-item svg {
+  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+.tp-nav-item:hover svg {
+  transform: scale(1.15) !important;
 }
 
 html .tp-app.tp-app[data-theme='forensic'] .tp-nav-item.active {
   background: #E2F0E5 !important;
   color: #174E30 !important;
   font-weight: 700 !important;
+  animation: tpActiveNavSpring 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both !important;
+}
+
+@keyframes tpActiveNavSpring {
+  0% {
+    transform: scale(0.96);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.tp-nav-item.active .tp-nav-chevron {
+  animation: tpChevronNudge 1.8s ease-in-out infinite !important;
+}
+
+@keyframes tpChevronNudge {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(3px);
+  }
 }
 
 html .tp-app.tp-app[data-theme='forensic'] .tp-workspace {
   background: #F4F9F5 !important;
   border: 1px solid #D5E5D8 !important;
+  transition: transform 0.2s ease !important;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-workspace:hover {
+  transform: translateY(-1px) !important;
 }
 
 html .tp-app.tp-app[data-theme='forensic'] .tp-workspace strong {
@@ -1293,12 +1614,29 @@ html .tp-app.tp-app[data-theme='forensic'] .tp-profile small {
   font-weight: 500 !important;
 }
 
+/* Accessibility: Complete Prefers-Reduced-Motion Fallback */
 @media (prefers-reduced-motion: reduce) {
   .tp-forensic-intro,
   .tp-portal-services,
   .tp-forensic-metrics,
   .tp-forensic-analytics,
-  .tp-forensic-review {
+  .tp-forensic-review,
+  .tp-scroll-reveal,
+  .tp-stagger-parent > *,
+  .tp-content > *,
+  .tp-chart-seg,
+  .tp-chart-active-tag,
+  .tp-chart-ranked-fill,
+  .tp-bar-stack,
+  .tp-sev-fill,
+  .aiori-spotlight-pill,
+  .tp-public-utility-dot,
+  .tp-forensic-status-dot,
+  .tp-chart-radar-pip,
+  .tp-metric-chip-pip {
     animation: none !important;
+    transition: none !important;
+    transform: none !important;
+    opacity: 1 !important;
   }
 }

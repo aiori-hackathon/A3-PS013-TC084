@@ -54,7 +54,7 @@ function RankedBars({ rows, total, tone, unit = 'events', verificationNote }) {
         {rows.map((r, i) => {
           const pct = total ? Math.round((r.count / total) * 100) : 0;
           return (
-            <li key={r.label} className="tp-ranked-row">
+            <li key={r.label} className="tp-ranked-row" style={{ '--rank-idx': i }}>
               <span className="tp-ranked-index">{String(i + 1).padStart(2, '0')}</span>
               <div className="tp-ranked-content">
                 <div className="tp-ranked-meta">
@@ -174,6 +174,7 @@ export default function EvidenceCharts({ events = [], timestampOf, eventTypeOf, 
                     <div
                       className={`tp-chart-col ${hasData ? 'has-data' : 'is-zero'}`}
                       key={d.key}
+                      style={{ '--col-idx': i }}
                       role="listitem"
                       title={`${longDay(d.key)} — ${d.failed} failed, ${d.ok} other`}
                     >

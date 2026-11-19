@@ -152,6 +152,7 @@ function Metric({ label, value, note, icon: Icon, chip, isAlert }) {
         <strong className="tp-metric-value">{value}</strong>
         {chip ? (
           <span className={`tp-metric-chip ${isAlert ? 'alert' : 'normal'}`}>
+            <span className="tp-metric-chip-pip" aria-hidden="true" />
             {chip}
           </span>
         ) : null}
@@ -731,10 +732,16 @@ export default function Dashboard({ user, onSignOut }) {
           entry.target.classList.add('tp-in-view');
         }
       });
-    }, { threshold: 0.06, rootMargin: '0px 0px -30px 0px' });
+    }, { threshold: 0.05, rootMargin: '0px 0px -20px 0px' });
 
     const els = document.querySelectorAll('.tp-scroll-reveal');
-    els.forEach(el => observer.observe(el));
+    els.forEach(el => {
+      observer.observe(el);
+      const rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight && rect.bottom > 0) {
+        el.classList.add('tp-in-view');
+      }
+    });
 
     return () => observer.disconnect();
   }, [page, events]);
@@ -975,14 +982,14 @@ export default function Dashboard({ user, onSignOut }) {
       <div className="tp-metrics tp-forensic-metrics tp-scroll-reveal">
         <Metric
           label="Collected events"
-          value={loading ? '…' : events.length.toLocaleString()}
+          value={loading ? '…' : <AnimatedCount value={events.length} />}
           note="Available for inspection"
           icon={EmblemMetricCollected}
           chip="LIVE PROBE"
         />
         <Metric
           label="Authentication failures"
-          value={loading ? '…' : failures.toLocaleString()}
+          value={loading ? '…' : <AnimatedCount value={failures} />}
           note={`${affectedDevices} source ${affectedDevices === 1 ? 'device' : 'devices'} affected`}
           icon={EmblemMetricFailures}
           chip={failures > 0 ? 'ACTIVE ALERT' : 'NOMINAL'}
@@ -990,14 +997,14 @@ export default function Dashboard({ user, onSignOut }) {
         />
         <Metric
           label="Source devices"
-          value={loading ? '…' : devices}
+          value={loading ? '…' : <AnimatedCount value={devices} />}
           note="Unique device identifiers"
           icon={EmblemMetricDevices}
           chip="VERIFIED"
         />
         <Metric
           label="Users observed"
-          value={loading ? '…' : users}
+          value={loading ? '…' : <AnimatedCount value={users} />}
           note="Unique usernames"
           icon={EmblemMetricUsers}
           chip="IDENTIFIED"
@@ -1012,8 +1019,8 @@ export default function Dashboard({ user, onSignOut }) {
           ['evidence', 'Evidence Register', 'Review cryptographic SHA-256 seals', EmblemEvidence, 'VAULT-03', 'SEALED'],
           ['graph', 'Investigation Graph', 'Trace multi-hop attack topologies', EmblemGraph, 'GRAPH-04', 'TOPOLOGY'],
           ['reports', 'Reports & Export', 'Compile statutory forensic dossiers', EmblemReports, 'AUDIT-05', 'EXPORT'],
-        ].map(([id, label, description, Emblem, code, badge]) => (
-          <button key={id} type="button" className="tp-portal-service" onClick={() => openPage(id)}>
+        ].map(([id, label, description, Emblem, code, badge], idx) => (
+          <button key={id} type="button" className="tp-portal-service" style={{ '--card-idx': idx }} onClick={() => openPage(id)}>
             <div className="tp-portal-service-top">
               <span className="tp-portal-service-icon">
                 <Emblem size={26} />

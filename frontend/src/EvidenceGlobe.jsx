@@ -64,21 +64,6 @@ const SEV_VAR = {
 };
 const sevVar = s => SEV_VAR[String(s || '').trim().toLowerCase()] || '#2D6A4F';
 
-const STATIC_TELEMETRY_LOGS = [
-  { tag: '[AIORI-3/STREAM]', time: '09:24:12Z', text: 'raw_log_stream payload accepted sha256:7b9a5f82c1...', badge: 'SEALED', badgeType: 'ok' },
-  { tag: '[SEC/PAM_AUTH]', time: '09:24:14Z', text: 'pam_unix(sshd:auth): authentication failure logname= uid=0 euid=0 tty=ssh ruser= rhost=10.0.4.12 user=root', badge: 'FAIL', badgeType: 'alert' },
-  { tag: '[CRYPTO/CHAIN]', time: '09:24:16Z', text: 'epoch_sequence_verify genesis_seal=valid records=3 chain_state=INTACT', badge: 'VERIFIED', badgeType: 'ok' },
-  { tag: '[AIORI-3/RADAR]', time: '09:24:18Z', text: 'coordinates locked at (21.5°N, 78.5°E) observation_hub=active node=core-01', badge: 'LOCKED', badgeType: 'info' },
-  { tag: '[AUDIT/KERNEL]', time: '09:24:21Z', text: 'audit(1763524821.402:91): syscall=59 success=no exit=-13 ppid=2840 pid=2841 auid=1000 uid=0', badge: 'DENIED', badgeType: 'alert' },
-  { tag: '[NET/TELEMETRY]', time: '09:24:23Z', text: 'switch-core-delhi port=eth0/2 rca_probe=active carrier_frequency=nominal', badge: 'ONLINE', badgeType: 'ok' },
-  { tag: '[AUTH/SSH_BURST]', time: '09:24:25Z', text: 'sshd[4102]: Invalid user admin from 192.168.1.105 port 51240 ssh2', badge: 'SUSPICIOUS', badgeType: 'alert' },
-  { tag: '[CUSTODY/SEAL]', time: '09:24:27Z', text: 'tamper_evidence_proof hash_match=true signature_authority=AIORI-3-GOV', badge: 'IMMUTABLE', badgeType: 'ok' },
-  { tag: '[AGENT/HEARTBEAT]', time: '09:24:29Z', text: 'tracepoint-agent delta_offset=0 byte_skew=0 clock_skew=+0.02s status=HEALTHY', badge: 'PULSE', badgeType: 'info' },
-  { tag: '[GRAPH/LINK]', time: '09:24:32Z', text: 'sequence_correlation user=root host=demo-device-01 multi_hop_edges=linked', badge: 'CORRELATED', badgeType: 'info' },
-  { tag: '[SYS/LOGIND]', time: '09:24:35Z', text: 'systemd-logind[912]: Session 42 logged out. Waiting for credentials cleanup', badge: 'INFO', badgeType: 'info' },
-  { tag: '[SEC/RULE_MATCH]', time: '09:24:38Z', text: 'snort_signature: ET POLICY Outbound SSH brute force detected threshold=3/30s', badge: 'WARNING', badgeType: 'alert' },
-];
-
 function hash(str) {
   let h = 2166136261;
   for (let i = 0; i < str.length; i += 1) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); }
@@ -343,45 +328,8 @@ export default function EvidenceGlobe({
 
   const empty = model.total === 0;
 
-  const logStreamLines = useMemo(() => {
-    const liveLines = (events || []).slice(0, 6).map((e, idx) => ({
-      tag: `[${(deviceOf?.(e) || 'AIORI-NODE').toUpperCase().slice(0, 14)}]`,
-      time: timestampOf?.(e) ? new Date(timestampOf(e)).toISOString().slice(11, 19) + 'Z' : `09:24:${String(idx * 4).padStart(2, '0')}Z`,
-      text: `${e.event_type || 'auth_event'}: ${e.message || e.raw_log || 'log entry indexed'}`,
-      badge: isFailure?.(e) ? 'FAIL' : 'OK',
-      badgeType: isFailure?.(e) ? 'alert' : 'ok'
-    }));
-    return [...liveLines, ...STATIC_TELEMETRY_LOGS];
-  }, [events, deviceOf, timestampOf, isFailure]);
-
   return (
     <figure className="tp-globe aiori-globe-container" data-empty={empty || undefined}>
-      {/* Moving Forensic Log Background with Subtle Low Opacity */}
-      <div className="tp-globe-log-stream" aria-hidden="true">
-        <div className="tp-log-stream-track">
-          <div className="tp-log-stream-content">
-            {logStreamLines.map((line, idx) => (
-              <div key={idx} className="tp-log-line">
-                <span className="tp-log-tag">{line.tag}</span>
-                <span className="tp-log-time">{line.time}</span>
-                <span className="tp-log-text">{line.text}</span>
-                {line.badge && <span className={`tp-log-chip ${line.badgeType || ''}`}>{line.badge}</span>}
-              </div>
-            ))}
-          </div>
-          <div className="tp-log-stream-content" aria-hidden="true">
-            {logStreamLines.map((line, idx) => (
-              <div key={`dup-${idx}`} className="tp-log-line">
-                <span className="tp-log-tag">{line.tag}</span>
-                <span className="tp-log-time">{line.time}</span>
-                <span className="tp-log-text">{line.text}</span>
-                {line.badge && <span className={`tp-log-chip ${line.badgeType || ''}`}>{line.badge}</span>}
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
       <div className="tp-globe-stage">
         <svg
           className="tp-globe-svg aiori-globe-svg"
