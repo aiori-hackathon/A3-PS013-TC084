@@ -22,25 +22,46 @@ if [ -z "${GROQ_API_KEY:-}" ] && [ -r "$KEY_FILE" ]; then
 fi
 export GROQ_API_KEY="${GROQ_API_KEY:-}"
 
+# A real Groq key starts with gsk_ and is around 56 characters. Anything else
+# starts a backend whose assistant is dead, with the only symptom appearing on
+# the page, so say so here instead.
 if [ -z "$GROQ_API_KEY" ]; then
-  echo "WARNING: GROQ_API_KEY is empty. The backend will start, but the" >&2
-  echo "         assistant will report that the key is not configured." >&2
-  echo "         Put the key in $KEY_FILE and restart." >&2
+  echo "WARNING: GROQ_API_KEY is empty. The assistant will not work." >&2
+  echo "         Put the real key in $KEY_FILE and restart." >&2
+elif [ "${GROQ_API_KEY#gsk_}" = "$GROQ_API_KEY" ] || [ ${#GROQ_API_KEY} -lt 40 ]; then
+  echo "WARNING: GROQ_API_KEY does not look like a Groq key" >&2
+  echo "         (${#GROQ_API_KEY} characters; expected gsk_... and about 56)." >&2
+  echo "         Check $KEY_FILE -- a placeholder will not work." >&2
 else
   echo "Groq key:  loaded (${#GROQ_API_KEY} characters)"
 fi
 
-# Wait for a previous process to release the port rather than racing it.
+# Stop any previous instance and wait for it to actually exit. Waiting on the
+# port alone was not enough: the old process can still be shutting down, and a
+# second start racing the first leaves whichever loses with EADDRINUSE.
+PATTERN="node src/server.js"
+pkill -f "$PATTERN" 2>/dev/null || true
+
 for _ in $(seq 1 40); do
-  if ! ss -ltn "sport = :$PORT" 2>/dev/null | grep -q LISTEN; then
-    break
-  fi
+  pgrep -f "$PATTERN" >/dev/null 2>&1 || break
+  sleep 0.5
+done
+
+if pgrep -f "$PATTERN" >/dev/null 2>&1; then
+  echo "Previous backend did not exit after 20s; forcing it." >&2
+  pkill -9 -f "$PATTERN" 2>/dev/null || true
+  sleep 1
+fi
+
+# Then wait for the listening socket itself to be released.
+for _ in $(seq 1 20); do
+  ss -ltn "sport = :$PORT" 2>/dev/null | grep -q LISTEN || break
   sleep 0.5
 done
 
 if ss -ltn "sport = :$PORT" 2>/dev/null | grep -q LISTEN; then
-  echo "Port $PORT is still in use after 20s. Stop the old process first:" >&2
-  echo "  pkill -f 'node src/server.js'" >&2
+  echo "Port $PORT is still held by something else:" >&2
+  ss -ltnp "sport = :$PORT" >&2
   exit 1
 fi
 
