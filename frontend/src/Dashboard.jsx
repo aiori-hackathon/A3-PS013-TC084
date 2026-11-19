@@ -941,22 +941,31 @@ export default function Dashboard({ user, onSignOut }) {
     <main className="tp-main">
     {/* TRACEPOINT_SINGLE_NAV_V1: status and account live in primary navigation */}
 
-      <div className="tp-content"><div className={`tp-page-header ${page === 'guide' ? 'tp-page-header-guide' : ''}`}><div><h1>{title}</h1><p>{page === 'overview' ? 'Security activity and collected evidence across your workspace.' : page === 'timeline' ? 'Explore, filter and inspect security events.' : page === 'ingestion' ? 'Explore sample logs and follow them through the ingestion pipeline.' : page === 'evidence' ? 'Evidence collection and integrity records.' : page === 'graph' ? 'Explore evidence-linked authentication sequences.' : page === 'investigations' ? 'Review events and prepare incident investigations.' : page === 'about' ? 'Meet the engineering and research team behind TracePoint, and discover the platform architecture.' : page === 'netlab' ? 'Network topology, observations and evidence-based root-cause findings.' : page === 'guide' ? 'Follow the workflow from raw log ingestion to an incident report.' : 'Export collected security activity.'}</p></div><div className="tp-actions">
-          {page !== 'overview' && page !== 'about' && (
-            <Button
-              variant="outline"
-              className="tp-button"
-              onClick={() => {
-                refresh();
-                setEvidenceRefresh(v => v + 1);
-              }}
-              disabled={loading}
-            >
-              <RefreshCw size={16} className={loading ? 'tp-spin' : ''}/> Refresh
-            </Button>
-          )}
-          {page === 'timeline' && <Button className="tp-button primary" onClick={exportCsv}><ArrowDownToLine size={16}/> Export CSV</Button>}
-        </div></div>
+      <div className="tp-content">
+        {page !== 'about' && (
+          <div className={`tp-page-header ${page === 'guide' ? 'tp-page-header-guide' : ''}`}>
+            <div>
+              <h1>{title}</h1>
+              <p>{page === 'overview' ? 'Security activity and collected evidence across your workspace.' : page === 'timeline' ? 'Explore, filter and inspect security events.' : page === 'ingestion' ? 'Explore sample logs and follow them through the ingestion pipeline.' : page === 'evidence' ? 'Evidence collection and integrity records.' : page === 'graph' ? 'Explore evidence-linked authentication sequences.' : page === 'investigations' ? 'Review events and prepare incident investigations.' : page === 'netlab' ? 'Network topology, observations and evidence-based root-cause findings.' : page === 'guide' ? 'Follow the workflow from raw log ingestion to an incident report.' : 'Export collected security activity.'}</p>
+            </div>
+            <div className="tp-actions">
+              {page !== 'overview' && (
+                <Button
+                  variant="outline"
+                  className="tp-button"
+                  onClick={() => {
+                    refresh();
+                    setEvidenceRefresh(v => v + 1);
+                  }}
+                  disabled={loading}
+                >
+                  <RefreshCw size={16} className={loading ? 'tp-spin' : ''}/> Refresh
+                </Button>
+              )}
+              {page === 'timeline' && <Button className="tp-button primary" onClick={exportCsv}><ArrowDownToLine size={16}/> Export CSV</Button>}
+            </div>
+          </div>
+        )}
       {error && <div className="tp-error" role="alert">{error}</div>}
       {page === 'overview' && <>
       <div className="tp-forensic-intro">
