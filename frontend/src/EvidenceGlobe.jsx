@@ -25,6 +25,7 @@ const TARGET_TILT = +0.375;
 
 function buildGrid() {
   const cells = [];
+  let index = 0;
   for (let lat = -88; lat <= 88; lat += LAT_STEP) {
     const phi = (lat * Math.PI) / 180;
     const ringR = Math.cos(phi);
@@ -39,7 +40,36 @@ function buildGrid() {
         else if (lat >= 16.5) tricolor = '#FFFFFF'; // White
         else tricolor = '#10B981'; // India Green
       }
-      cells.push({ lat, lon, phi, land: true, inIndia, tricolor });
+
+      // Precompute deterministic stream flight parameters for pixel emergence animation
+      const s1 = Math.abs((Math.sin(index * 9.17 + 1.23) * 10000) % 1);
+      const s2 = Math.abs((Math.sin(index * 13.43 + 4.56) * 10000) % 1);
+      const s3 = Math.abs((Math.sin(index * 17.89 + 7.89) * 10000) % 1);
+
+      // Pixel emitter position in top-left corner (scattered around 10..36, 6..30)
+      const emitterX = 22 + (s1 - 0.5) * 28;
+      const emitterY = 18 + (s2 - 0.5) * 24;
+
+      // Stagger delay so pixels emerge in an organic cascading stream from top-left
+      const delay = (s1 * 0.4 + s2 * 0.3 + ((index % 120) / 120) * 0.3) * 1050 + s3 * 180;
+      const duration = 700 + s2 * 300;
+      const arcHeight = (s3 - 0.5) * 38;
+
+      cells.push({
+        lat,
+        lon,
+        phi,
+        land: true,
+        inIndia,
+        tricolor,
+        index,
+        emitterX,
+        emitterY,
+        delay,
+        duration,
+        arcHeight,
+      });
+      index += 1;
     }
   }
   return cells;
@@ -83,76 +113,89 @@ function EvidenceGlobe({
   deviceOf = e => e.device_id,
   isFailure = () => false,
   timestampOf = e => e.timestamp,
+  replayTrigger = 0,
 }) {
   const grid = useMemo(() => buildGrid(), []);
 
   // Spin & Tilt state
-  const [spin, setSpin] = useState(TARGET_SPIN - 140);
+  const [spin, setSpin] = useState((TARGET_SPIN - 120 + 360) % 360);
   const [tilt, setTilt] = useState(0.15);
   const [dragging, setDragging] = useState(false);
   const [introLocked, setIntroLocked] = useState(false);
+  const [animElapsed, setAnimElapsed] = useState(0);
 
   const raf = useRef(0);
   const drag = useRef(null);
 
-  // Smooth deceleration to India on initial load
-  const startDeceleration = useCallback(() => {
+  // Smooth Pixel Emergence and Deceleration to India on initial load or replay
+  const startEmergenceAnimation = useCallback(() => {
+    cancelAnimationFrame(raf.current);
     setIntroLocked(false);
-    const startSpin = (TARGET_SPIN - 140 + 360) % 360;
-    setSpin(startSpin);
-    setTilt(0.15);
+    setAnimElapsed(0);
 
-    const spinStart = performance.now();
-    const spinDuration = 2000;
-    const initialSpin = startSpin;
-    const deltaSpin = (TARGET_SPIN - initialSpin + 720) % 360 + 360;
+    const startSpin = (TARGET_SPIN - 120 + 360) % 360;
     const initialTilt = 0.15;
+    const deltaSpin = (TARGET_SPIN - startSpin + 720) % 360 + 360;
+    const startTime = performance.now();
+    const totalDuration = 3200;
 
-    const animateSpin = tNow => {
-      const sElapsed = tNow - spinStart;
-      const sp = Math.min(1, sElapsed / spinDuration);
-      const ease = 1 - Math.pow(1 - sp, 3);
+    const tick = tNow => {
+      const elapsed = tNow - startTime;
+      setAnimElapsed(elapsed);
 
-      setSpin((initialSpin + deltaSpin * ease) % 360);
-      setTilt(initialTilt + (TARGET_TILT - initialTilt) * ease);
+      // Rotation begins at 1100ms as pixels assemble, and smoothly decelerates into TARGET_SPIN by 3200ms
+      if (elapsed < 1100) {
+        setSpin(startSpin);
+        setTilt(initialTilt);
+      } else {
+        const rotElapsed = elapsed - 1100;
+        const pRot = Math.min(1, rotElapsed / 2100);
+        const ease = 1 - Math.pow(1 - pRot, 3);
+        setSpin((startSpin + deltaSpin * ease) % 360);
+        setTilt(initialTilt + (TARGET_TILT - initialTilt) * ease);
+      }
 
-      if (sp < 1) {
-        raf.current = requestAnimationFrame(animateSpin);
+      if (elapsed < totalDuration) {
+        raf.current = requestAnimationFrame(tick);
       } else {
         setSpin(TARGET_SPIN);
         setTilt(TARGET_TILT);
         setIntroLocked(true);
+        setAnimElapsed(totalDuration);
       }
     };
 
-    raf.current = requestAnimationFrame(animateSpin);
+    raf.current = requestAnimationFrame(tick);
   }, []);
 
-  // Run on mount
+  // Run on mount or on replay trigger
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       setSpin(TARGET_SPIN);
       setTilt(TARGET_TILT);
       setIntroLocked(true);
+      setAnimElapsed(999999);
       return undefined;
     }
 
     const timer = setTimeout(() => {
-      startDeceleration();
-    }, 150);
+      startEmergenceAnimation();
+    }, 120);
 
     return () => {
       clearTimeout(timer);
       cancelAnimationFrame(raf.current);
     };
-  }, [startDeceleration]);
+  }, [startEmergenceAnimation, replayTrigger]);
 
   // Pointer drag gestures
   const onPointerDown = e => {
+    cancelAnimationFrame(raf.current);
     e.currentTarget.setPointerCapture(e.pointerId);
     drag.current = { x: e.clientX, y: e.clientY, spin, tilt };
     setDragging(true);
     setIntroLocked(true);
+    setAnimElapsed(999999);
   };
 
   const onPointerMove = e => {
@@ -178,11 +221,13 @@ function EvidenceGlobe({
     if (e.key === 'ArrowDown') { setTilt(t => Math.min(1.1, t + 0.08)); e.preventDefault(); }
   };
 
-  // Compute Surface Dots with India Highlight
+  // Compute Surface Dots with dynamic Pixel Emergence
   const dots = useMemo(() => {
     const out = [];
     const ct = Math.cos(tilt);
     const st = Math.sin(tilt);
+    const isEmerging = animElapsed < 2200 && !dragging;
+
     for (const c of grid) {
       const theta = ((c.lon + spin) * Math.PI) / 180;
       const x1 = Math.cos(c.phi) * Math.sin(theta);
@@ -190,18 +235,85 @@ function EvidenceGlobe({
       const z1 = Math.cos(c.phi) * Math.cos(theta);
       const y2 = y1 * ct - z1 * st;
       const z2 = y1 * st + z1 * ct;
-      if (z2 <= 0.02) continue;
-      out.push({
-        x: CX + x1 * R,
-        y: CY - y2 * R,
-        z: z2,
-        land: c.land,
-        inIndia: c.inIndia,
-        tricolor: c.tricolor,
-      });
+
+      if (!isEmerging && z2 <= 0.02) continue;
+
+      const targetX = CX + x1 * R;
+      const targetY = CY - y2 * R;
+      const isIndiaDot = introLocked && c.inIndia;
+      const targetRadius = isIndiaDot
+        ? 1.9 + Math.max(0, z2) * 1.5
+        : 1.15 + Math.max(0, z2) * 1.35;
+      const targetOpacity = isIndiaDot
+        ? 0.98
+        : Math.min(1, 0.65 + Math.max(0, z2) * 0.35);
+
+      if (!isEmerging) {
+        out.push({
+          x: targetX,
+          y: targetY,
+          z: z2,
+          r: targetRadius,
+          opacity: targetOpacity,
+          land: c.land,
+          inIndia: c.inIndia,
+          tricolor: c.tricolor,
+        });
+      } else {
+        const { emitterX, emitterY, delay, duration, arcHeight } = c;
+
+        if (animElapsed < delay) {
+          // Pixel hasn't launched yet
+          continue;
+        }
+
+        const flightTime = animElapsed - delay;
+        if (flightTime >= duration) {
+          // Pixel arrived at target
+          if (z2 <= 0.02) continue;
+          out.push({
+            x: targetX,
+            y: targetY,
+            z: z2,
+            r: targetRadius,
+            opacity: targetOpacity,
+            land: c.land,
+            inIndia: c.inIndia,
+            tricolor: c.tricolor,
+          });
+        } else {
+          // Pixel in active flight from top-left emitter
+          const p = Math.min(1, flightTime / duration);
+          const ease = 1 - Math.pow(1 - p, 3);
+
+          const dx = targetX - emitterX;
+          const dy = targetY - emitterY;
+          const dist = Math.hypot(dx, dy) || 1;
+          const nx = -dy / dist;
+          const ny = dx / dist;
+          const arc = Math.sin(p * Math.PI) * arcHeight;
+
+          const curX = emitterX + dx * ease + nx * arc;
+          const curY = emitterY + dy * ease + ny * arc;
+          const curR = 0.6 + (targetRadius - 0.6) * ease;
+          const curOpacity = Math.min(1, p * 2) * targetOpacity;
+
+          out.push({
+            x: curX,
+            y: curY,
+            z: z2,
+            r: curR,
+            opacity: curOpacity,
+            land: c.land,
+            inIndia: c.inIndia,
+            tricolor: c.tricolor,
+            isFlying: true,
+          });
+        }
+      }
     }
     return out;
-  }, [grid, spin, tilt]);
+  }, [grid, spin, tilt, animElapsed, dragging, introLocked]);
 
   // Event Markers
   const model = useMemo(() => {
@@ -303,6 +415,13 @@ function EvidenceGlobe({
               <stop offset="100%" stopColor="#6EE7B7" stopOpacity="0.75" />
             </radialGradient>
 
+            {/* Top-Left Cyber Emitter Radiant Source */}
+            <radialGradient id="tp-emitter-glow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="#34D399" stopOpacity="0.85" />
+              <stop offset="35%" stopColor="#10B981" stopOpacity="0.4" />
+              <stop offset="100%" stopColor="#0A2218" stopOpacity="0" />
+            </radialGradient>
+
             <filter id="tp-globe-atmo-blur" x="-30%" y="-30%" width="160%" height="160%">
               <feGaussianBlur stdDeviation="5" />
             </filter>
@@ -316,6 +435,20 @@ function EvidenceGlobe({
             </filter>
           </defs>
 
+          {/* Top-Left Corner Emitter Node (Streams pixels & fades out as globe crystallizes) */}
+          {animElapsed < 1900 && !dragging && (
+            <g
+              className="aiori-emitter-beacon"
+              opacity={Math.max(0, 1 - animElapsed / 1700)}
+              style={{ pointerEvents: 'none' }}
+            >
+              <circle cx="22" cy="18" r="22" fill="url(#tp-emitter-glow)" />
+              <circle cx="22" cy="18" r="3.5" fill="#34D399" filter="url(#tp-tricolor-glow)" />
+              <circle cx="22" cy="18" r="9" stroke="#6EE7B7" strokeWidth="1" fill="none" opacity="0.65" className="emitter-ring" />
+              <circle cx="22" cy="18" r="17" stroke="#34D399" strokeWidth="0.8" strokeDasharray="3 3" fill="none" opacity="0.4" className="emitter-ring r2" />
+            </g>
+          )}
+
           {/* Outer Atmosphere Glow */}
           <circle
             className="tp-globe-atmo"
@@ -324,13 +457,26 @@ function EvidenceGlobe({
             r={R + 3}
             stroke="#34D399"
             strokeWidth="2.5"
-            opacity="0.35"
+            opacity={animElapsed >= 1800 ? 0.35 : Math.max(0, (animElapsed - 700) / 1100) * 0.35}
             filter="url(#tp-globe-atmo-blur)"
           />
 
-          {/* Globe Sphere */}
-          <circle cx={CX} cy={CY} r={R} fill="url(#tp-globe-shade-pista)" />
-          <circle className="tp-globe-rim" cx={CX} cy={CY} r={R} fill="url(#tp-globe-rim-pista)" />
+          {/* Globe Sphere Backdrop (Emerges gracefully as pixels assemble) */}
+          <circle
+            cx={CX}
+            cy={CY}
+            r={R}
+            fill="url(#tp-globe-shade-pista)"
+            opacity={animElapsed >= 1800 ? 1 : Math.max(0, (animElapsed - 300) / 1300)}
+          />
+          <circle
+            className="tp-globe-rim"
+            cx={CX}
+            cy={CY}
+            r={R}
+            fill="url(#tp-globe-rim-pista)"
+            opacity={animElapsed >= 1800 ? 1 : Math.max(0, (animElapsed - 500) / 1200)}
+          />
 
           {/* Dot Matrix Surface with India Centered at CX, CY */}
           <g className="tp-globe-surface">
@@ -338,33 +484,28 @@ function EvidenceGlobe({
               const isIndiaHighlight = introLocked && d.inIndia;
               const fill = isIndiaHighlight
                 ? d.tricolor
-                : '#34D399';
-
-              const r = isIndiaHighlight
-                ? 1.9 + d.z * 1.5
-                : 1.15 + d.z * 1.35;
-
-              const opacity = isIndiaHighlight
-                ? 0.98
-                : Math.min(1, 0.65 + d.z * 0.35);
+                : (d.isFlying ? '#6EE7B7' : '#34D399');
 
               return (
                 <circle
                   key={i}
                   cx={d.x}
                   cy={d.y}
-                  r={r}
+                  r={d.r}
                   fill={fill}
                   className={isIndiaHighlight ? 'is-india' : 'is-land'}
-                  opacity={opacity}
+                  opacity={d.opacity}
                   filter={isIndiaHighlight ? 'url(#tp-tricolor-glow)' : undefined}
                 />
               );
             })}
           </g>
 
-          {/* Event Markers */}
-          <g className="tp-globe-markers">
+          {/* Event Markers (Fade in once globe is assembled) */}
+          <g
+            className="tp-globe-markers"
+            opacity={introLocked ? 1 : Math.max(0, (animElapsed - 2200) / 700)}
+          >
             {surfaceMarkers.filter(d => d.visible).map((d, i) => (
               <g key={i}>
                 <circle

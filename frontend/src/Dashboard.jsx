@@ -776,6 +776,7 @@ export default function Dashboard({ user, onSignOut }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const progressBarRef = useRef(null);
   const [backToTopVisible, setBackToTopVisible] = useState(false);
+  const [globeReplay, setGlobeReplay] = useState(0);
 
   // Ultra-lightweight native scroll progress & back-to-top handler (zero JS friction)
   useEffect(() => {
@@ -1086,6 +1087,15 @@ export default function Dashboard({ user, onSignOut }) {
                 <div className="tp-overview-status-pill">
                   <span>Locked: 21.5°N, 78.5°E</span>
                 </div>
+                <button
+                  type="button"
+                  className="tp-overview-status-pill tp-replay-pill"
+                  onClick={() => setGlobeReplay(k => k + 1)}
+                  title="Replay globe pixel emergence animation"
+                >
+                  <span className="tp-replay-icon" aria-hidden="true">↺</span>
+                  <span>Replay</span>
+                </button>
               </div>
             </div>
             <div
@@ -1103,6 +1113,7 @@ export default function Dashboard({ user, onSignOut }) {
                 deviceOf={device}
                 isFailure={fail}
                 timestampOf={timestamp}
+                replayTrigger={globeReplay}
               />
 
               {/* Floating Card 1: Top Right — OpenTrain-inspired Live Telemetry Card */}
