@@ -46,14 +46,21 @@ function buildGrid() {
       const s2 = Math.abs((Math.sin(index * 13.43 + 4.56) * 10000) % 1);
       const s3 = Math.abs((Math.sin(index * 17.89 + 7.89) * 10000) % 1);
 
-      // Pixel emitter position in top-left corner (scattered around 10..36, 6..30)
-      const emitterX = 22 + (s1 - 0.5) * 28;
-      const emitterY = 18 + (s2 - 0.5) * 24;
+      // Relative vertical position on globe from north (+88) to south (-88)
+      const latNorm = (88 - lat) / 176;
+
+      // Start point P0 in the widely expanded top-left region across the hero canvas
+      // Spanning from X = -650 to -420, Y = -70 to 180 (covering the hero title & lead area)
+      const startX = -600 + (1 - latNorm) * 90 + (s1 - 0.5) * 120;
+      const startY = -60 + latNorm * 220 + (s2 - 0.5) * 80;
+
+      // Expanded midpoint P1 (fanning out wide across the hero space as drawn in user diagram)
+      const midX = -270 + (1 - latNorm) * 80 + (s2 - 0.5) * 110;
+      const midY = -75 + latNorm * 300 + (s3 - 0.5) * 90;
 
       // Stagger delay so pixels emerge in an organic cascading stream from top-left
-      const delay = (s1 * 0.4 + s2 * 0.3 + ((index % 120) / 120) * 0.3) * 1050 + s3 * 180;
-      const duration = 700 + s2 * 300;
-      const arcHeight = (s3 - 0.5) * 38;
+      const delay = (s1 * 0.45 + (1 - latNorm) * 0.35 + ((index % 100) / 100) * 0.2) * 950 + s3 * 180;
+      const duration = 750 + s2 * 350;
 
       cells.push({
         lat,
@@ -63,11 +70,12 @@ function buildGrid() {
         inIndia,
         tricolor,
         index,
-        emitterX,
-        emitterY,
+        startX,
+        startY,
+        midX,
+        midY,
         delay,
         duration,
-        arcHeight,
       });
       index += 1;
     }
@@ -260,7 +268,7 @@ function EvidenceGlobe({
           tricolor: c.tricolor,
         });
       } else {
-        const { emitterX, emitterY, delay, duration, arcHeight } = c;
+        const { startX, startY, midX, midY, delay, duration } = c;
 
         if (animElapsed < delay) {
           // Pixel hasn't launched yet
@@ -269,7 +277,7 @@ function EvidenceGlobe({
 
         const flightTime = animElapsed - delay;
         if (flightTime >= duration) {
-          // Pixel arrived at target
+          // Pixel arrived at target on globe
           if (z2 <= 0.02) continue;
           out.push({
             x: targetX,
@@ -282,21 +290,17 @@ function EvidenceGlobe({
             tricolor: c.tricolor,
           });
         } else {
-          // Pixel in active flight from top-left emitter
+          // Pixel in active flight from expanded top-left area along sweeping Bezier arc
           const p = Math.min(1, flightTime / duration);
-          const ease = 1 - Math.pow(1 - p, 3);
+          const ease = 1 - Math.pow(1 - p, 3); // smooth quintic ease-out
 
-          const dx = targetX - emitterX;
-          const dy = targetY - emitterY;
-          const dist = Math.hypot(dx, dy) || 1;
-          const nx = -dy / dist;
-          const ny = dx / dist;
-          const arc = Math.sin(p * Math.PI) * arcHeight;
+          // Quadratic Bezier interpolation: (1 - ease)^2 * start + 2*(1 - ease)*ease * mid + ease^2 * target
+          const oneMinusE = 1 - ease;
+          const curX = oneMinusE * oneMinusE * startX + 2 * oneMinusE * ease * midX + ease * ease * targetX;
+          const curY = oneMinusE * oneMinusE * startY + 2 * oneMinusE * ease * midY + ease * ease * targetY;
 
-          const curX = emitterX + dx * ease + nx * arc;
-          const curY = emitterY + dy * ease + ny * arc;
-          const curR = 0.6 + (targetRadius - 0.6) * ease;
-          const curOpacity = Math.min(1, p * 2) * targetOpacity;
+          const curR = 0.75 + (targetRadius - 0.75) * ease;
+          const curOpacity = Math.min(1, p * 2.2) * targetOpacity;
 
           out.push({
             x: curX,
@@ -435,17 +439,40 @@ function EvidenceGlobe({
             </filter>
           </defs>
 
-          {/* Top-Left Corner Emitter Node (Streams pixels & fades out as globe crystallizes) */}
-          {animElapsed < 1900 && !dragging && (
+          {/* Sweeping Streamline Arcs across Hero (matching user's expanded emergence flow) */}
+          {animElapsed < 2100 && !dragging && (
             <g
-              className="aiori-emitter-beacon"
-              opacity={Math.max(0, 1 - animElapsed / 1700)}
+              className="aiori-streamline-field"
+              opacity={Math.max(0, 1 - animElapsed / 1900) * 0.55}
               style={{ pointerEvents: 'none' }}
             >
-              <circle cx="22" cy="18" r="22" fill="url(#tp-emitter-glow)" />
-              <circle cx="22" cy="18" r="3.5" fill="#34D399" filter="url(#tp-tricolor-glow)" />
-              <circle cx="22" cy="18" r="9" stroke="#6EE7B7" strokeWidth="1" fill="none" opacity="0.65" className="emitter-ring" />
-              <circle cx="22" cy="18" r="17" stroke="#34D399" strokeWidth="0.8" strokeDasharray="3 3" fill="none" opacity="0.4" className="emitter-ring r2" />
+              {/* Top Arcing Streamline */}
+              <path
+                d={`M -540 -50 Q -240 -65 ${CX} ${CY - R + 8}`}
+                fill="none"
+                stroke="#34D399"
+                strokeWidth="1.5"
+                strokeDasharray="6 8"
+                opacity="0.6"
+              />
+              {/* Equatorial Streamline */}
+              <path
+                d={`M -580 55 Q -210 95 ${CX - R + 8} ${CY}`}
+                fill="none"
+                stroke="#10B981"
+                strokeWidth="1.8"
+                strokeDasharray="8 10"
+                opacity="0.75"
+              />
+              {/* Lower Southern Streamline */}
+              <path
+                d={`M -520 160 Q -180 230 ${CX} ${CY + R - 10}`}
+                fill="none"
+                stroke="#34D399"
+                strokeWidth="1.5"
+                strokeDasharray="6 8"
+                opacity="0.55"
+              />
             </g>
           )}
 
