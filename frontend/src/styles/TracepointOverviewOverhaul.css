@@ -34,20 +34,23 @@
 
 /* Section Header Badges (Matching About Us eyebrow style) */
 .tp-overview-eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 3px 10px;
-  background: #E8F2EA;
-  border: 1px solid #C1DEC8;
-  border-radius: 9999px;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 10.5px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #25543D;
-  margin-bottom: 6px;
+  display: inline-flex !important;
+  align-self: flex-start !important;
+  width: fit-content !important;
+  max-width: max-content !important;
+  align-items: center !important;
+  gap: 7px !important;
+  padding: 4px 12px !important;
+  background: #E8F2EA !important;
+  border: 1px solid #C1DEC8 !important;
+  border-radius: 9999px !important;
+  font-family: 'IBM Plex Mono', monospace !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  color: #25543D !important;
+  margin-bottom: 10px !important;
 }
 
 .tp-overview-eyebrow span {
@@ -55,82 +58,87 @@
 }
 
 /* ---------------------------------------------------------------------------
-   Overview Hero Header (Compact 260-290px Height)
+   Overview Hero Header (Compact, Modern, About Us Inspired)
    --------------------------------------------------------------------------- */
 .tp-overview-hero-wrapper {
-  background: #FFFFFF;
-  border: 1px solid #D4E5D8;
-  border-radius: 16px;
-  padding: 20px 28px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 6px 16px rgba(0, 0, 0, 0.04);
-  display: grid;
-  grid-template-columns: 1fr 280px;
-  gap: 20px;
-  align-items: center;
-  min-height: 240px;
-  max-height: 285px;
-  position: relative;
-  overflow: hidden;
-  margin-bottom: 0;
+  background: #FFFFFF !important;
+  border: 1px solid #D4E5D8 !important;
+  border-radius: 16px !important;
+  padding: 26px 32px !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 6px 18px rgba(37, 84, 61, 0.05) !important;
+  display: grid !important;
+  grid-template-columns: 1fr 280px !important;
+  gap: 28px !important;
+  align-items: center !important;
+  min-height: 220px !important;
+  max-height: 265px !important;
+  position: relative !important;
+  overflow: hidden !important;
+  margin-bottom: 0 !important;
 }
 
 .tp-overview-hero-content {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  min-width: 0;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 6px !important;
+  min-width: 0 !important;
+  border: none !important;
+  outline: none !important;
+  background: transparent !important;
 }
 
 .tp-overview-title {
-  font-size: 26px;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  line-height: 1.25;
-  color: #0F172A;
-  margin: 0;
+  font-size: 30px !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.025em !important;
+  line-height: 1.2 !important;
+  color: #0F172A !important;
+  margin: 0 0 8px 0 !important;
 }
 
 .tp-overview-accent {
-  background: linear-gradient(135deg, #25543D 0%, #10B981 60%, #059669 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  background: linear-gradient(135deg, #1B4D3E 0%, #2D6A4F 60%, #10B981 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
 }
 
 .tp-overview-subtitle {
-  font-size: 13.5px;
-  color: #3D5949;
-  line-height: 1.5;
-  margin: 0 0 6px 0;
-  max-width: 580px;
+  font-size: 13.5px !important;
+  color: #3D5949 !important;
+  line-height: 1.55 !important;
+  margin: 0 0 12px 0 !important;
+  max-width: 580px !important;
 }
 
 .tp-overview-hero-meta {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 4px;
+  display: flex !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: 10px !important;
+  margin-top: 4px !important;
 }
 
 .tp-overview-status-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 3px 10px;
-  background: #F1F5F2;
-  border: 1px solid #D4E5D8;
-  border-radius: 9999px;
-  font-size: 11px;
-  font-weight: 600;
-  color: #25543D;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 7px !important;
+  padding: 4px 12px !important;
+  background: #F4F8F5 !important;
+  border: 1px solid #D4E5D8 !important;
+  border-radius: 9999px !important;
+  font-family: 'IBM Plex Mono', monospace !important;
+  font-size: 11.5px !important;
+  font-weight: 600 !important;
+  color: #25543D !important;
 }
 
 .tp-overview-status-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #10B981;
-  box-shadow: 0 0 6px #10B981;
+  width: 6px !important;
+  height: 6px !important;
+  border-radius: 50% !important;
+  background: #10B981 !important;
+  box-shadow: 0 0 6px #10B981 !important;
 }
 
 .tp-overview-hero-globe-slot {
@@ -140,16 +148,19 @@
   position: relative !important;
   width: 100% !important;
   max-width: 280px !important;
-  height: 220px !important;
-  min-height: 220px !important;
-  max-height: 220px !important;
+  height: 210px !important;
+  min-height: 210px !important;
+  max-height: 210px !important;
   overflow: visible !important;
   margin: 0 auto !important;
   padding: 0 !important;
   box-sizing: border-box !important;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
 }
 
-/* Hero Globe Overrides — High specificity containment and scale */
+/* Hero Globe Overrides — High specificity containment, scale and zero outline */
 html body #root .tp-app.tp-app[data-theme='forensic'] .tp-overview-hero-globe-slot .tp-globe,
 html .tp-app.tp-app[data-theme='forensic'] .tp-overview-hero-globe-slot .tp-globe,
 html body #root .tp-overview-hero-globe-slot .tp-globe,
@@ -173,6 +184,7 @@ html body #root .tp-overview-hero-globe-slot .tp-globe,
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
+  outline: none !important;
   z-index: 2 !important;
 }
 
@@ -188,6 +200,9 @@ html body #root .tp-overview-hero-globe-slot .tp-globe-stage,
   overflow: visible !important;
   position: relative !important;
   margin: 0 auto !important;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
 }
 
 html body #root .tp-app.tp-app[data-theme='forensic'] .tp-overview-hero-globe-slot .tp-globe-svg,
@@ -196,17 +211,21 @@ html body #root .tp-app.tp-app[data-theme='forensic'] .tp-overview-hero-globe-sl
 html body #root .tp-overview-hero-globe-slot .aiori-globe-svg,
 .tp-overview-hero-globe-slot .aiori-globe-svg,
 .tp-overview-hero-globe-slot .tp-globe-svg {
-  width: 250px !important;
-  height: 185px !important;
-  max-width: 250px !important;
-  max-height: 185px !important;
+  width: 260px !important;
+  height: 195px !important;
+  max-width: 260px !important;
+  max-height: 195px !important;
   min-width: 0 !important;
   min-height: 0 !important;
   overflow: visible !important;
   margin: 0 auto !important;
   display: block !important;
   position: relative !important;
-  filter: drop-shadow(0 4px 16px rgba(35, 84, 58, 0.12)) !important;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  filter: drop-shadow(0 6px 20px rgba(35, 84, 58, 0.16)) !important;
 }
 
 /* ---------------------------------------------------------------------------

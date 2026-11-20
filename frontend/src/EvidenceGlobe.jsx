@@ -276,7 +276,8 @@ function EvidenceGlobe({
           className="tp-globe-svg aiori-globe-svg"
           viewBox="0 0 420 310"
           role="img"
-          tabIndex={0}
+          tabIndex={-1}
+          style={{ outline: 'none' }}
           data-dragging={dragging || undefined}
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
