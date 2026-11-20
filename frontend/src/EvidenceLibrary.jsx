@@ -460,6 +460,12 @@ export default function EvidenceLibrary({ refreshSignal = 0 }) {
               })}
             </ol>
 
+            <p className="tp-custody-caution">
+              An intact chain shows these entries have not been altered since they
+              were written. It does not show that the record is complete, and it
+              does not independently establish who performed each action.
+            </p>
+
             {totalCustody > 10 && (
               <div className="tp-see-more-bar" role="navigation" aria-label="Custody pagination controls">
                 <div className="tp-see-more-actions">
@@ -502,12 +508,6 @@ export default function EvidenceLibrary({ refreshSignal = 0 }) {
                 </span>
               </div>
             )}
-
-            <p className="tp-custody-caution">
-              An intact chain shows these entries have not been altered since they
-              were written. It does not show that the record is complete, and it
-              does not independently establish who performed each action.
-            </p>
           </>
         )}
       </section>
