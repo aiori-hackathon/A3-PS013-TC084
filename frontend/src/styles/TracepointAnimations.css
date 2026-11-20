@@ -1195,14 +1195,25 @@ html {
 
 /* ===========================================================================
    FLUID SCROLL REVEAL & STAGGERED TELEMETRY ANIMATIONS
-   (Hardware-Accelerated Zero-Lag Compositor Transforms)
+   (Hardware-Accelerated Zero-Lag Compositor Transforms with Fail-Safe Fallback)
    =========================================================================== */
+@keyframes tpScrollRevealFallback {
+  0% {
+    /* remain at initial hidden/transformed state during early mount */
+  }
+  100% {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
 .tp-scroll-reveal,
 .tp-reveal-up {
   opacity: 0;
   transform: translateY(16px);
   transition: opacity 0.38s cubic-bezier(0.16, 1, 0.3, 1),
               transform 0.38s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: tpScrollRevealFallback 0.35s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards;
 }
 
 .tp-reveal-left {
@@ -1210,6 +1221,7 @@ html {
   transform: translateX(-16px);
   transition: opacity 0.38s cubic-bezier(0.16, 1, 0.3, 1),
               transform 0.38s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: tpScrollRevealFallback 0.35s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards;
 }
 
 .tp-reveal-right {
@@ -1217,6 +1229,7 @@ html {
   transform: translateX(16px);
   transition: opacity 0.38s cubic-bezier(0.16, 1, 0.3, 1),
               transform 0.38s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: tpScrollRevealFallback 0.35s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards;
 }
 
 .tp-reveal-scale {
@@ -1224,6 +1237,7 @@ html {
   transform: scale(0.97);
   transition: opacity 0.38s cubic-bezier(0.16, 1, 0.3, 1),
               transform 0.38s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: tpScrollRevealFallback 0.35s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards;
 }
 
 .tp-scroll-reveal.tp-in-view,
@@ -1233,6 +1247,7 @@ html {
 .tp-reveal-scale.tp-in-view {
   opacity: 1 !important;
   transform: translateY(0) scale(1) !important;
+  animation: none !important;
 }
 
 /* Staggered Children inside Grid/Flex Modules */
@@ -1242,11 +1257,13 @@ html {
   transition: opacity 0.38s cubic-bezier(0.16, 1, 0.3, 1),
               transform 0.38s cubic-bezier(0.16, 1, 0.3, 1);
   transition-delay: calc(var(--card-idx, var(--row-idx, var(--rank-idx, var(--stagger-idx, 0)))) * 60ms);
+  animation: tpScrollRevealFallback 0.35s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards;
 }
 
 .tp-stagger-parent.tp-in-view > * {
   opacity: 1 !important;
   transform: translateY(0) scale(1) !important;
+  animation: none !important;
 }
 
 /* Automatic child fallback cascade */

@@ -813,25 +813,52 @@ export default function Dashboard({ user, onSignOut }) {
           observer.unobserve(entry.target);
         }
       });
-    }, { threshold: 0.05, rootMargin: '0px 0px 40px 0px' });
+    }, { threshold: 0.05, rootMargin: '0px 0px 80px 0px' });
 
     const observeTargets = () => {
       const targets = document.querySelectorAll(
         '.tp-scroll-reveal, .tp-reveal-up, .tp-reveal-left, .tp-reveal-right, .tp-reveal-scale, .tp-stagger-parent'
       );
+      const vh = window.innerHeight || document.documentElement.clientHeight || 800;
       targets.forEach(el => {
         if (!el.classList.contains('tp-in-view')) {
-          observer.observe(el);
+          const rect = el.getBoundingClientRect();
+          // If already in or above the visible viewport, reveal immediately without waiting for scroll
+          if (rect.top <= vh + 120 && rect.bottom >= -50) {
+            el.classList.add('tp-in-view');
+          } else {
+            observer.observe(el);
+          }
         }
       });
     };
 
     observeTargets();
-    const timer = setTimeout(observeTargets, 100);
+    const t1 = setTimeout(observeTargets, 60);
+    const t2 = setTimeout(observeTargets, 200);
+    const t3 = setTimeout(observeTargets, 500);
+    const t4 = setTimeout(observeTargets, 1000);
+
+    // Watch for dynamically loaded / code-split chunk mounts
+    let mutationObserver = null;
+    try {
+      mutationObserver = new MutationObserver(() => {
+        observeTargets();
+      });
+      mutationObserver.observe(document.body, { childList: true, subtree: true });
+    } catch { /* unsupported in some testing environments */ }
+
+    const handleViewMounted = () => observeTargets();
+    window.addEventListener('tp-view-mounted', handleViewMounted);
 
     return () => {
-      clearTimeout(timer);
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+      clearTimeout(t4);
       observer.disconnect();
+      if (mutationObserver) mutationObserver.disconnect();
+      window.removeEventListener('tp-view-mounted', handleViewMounted);
     };
   }, [page, events]);
   // TRACEPOINT_FORENSIC_V1: the app ships in one appearance, and this value is
