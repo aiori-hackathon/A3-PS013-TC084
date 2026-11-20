@@ -134,13 +134,79 @@
 }
 
 .tp-overview-hero-globe-slot {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  height: 240px;
-  max-height: 240px;
-  overflow: hidden;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  position: relative !important;
+  width: 100% !important;
+  max-width: 280px !important;
+  height: 220px !important;
+  min-height: 220px !important;
+  max-height: 220px !important;
+  overflow: visible !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* Hero Globe Overrides — High specificity containment and scale */
+html body #root .tp-app.tp-app[data-theme='forensic'] .tp-overview-hero-globe-slot .tp-globe,
+html .tp-app.tp-app[data-theme='forensic'] .tp-overview-hero-globe-slot .tp-globe,
+html body #root .tp-overview-hero-globe-slot .tp-globe,
+.tp-overview-hero-globe-slot .tp-globe {
+  position: relative !important;
+  top: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+  transform: none !important;
+  width: 100% !important;
+  max-width: 260px !important;
+  height: 195px !important;
+  max-height: 195px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  z-index: 2 !important;
+}
+
+html body #root .tp-app.tp-app[data-theme='forensic'] .tp-overview-hero-globe-slot .tp-globe-stage,
+html .tp-app.tp-app[data-theme='forensic'] .tp-overview-hero-globe-slot .tp-globe-stage,
+html body #root .tp-overview-hero-globe-slot .tp-globe-stage,
+.tp-overview-hero-globe-slot .tp-globe-stage {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  height: 100% !important;
+  overflow: visible !important;
+  position: relative !important;
+  margin: 0 auto !important;
+}
+
+html body #root .tp-app.tp-app[data-theme='forensic'] .tp-overview-hero-globe-slot .tp-globe-svg,
+html .tp-app.tp-app[data-theme='forensic'] .tp-overview-hero-globe-slot .tp-globe-svg,
+html body #root .tp-app.tp-app[data-theme='forensic'] .tp-overview-hero-globe-slot .aiori-globe-svg,
+html body #root .tp-overview-hero-globe-slot .aiori-globe-svg,
+.tp-overview-hero-globe-slot .aiori-globe-svg,
+.tp-overview-hero-globe-slot .tp-globe-svg {
+  width: 250px !important;
+  height: 185px !important;
+  max-width: 250px !important;
+  max-height: 185px !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  overflow: visible !important;
+  margin: 0 auto !important;
+  display: block !important;
+  position: relative !important;
+  filter: drop-shadow(0 4px 16px rgba(35, 84, 58, 0.12)) !important;
 }
 
 /* ---------------------------------------------------------------------------

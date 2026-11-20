@@ -2465,7 +2465,7 @@ html .tp-app.tp-app[data-theme='forensic'] .tp-content:has(.tp-benchmark) > .tp-
   }
 
   /* Large globe integrated into the right side — matched to text title height */
-  html .tp-app.tp-app[data-theme='forensic'] .tp-globe {
+  html .tp-app.tp-app[data-theme='forensic'] .tp-forensic-intro .tp-globe {
     position: absolute !important;
     z-index: 1 !important;
     top: 50% !important;
@@ -2476,7 +2476,7 @@ html .tp-app.tp-app[data-theme='forensic'] .tp-content:has(.tp-benchmark) > .tp-
     gap: 0 !important;
   }
 
-  html .tp-app.tp-app[data-theme='forensic'] .tp-globe-svg {
+  html .tp-app.tp-app[data-theme='forensic'] .tp-forensic-intro .tp-globe-svg {
     width: clamp(540px, 46vw, 680px) !important;
     height: clamp(390px, 34vw, 500px) !important;
     max-width: none !important;

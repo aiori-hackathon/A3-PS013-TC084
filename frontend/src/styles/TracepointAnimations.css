@@ -149,7 +149,7 @@ html .tp-app.tp-app[data-theme='forensic'] .tp-forensic-intro-copy {
   padding-top: 14px !important;
 }
 
-html .tp-app.tp-app[data-theme='forensic'] .tp-globe {
+html .tp-app.tp-app[data-theme='forensic'] .tp-forensic-intro .tp-globe {
   position: absolute !important;
   z-index: 1 !important;
   top: 50% !important;
@@ -160,7 +160,7 @@ html .tp-app.tp-app[data-theme='forensic'] .tp-globe {
   gap: 0 !important;
 }
 
-html .tp-app.tp-app[data-theme='forensic'] .tp-globe-stage {
+html .tp-app.tp-app[data-theme='forensic'] .tp-forensic-intro .tp-globe-stage {
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -169,9 +169,8 @@ html .tp-app.tp-app[data-theme='forensic'] .tp-globe-stage {
   z-index: 2 !important;
 }
 
-html body #root .tp-app.tp-app[data-theme='forensic'] .tp-globe-svg,
-html .tp-app.tp-app[data-theme='forensic'] .tp-globe-svg,
-.aiori-globe-svg {
+html body #root .tp-app.tp-app[data-theme='forensic'] .tp-forensic-intro .tp-globe-svg,
+html .tp-app.tp-app[data-theme='forensic'] .tp-forensic-intro .tp-globe-svg {
   width: clamp(540px, 46vw, 680px) !important;
   height: clamp(390px, 34vw, 500px) !important;
   max-width: none !important;
