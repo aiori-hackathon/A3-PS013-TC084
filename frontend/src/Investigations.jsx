@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import {
   Plus, Search, X, ShieldAlert, FileText, Link2, Send, RefreshCw,
-  ChevronDown, ChevronUp, FolderKanban, CheckCircle2, AlertCircle, Activity
+  ChevronDown, ChevronUp, FolderKanban, CheckCircle2, AlertCircle, Activity,
+  Trash2, RotateCcw, XCircle
 } from 'lucide-react';
 import './styles/Tracepoint.css';
 import './styles/investigations.css';
@@ -121,9 +122,86 @@ export default function Investigations({ events = [] }) {
   const createStart = useRef(0);
   useEffect(() => () => clearTimeout(createTimer.current), []);
 
-  const [chatMessages, setChatMessages] = useState([]);
+  // Per-investigation isolated chat conversations (keyed by active case ID)
+  const [caseChats, setCaseChats] = useState({});
   const [chatBusy, setChatBusy] = useState(false);
   const [chatError, setChatError] = useState('');
+  const chatAbortController = useRef(null);
+
+  const activeCaseId = active?.id;
+  const chatMessages = useMemo(() => {
+    return (activeCaseId && caseChats[activeCaseId]) || [];
+  }, [activeCaseId, caseChats]);
+
+  const setCaseMessages = useCallback((updater) => {
+    if (!activeCaseId) return;
+    setCaseChats(prev => {
+      const current = prev[activeCaseId] || [];
+      const next = typeof updater === 'function' ? updater(current) : updater;
+      return { ...prev, [activeCaseId]: next };
+    });
+  }, [activeCaseId]);
+
+  // Reset agent input and in-flight operations when switching cases
+  useEffect(() => {
+    setChatQuestion('');
+    setChatError('');
+    setScanVisible(false);
+    clearTimeout(scanTimer.current);
+    if (chatAbortController.current) {
+      chatAbortController.current.abort();
+      chatAbortController.current = null;
+    }
+    setChatBusy(false);
+  }, [activeCaseId]);
+
+  function clearCaseChat() {
+    if (!activeCaseId) return;
+    if (chatBusy && chatAbortController.current) {
+      chatAbortController.current.abort();
+      chatAbortController.current = null;
+      clearTimeout(scanTimer.current);
+      setScanVisible(false);
+      setChatBusy(false);
+    }
+    setCaseChats(prev => {
+      const next = { ...prev };
+      delete next[activeCaseId];
+      return next;
+    });
+    setChatError('');
+  }
+
+  function deleteMessage(index) {
+    if (!activeCaseId) return;
+    setCaseChats(prev => {
+      const current = prev[activeCaseId] || [];
+      const msg = current[index];
+      let nextList;
+      if (msg?.role === 'user' && current[index + 1]?.role === 'assistant') {
+        nextList = current.filter((_, i) => i !== index && i !== index + 1);
+      } else {
+        nextList = current.filter((_, i) => i !== index);
+      }
+      return { ...prev, [activeCaseId]: nextList };
+    });
+  }
+
+  function cancelAssistantRequest() {
+    if (chatAbortController.current) {
+      chatAbortController.current.abort();
+      chatAbortController.current = null;
+    }
+    clearTimeout(scanTimer.current);
+    setScanVisible(false);
+    setChatBusy(false);
+    setCaseMessages(prev => {
+      if (prev.length > 0 && prev[prev.length - 1].role === 'user') {
+        return prev.slice(0, -1);
+      }
+      return prev;
+    });
+  }
 
 
   async function loadCases() {
@@ -219,6 +297,10 @@ export default function Investigations({ events = [] }) {
     setChatQuestion('');
     setChatError('');
     setChatBusy(true);
+
+    const controller = new AbortController();
+    chatAbortController.current = controller;
+
     // Every stage starts as working. Nothing here claims one has finished.
     clearTimeout(scanTimer.current);
     scanStart.current = Date.now();
@@ -230,7 +312,7 @@ export default function Investigations({ events = [] }) {
       .slice(-10)
       .map(({ role, content }) => ({ role, content }));
 
-    setChatMessages(previous => [
+    setCaseMessages(previous => [
       ...previous,
       { role: 'user', content: question },
     ]);
@@ -242,11 +324,12 @@ export default function Investigations({ events = [] }) {
           question,
           conversation_history: history,
         }),
+        signal: controller.signal,
       });
 
       settleScan(stagesFromResult(result));
 
-      setChatMessages(previous => [
+      setCaseMessages(previous => [
         ...previous,
         {
           role: 'assistant',
@@ -256,10 +339,17 @@ export default function Investigations({ events = [] }) {
         },
       ]);
     } catch (err) {
+      if (err.name === 'AbortError') {
+        setScanVisible(false);
+        return;
+      }
       settleScan(STAGES_FAILED);
       setChatError(err.message || 'Could not contact the investigation assistant.');
       setChatQuestion(question);
     } finally {
+      if (chatAbortController.current === controller) {
+        chatAbortController.current = null;
+      }
       setChatBusy(false);
     }
   }
@@ -429,7 +519,7 @@ export default function Investigations({ events = [] }) {
     </section>
 
     {creating && typeof document !== 'undefined' && createPortal(
-      <div className="tp-overlay tp-inv-modal-overlay tp-inv-create-overlay tp-app" data-theme={pageTheme} onMouseDown={() => setCreating(false)}>
+      <div className="tp-overlay tp-inv-modal-overlay tp-inv-create-overlay" data-theme={pageTheme} onMouseDown={() => setCreating(false)}>
         <aside className="tp-drawer tp-investigation-modal tp-investigation-create-modal" role="dialog" aria-modal="true" aria-label="Create investigation" onMouseDown={e => e.stopPropagation()}>
           <div className="tp-drawer-header"><div><span>New case</span><h2>Create investigation</h2></div><button onClick={() => setCreating(false)} aria-label="Close"><X size={21}/></button></div>
           {createScanOn && <InvestigationScan states={createStates} stages={CREATE_STAGES} />}
@@ -445,7 +535,7 @@ export default function Investigations({ events = [] }) {
     )}
 
     {active && !creating && typeof document !== 'undefined' && createPortal(
-      <div className="tp-overlay tp-inv-modal-overlay tp-inv-detail-overlay tp-app" data-theme={pageTheme} onMouseDown={() => setActive(null)}>
+      <div className="tp-overlay tp-inv-modal-overlay tp-inv-detail-overlay" data-theme={pageTheme} onMouseDown={() => setActive(null)}>
         <aside className="tp-drawer tp-inv-drawer tp-investigation-modal tp-investigation-detail-modal" role="dialog" aria-modal="true" aria-label="Investigation details" onMouseDown={e => e.stopPropagation()}>
           <div className="tp-drawer-header"><div><span>TP-{String(active.id).padStart(4, '0')}</span><h2>{active.title}</h2><span className={`tp-inv-pill ${active.severity}`}>{active.severity}</span></div><button onClick={() => setActive(null)} aria-label="Close"><X size={21}/></button></div>
           <div className="tp-drawer-body tp-inv-detail">
@@ -474,7 +564,20 @@ export default function Investigations({ events = [] }) {
                   <h3>Ask about this investigation</h3>
                   <p>Answers are grounded in the events linked to this case.</p>
                 </div>
-                <span className="tp-ai-status">AI ASSISTANT</span>
+                <div className="tp-ai-heading-actions">
+                  {chatMessages.length > 0 && (
+                    <button
+                      type="button"
+                      className="tp-ai-reset-btn"
+                      onClick={clearCaseChat}
+                      title="Reset conversation for this case"
+                    >
+                      <RotateCcw size={12} />
+                      <span>Reset conversation</span>
+                    </button>
+                  )}
+                  <span className="tp-ai-status">AI ASSISTANT</span>
+                </div>
               </div>
 
               <div className="tp-ai-messages" aria-live="polite">
@@ -488,9 +591,21 @@ export default function Investigations({ events = [] }) {
                     className={`tp-ai-message ${message.role === 'user' ? 'user' : 'assistant'}`}
                     key={`${index}-${message.role}`}
                   >
-                    <span className="tp-ai-message-role">
-                      {message.role === 'user' ? 'YOU' : 'TRACEPOINT AI'}
-                    </span>
+                    <div className="tp-ai-msg-header">
+                      <span className="tp-ai-message-role">
+                        {message.role === 'user' ? 'YOU' : 'TRACEPOINT AI'}
+                      </span>
+                      <button
+                        type="button"
+                        className="tp-ai-msg-delete"
+                        onClick={() => deleteMessage(index)}
+                        title={message.role === 'user' ? 'Delete question and answer' : 'Delete response'}
+                        aria-label="Delete message"
+                      >
+                        <Trash2 size={11} />
+                        <span>Delete</span>
+                      </button>
+                    </div>
                     <p>{message.content}</p>
                     {message.sources?.length > 0 && (
                       <div className="tp-ai-sources">
@@ -539,30 +654,63 @@ export default function Investigations({ events = [] }) {
                     value={chatQuestion}
                     onChange={e => setChatQuestion(e.target.value)}
                     onKeyDown={e => {
-                      if (e.key === 'Enter' && !e.shiftKey) {
+                      if (e.key === 'Escape') {
+                        e.preventDefault();
+                        setChatQuestion('');
+                      } else if (e.key === 'Enter' && !e.shiftKey) {
                         e.preventDefault();
                         if (!chatBusy && chatQuestion.trim().length >= 3) {
                           askInvestigationAssistant(e);
                         }
                       }
                     }}
-                    placeholder="Ask a question about the evidence (Press Enter ↵ to send)…"
+                    placeholder="Ask a question about the evidence (Press Enter ↵ to send, Esc to cancel)…"
                     aria-label="Question about this investigation"
                     disabled={chatBusy}
                     required
                   />
+                  {chatQuestion.length > 0 && !chatBusy && (
+                    <button
+                      type="button"
+                      className="tp-ai-input-clear-btn"
+                      onClick={() => setChatQuestion('')}
+                      title="Clear / Cancel question (Esc)"
+                      aria-label="Clear question text"
+                    >
+                      <X size={13} />
+                      <span>Clear</span>
+                    </button>
+                  )}
                 </div>
                 <div className="tp-ai-form-actions">
-                  <span className="tp-ai-keyboard-hint">Press <strong>Enter ↵</strong> to ask AI · <strong>Shift + Enter</strong> for new line</span>
-                  <button
-                    className="tp-button primary tp-ai-submit-btn"
-                    type="submit"
-                    disabled={chatBusy || chatQuestion.trim().length < 3}
-                    title="Ask AI Agent (Enter ↵)"
-                  >
-                    <Send size={15} />
-                    <span>{chatBusy ? 'Analysing…' : 'Ask Agent ↵'}</span>
-                  </button>
+                  <span className="tp-ai-keyboard-hint">
+                    {chatBusy
+                      ? 'AI is analysing evidence… You can cancel at any time.'
+                      : <>Press <strong>Enter ↵</strong> to ask AI · <strong>Shift + Enter</strong> for new line · <strong>Esc</strong> to cancel</>}
+                  </span>
+                  <div className="tp-ai-action-buttons">
+                    {chatBusy ? (
+                      <button
+                        className="tp-button tp-ai-abort-btn"
+                        type="button"
+                        onClick={cancelAssistantRequest}
+                        title="Cancel inquiry"
+                      >
+                        <XCircle size={15} />
+                        <span>Cancel inquiry</span>
+                      </button>
+                    ) : (
+                      <button
+                        className="tp-button primary tp-ai-submit-btn"
+                        type="submit"
+                        disabled={chatQuestion.trim().length < 3}
+                        title="Ask AI Agent (Enter ↵)"
+                      >
+                        <Send size={15} />
+                        <span>Ask Agent ↵</span>
+                      </button>
+                    )}
+                  </div>
                 </div>
               </form>
               <p className="tp-ai-disclaimer">
