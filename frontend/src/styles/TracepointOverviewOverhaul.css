@@ -58,22 +58,21 @@
 }
 
 /* ---------------------------------------------------------------------------
-   Overview Hero Header (Compact, Modern, About Us Inspired)
+   Overview Hero Header (Unboxed, Expansive, Big Commanding 3D Globe)
    --------------------------------------------------------------------------- */
 .tp-overview-hero-wrapper {
-  background: #FFFFFF !important;
-  border: 1px solid #D4E5D8 !important;
-  border-radius: 16px !important;
-  padding: 26px 32px !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 6px 18px rgba(37, 84, 61, 0.05) !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 16px 4px 28px 4px !important;
   display: grid !important;
-  grid-template-columns: 1fr 280px !important;
-  gap: 28px !important;
+  grid-template-columns: minmax(0, 1.15fr) minmax(380px, 0.85fr) !important;
+  gap: 32px !important;
   align-items: center !important;
-  min-height: 220px !important;
-  max-height: 265px !important;
+  min-height: 380px !important;
   position: relative !important;
-  overflow: hidden !important;
+  overflow: visible !important;
   margin-bottom: 0 !important;
 }
 
@@ -81,7 +80,7 @@
   display: flex !important;
   flex-direction: column !important;
   align-items: flex-start !important;
-  gap: 6px !important;
+  gap: 8px !important;
   min-width: 0 !important;
   border: none !important;
   outline: none !important;
@@ -89,12 +88,12 @@
 }
 
 .tp-overview-title {
-  font-size: 30px !important;
+  font-size: clamp(34px, 3.4vw, 46px) !important;
   font-weight: 800 !important;
-  letter-spacing: -0.025em !important;
-  line-height: 1.2 !important;
+  letter-spacing: -0.035em !important;
+  line-height: 1.12 !important;
   color: #0F172A !important;
-  margin: 0 0 8px 0 !important;
+  margin: 0 0 12px 0 !important;
 }
 
 .tp-overview-accent {
@@ -104,41 +103,42 @@
 }
 
 .tp-overview-subtitle {
-  font-size: 13.5px !important;
+  font-size: 15px !important;
   color: #3D5949 !important;
-  line-height: 1.55 !important;
-  margin: 0 0 12px 0 !important;
-  max-width: 580px !important;
+  line-height: 1.6 !important;
+  margin: 0 0 18px 0 !important;
+  max-width: 560px !important;
 }
 
 .tp-overview-hero-meta {
   display: flex !important;
   align-items: center !important;
   flex-wrap: wrap !important;
-  gap: 10px !important;
-  margin-top: 4px !important;
+  gap: 12px !important;
+  margin-top: 6px !important;
 }
 
 .tp-overview-status-pill {
   display: inline-flex !important;
   align-items: center !important;
-  gap: 7px !important;
-  padding: 4px 12px !important;
-  background: #F4F8F5 !important;
+  gap: 8px !important;
+  padding: 6px 14px !important;
+  background: #FFFFFF !important;
   border: 1px solid #D4E5D8 !important;
   border-radius: 9999px !important;
   font-family: 'IBM Plex Mono', monospace !important;
-  font-size: 11.5px !important;
+  font-size: 12px !important;
   font-weight: 600 !important;
   color: #25543D !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
 }
 
 .tp-overview-status-dot {
-  width: 6px !important;
-  height: 6px !important;
+  width: 7px !important;
+  height: 7px !important;
   border-radius: 50% !important;
   background: #10B981 !important;
-  box-shadow: 0 0 6px #10B981 !important;
+  box-shadow: 0 0 8px #10B981 !important;
 }
 
 .tp-overview-hero-globe-slot {
@@ -147,10 +147,10 @@
   justify-content: center !important;
   position: relative !important;
   width: 100% !important;
-  max-width: 280px !important;
-  height: 210px !important;
-  min-height: 210px !important;
-  max-height: 210px !important;
+  max-width: 520px !important;
+  height: 380px !important;
+  min-height: 380px !important;
+  max-height: 420px !important;
   overflow: visible !important;
   margin: 0 auto !important;
   padding: 0 !important;
@@ -160,7 +160,7 @@
   outline: none !important;
 }
 
-/* Hero Globe Overrides — High specificity containment, scale and zero outline */
+/* Hero Globe Overrides — Big, commanding 3D Earth */
 html body #root .tp-app.tp-app[data-theme='forensic'] .tp-overview-hero-globe-slot .tp-globe,
 html .tp-app.tp-app[data-theme='forensic'] .tp-overview-hero-globe-slot .tp-globe,
 html body #root .tp-overview-hero-globe-slot .tp-globe,
@@ -172,9 +172,9 @@ html body #root .tp-overview-hero-globe-slot .tp-globe,
   left: auto !important;
   transform: none !important;
   width: 100% !important;
-  max-width: 260px !important;
-  height: 195px !important;
-  max-height: 195px !important;
+  max-width: 500px !important;
+  height: 370px !important;
+  max-height: 370px !important;
   display: flex !important;
   flex-direction: column !important;
   align-items: center !important;
@@ -211,10 +211,10 @@ html body #root .tp-app.tp-app[data-theme='forensic'] .tp-overview-hero-globe-sl
 html body #root .tp-overview-hero-globe-slot .aiori-globe-svg,
 .tp-overview-hero-globe-slot .aiori-globe-svg,
 .tp-overview-hero-globe-slot .tp-globe-svg {
-  width: 260px !important;
-  height: 195px !important;
-  max-width: 260px !important;
-  max-height: 195px !important;
+  width: clamp(380px, 34vw, 490px) !important;
+  height: clamp(280px, 26vw, 365px) !important;
+  max-width: 100% !important;
+  max-height: 370px !important;
   min-width: 0 !important;
   min-height: 0 !important;
   overflow: visible !important;
@@ -225,7 +225,7 @@ html body #root .tp-overview-hero-globe-slot .aiori-globe-svg,
   border: none !important;
   outline: none !important;
   box-shadow: none !important;
-  filter: drop-shadow(0 6px 20px rgba(35, 84, 58, 0.16)) !important;
+  filter: drop-shadow(0 12px 32px rgba(35, 84, 58, 0.18)) !important;
 }
 
 /* ---------------------------------------------------------------------------
@@ -654,11 +654,27 @@ html body #root .tp-overview-hero-globe-slot .aiori-globe-svg,
 /* Responsive Media Queries */
 @media (max-width: 1100px) {
   .tp-overview-hero-wrapper {
-    grid-template-columns: 1fr;
-    text-align: center;
+    grid-template-columns: 1fr !important;
+    text-align: center !important;
+    gap: 24px !important;
+    min-height: auto !important;
   }
   .tp-overview-hero-content {
-    align-items: center;
+    align-items: center !important;
+  }
+  .tp-overview-eyebrow {
+    align-self: center !important;
+  }
+  .tp-overview-hero-meta {
+    justify-content: center !important;
+  }
+  .tp-overview-hero-globe-slot {
+    height: 320px !important;
+    min-height: 320px !important;
+  }
+  .tp-overview-hero-globe-slot .aiori-globe-svg {
+    width: clamp(300px, 60vw, 400px) !important;
+    height: clamp(220px, 45vw, 300px) !important;
   }
   .tp-overview-tools-grid {
     grid-template-columns: repeat(3, 1fr);
