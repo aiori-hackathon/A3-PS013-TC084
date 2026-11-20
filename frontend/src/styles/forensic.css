@@ -883,18 +883,43 @@ html .tp-app.tp-app[data-theme='forensic'] :is(
 
 html .tp-app.tp-app[data-theme='forensic'] :is(
   .tp-page-header, .tp-inv-phase5-hero, [class*='page-header'], [class*='-hero']
-) {
+):not(.tp-overview-canvas):not(.tp-overview-lead):not(.tp-overview-globe-stage):not(.tp-overview-pills):not([class*='tp-overview']) {
   background: var(--fx-raised) !important;
   border: 1px solid var(--fx-line) !important;
   border-inline-start: 2px solid var(--fx-signal) !important;
   border-radius: var(--fx-r-md) !important;
   color: var(--fx-text) !important;
 }
-html .tp-app.tp-app[data-theme='forensic'] :is(.tp-page-header, [class*='-hero']) :is(h1, h2, h3) {
+html .tp-app.tp-app[data-theme='forensic'] :is(.tp-page-header, [class*='-hero']):not([class*='tp-overview']) :is(h1, h2, h3) {
   color: var(--fx-text) !important;
 }
-html .tp-app.tp-app[data-theme='forensic'] :is(.tp-page-header, [class*='-hero']) :is(p, span, small) {
+html .tp-app.tp-app[data-theme='forensic'] :is(.tp-page-header, [class*='-hero']):not([class*='tp-overview']) :is(p, span, small) {
   color: var(--fx-text-dim) !important;
+}
+
+/* Overview Header Canvas: Unboxed Open Canvas (Zero borders, zero backgrounds, zero outlines) */
+html body #root .tp-app.tp-app[data-theme='forensic'] :is(
+  .tp-overview-canvas,
+  .tp-overview-lead,
+  .tp-overview-globe-stage,
+  .tp-overview-pills,
+  .tp-overview-hero-wrapper,
+  .tp-overview-hero-content,
+  .tp-overview-hero-globe-slot,
+  .tp-overview-hero-meta
+) {
+  background: transparent !important;
+  background-image: none !important;
+  border: none !important;
+  border-left: none !important;
+  border-right: none !important;
+  border-top: none !important;
+  border-bottom: none !important;
+  border-inline-start: none !important;
+  border-inline-end: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  outline: none !important;
 }
 
 /* The nav strip that carried the navy behind the tabs. */

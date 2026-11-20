@@ -60,11 +60,20 @@
 /* ---------------------------------------------------------------------------
    Overview Hero Header (Unboxed, Expansive, Big Commanding 3D Globe)
    --------------------------------------------------------------------------- */
+.tp-overview-canvas,
 .tp-overview-hero-wrapper {
   background: transparent !important;
+  background-image: none !important;
   border: none !important;
+  border-left: none !important;
+  border-right: none !important;
+  border-top: none !important;
+  border-bottom: none !important;
+  border-inline-start: none !important;
+  border-inline-end: none !important;
   border-radius: 0 !important;
   box-shadow: none !important;
+  outline: none !important;
   padding: 16px 4px 28px 4px !important;
   display: grid !important;
   grid-template-columns: minmax(0, 1.15fr) minmax(380px, 0.85fr) !important;
@@ -76,6 +85,7 @@
   margin-bottom: 24px !important;
 }
 
+.tp-overview-lead,
 .tp-overview-hero-content {
   display: flex !important;
   flex-direction: column !important;
@@ -83,8 +93,15 @@
   gap: 8px !important;
   min-width: 0 !important;
   border: none !important;
+  border-left: none !important;
+  border-right: none !important;
+  border-top: none !important;
+  border-bottom: none !important;
+  border-inline-start: none !important;
+  border-inline-end: none !important;
   outline: none !important;
   background: transparent !important;
+  box-shadow: none !important;
 }
 
 .tp-overview-title {
@@ -110,12 +127,22 @@
   max-width: 560px !important;
 }
 
+.tp-overview-pills,
 .tp-overview-hero-meta {
   display: flex !important;
   align-items: center !important;
   flex-wrap: wrap !important;
   gap: 12px !important;
   margin-top: 6px !important;
+  border: none !important;
+  border-left: none !important;
+  border-right: none !important;
+  border-top: none !important;
+  border-bottom: none !important;
+  border-inline-start: none !important;
+  border-inline-end: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
 }
 
 .tp-overview-status-pill {
@@ -141,6 +168,7 @@
   box-shadow: 0 0 8px #10B981 !important;
 }
 
+.tp-overview-globe-stage,
 .tp-overview-hero-globe-slot {
   display: flex !important;
   align-items: center !important;
@@ -156,15 +184,23 @@
   padding: 0 !important;
   box-sizing: border-box !important;
   background: transparent !important;
+  background-image: none !important;
   border: none !important;
+  border-left: none !important;
+  border-right: none !important;
+  border-top: none !important;
+  border-bottom: none !important;
+  border-inline-start: none !important;
+  border-inline-end: none !important;
   outline: none !important;
+  box-shadow: none !important;
 }
 
 /* Hero Globe Overrides — Big, commanding 3D Earth */
-html body #root .tp-app.tp-app[data-theme='forensic'] .tp-overview-hero-globe-slot .tp-globe,
-html .tp-app.tp-app[data-theme='forensic'] .tp-overview-hero-globe-slot .tp-globe,
-html body #root .tp-overview-hero-globe-slot .tp-globe,
-.tp-overview-hero-globe-slot .tp-globe {
+html body #root .tp-app.tp-app[data-theme='forensic'] :is(.tp-overview-globe-stage, .tp-overview-hero-globe-slot) .tp-globe,
+html .tp-app.tp-app[data-theme='forensic'] :is(.tp-overview-globe-stage, .tp-overview-hero-globe-slot) .tp-globe,
+html body #root :is(.tp-overview-globe-stage, .tp-overview-hero-globe-slot) .tp-globe,
+:is(.tp-overview-globe-stage, .tp-overview-hero-globe-slot) .tp-globe {
   position: relative !important;
   top: auto !important;
   right: auto !important;
@@ -188,10 +224,10 @@ html body #root .tp-overview-hero-globe-slot .tp-globe,
   z-index: 2 !important;
 }
 
-html body #root .tp-app.tp-app[data-theme='forensic'] .tp-overview-hero-globe-slot .tp-globe-stage,
-html .tp-app.tp-app[data-theme='forensic'] .tp-overview-hero-globe-slot .tp-globe-stage,
-html body #root .tp-overview-hero-globe-slot .tp-globe-stage,
-.tp-overview-hero-globe-slot .tp-globe-stage {
+html body #root .tp-app.tp-app[data-theme='forensic'] :is(.tp-overview-globe-stage, .tp-overview-hero-globe-slot) .tp-globe-stage,
+html .tp-app.tp-app[data-theme='forensic'] :is(.tp-overview-globe-stage, .tp-overview-hero-globe-slot) .tp-globe-stage,
+html body #root :is(.tp-overview-globe-stage, .tp-overview-hero-globe-slot) .tp-globe-stage,
+:is(.tp-overview-globe-stage, .tp-overview-hero-globe-slot) .tp-globe-stage {
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -205,12 +241,12 @@ html body #root .tp-overview-hero-globe-slot .tp-globe-stage,
   outline: none !important;
 }
 
-html body #root .tp-app.tp-app[data-theme='forensic'] .tp-overview-hero-globe-slot .tp-globe-svg,
-html .tp-app.tp-app[data-theme='forensic'] .tp-overview-hero-globe-slot .tp-globe-svg,
-html body #root .tp-app.tp-app[data-theme='forensic'] .tp-overview-hero-globe-slot .aiori-globe-svg,
-html body #root .tp-overview-hero-globe-slot .aiori-globe-svg,
-.tp-overview-hero-globe-slot .aiori-globe-svg,
-.tp-overview-hero-globe-slot .tp-globe-svg {
+html body #root .tp-app.tp-app[data-theme='forensic'] :is(.tp-overview-globe-stage, .tp-overview-hero-globe-slot) .tp-globe-svg,
+html .tp-app.tp-app[data-theme='forensic'] :is(.tp-overview-globe-stage, .tp-overview-hero-globe-slot) .tp-globe-svg,
+html body #root .tp-app.tp-app[data-theme='forensic'] :is(.tp-overview-globe-stage, .tp-overview-hero-globe-slot) .aiori-globe-svg,
+html body #root :is(.tp-overview-globe-stage, .tp-overview-hero-globe-slot) .aiori-globe-svg,
+:is(.tp-overview-globe-stage, .tp-overview-hero-globe-slot) .aiori-globe-svg,
+:is(.tp-overview-globe-stage, .tp-overview-hero-globe-slot) .tp-globe-svg {
   width: clamp(380px, 34vw, 490px) !important;
   height: clamp(280px, 26vw, 365px) !important;
   max-width: 100% !important;
@@ -449,9 +485,14 @@ html body #root .tp-app[data-theme='dark'] .tp-floating-tag {
 }
 
 /* Explicitly eliminate any black lines, outlines, pseudo-elements, or borders on hero container/globe */
+.tp-overview-canvas,
+.tp-overview-lead,
+.tp-overview-globe-stage,
+.tp-overview-pills,
 .tp-overview-hero-wrapper,
 .tp-overview-hero-content,
 .tp-overview-hero-globe-slot,
+.tp-overview-hero-meta,
 .aiori-globe-container,
 .tp-globe,
 .tp-globe-stage,
@@ -460,11 +501,21 @@ html body #root .tp-app[data-theme='dark'] .tp-floating-tag {
   border-right: none !important;
   border-top: none !important;
   border-bottom: none !important;
+  border-inline-start: none !important;
+  border-inline-end: none !important;
   border: none !important;
   outline: none !important;
   box-shadow: none !important;
 }
 
+.tp-overview-canvas::before,
+.tp-overview-canvas::after,
+.tp-overview-lead::before,
+.tp-overview-lead::after,
+.tp-overview-globe-stage::before,
+.tp-overview-globe-stage::after,
+.tp-overview-pills::before,
+.tp-overview-pills::after,
 .tp-overview-hero-wrapper::before,
 .tp-overview-hero-wrapper::after,
 .tp-overview-hero-content::before,
@@ -901,26 +952,31 @@ html body #root .tp-app[data-theme='dark'] .tp-floating-tag {
 
 /* Responsive Media Queries */
 @media (max-width: 880px) {
+  .tp-overview-canvas,
   .tp-overview-hero-wrapper {
     grid-template-columns: 1fr !important;
     text-align: center !important;
     gap: 24px !important;
     min-height: auto !important;
   }
+  .tp-overview-lead,
   .tp-overview-hero-content {
     align-items: center !important;
   }
   .tp-overview-eyebrow {
     align-self: center !important;
   }
+  .tp-overview-pills,
   .tp-overview-hero-meta {
     justify-content: center !important;
   }
+  .tp-overview-globe-stage,
   .tp-overview-hero-globe-slot {
     height: auto !important;
     min-height: auto !important;
     padding-bottom: 20px !important;
   }
+  .tp-overview-globe-stage .aiori-globe-svg,
   .tp-overview-hero-globe-slot .aiori-globe-svg {
     width: clamp(280px, 80vw, 380px) !important;
     height: clamp(220px, 60vw, 300px) !important;

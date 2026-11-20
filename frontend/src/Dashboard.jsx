@@ -971,8 +971,8 @@ export default function Dashboard({ user, onSignOut }) {
         <div className="tp-overview-container">
           {/* 1. Overview Hero Header with Docked Globe */}
           <section
-            className="tp-overview-hero-wrapper tp-scroll-reveal"
-            aria-label="Overview Hero"
+            className="tp-overview-canvas tp-scroll-reveal"
+            aria-label="Overview Telemetry Canvas"
             style={{
               background: 'transparent',
               border: 'none',
@@ -982,7 +982,7 @@ export default function Dashboard({ user, onSignOut }) {
             }}
           >
             <div
-              className="tp-overview-hero-content"
+              className="tp-overview-lead"
               style={{
                 background: 'transparent',
                 border: 'none',
@@ -1000,7 +1000,15 @@ export default function Dashboard({ user, onSignOut }) {
                 Real-time internet operations and security incident telemetry for Indian infrastructure.
                 Every evidence chain cryptographically sealed with RFC 5424 normalization.
               </p>
-              <div className="tp-overview-hero-meta">
+              <div
+                className="tp-overview-pills"
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  outline: 'none',
+                  boxShadow: 'none',
+                }}
+              >
                 <div className="tp-overview-status-pill">
                   <span className="tp-overview-status-dot" aria-hidden="true" />
                   <span>{loading ? 'Connecting telemetry probe…' : `${events.length.toLocaleString()} events indexed`}</span>
@@ -1011,7 +1019,7 @@ export default function Dashboard({ user, onSignOut }) {
               </div>
             </div>
             <div
-              className="tp-overview-hero-globe-slot"
+              className="tp-overview-globe-stage"
               style={{
                 background: 'transparent',
                 border: 'none',
