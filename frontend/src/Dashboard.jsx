@@ -43,7 +43,6 @@ import './styles/TracepointAnimations.css';
 import TracepointMark from './TracepointMark';
 import EvidenceGlobe from './EvidenceGlobe';
 import EvidenceCharts from './EvidenceCharts';
-import GlobeIntro from './GlobeIntro';
 import './styles/TracepointOverviewOverhaul.css';
 import {
   EmblemIngestion,
@@ -717,20 +716,6 @@ export default function Dashboard({ user, onSignOut }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const progressBarRef = useRef(null);
   const [backToTopVisible, setBackToTopVisible] = useState(false);
-  const [showIntro, setShowIntro] = useState(() => {
-    try {
-      return !sessionStorage.getItem('intro-played');
-    } catch {
-      return false;
-    }
-  });
-
-  const replayIntro = useCallback(() => {
-    try {
-      sessionStorage.removeItem('intro-played');
-    } catch {}
-    setShowIntro(true);
-  }, []);
 
   // Ultra-lightweight native scroll progress & back-to-top handler (zero JS friction)
   useEffect(() => {
@@ -959,16 +944,6 @@ export default function Dashboard({ user, onSignOut }) {
     {/* TRACEPOINT_SINGLE_NAV_V1: status and account live in primary navigation */}
 
       <div className="tp-content">
-        {showIntro && page === 'overview' && (
-          <GlobeIntro
-            onComplete={() => setShowIntro(false)}
-            events={events}
-            severityOf={severity}
-            deviceOf={device}
-            isFailure={fail}
-            timestampOf={timestamp}
-          />
-        )}
         {page !== 'about' && page !== 'overview' && (
           <div className={`tp-page-header ${page === 'guide' ? 'tp-page-header-guide' : ''}`}>
             <div>
@@ -1015,14 +990,6 @@ export default function Dashboard({ user, onSignOut }) {
                 <div className="tp-overview-status-pill">
                   <span>Locked: 21.5°N, 78.5°E</span>
                 </div>
-                <button
-                  type="button"
-                  className="tp-intro-replay-btn"
-                  onClick={replayIntro}
-                  title="Replay cinematic globe intro animation"
-                >
-                  ↺ Replay Intro
-                </button>
               </div>
             </div>
             <div className="tp-overview-hero-globe-slot">
@@ -1041,9 +1008,9 @@ export default function Dashboard({ user, onSignOut }) {
           {/* 2. Operational Signals Section Header & Metric Cards */}
           <div className="tp-overview-section-header tp-scroll-reveal">
             <div>
-              <h2>Operational Signals</h2>
+              <h2>Operational signals</h2>
+              <span className="tp-overview-section-sub">Live probe telemetry</span>
             </div>
-            <span>Live probe telemetry</span>
           </div>
 
           <div className="tp-overview-metrics-grid tp-scroll-reveal tp-stagger-parent">
@@ -1091,9 +1058,9 @@ export default function Dashboard({ user, onSignOut }) {
           {/* 3. Forensic Tool Launchpad Section Header & Cards */}
           <div className="tp-overview-section-header tp-scroll-reveal">
             <div>
-              <h2>Forensic Tool Launchpad</h2>
+              <h2>Forensic tool launchpad</h2>
+              <span className="tp-overview-section-sub">Deep inspection modules</span>
             </div>
-            <span>Deep inspection modules</span>
           </div>
 
           <nav className="tp-overview-tools-grid tp-scroll-reveal tp-stagger-parent" aria-label="Quick access to TracePoint tools">
@@ -1242,9 +1209,9 @@ export default function Dashboard({ user, onSignOut }) {
           {/* 4. Authentication Outcomes Timeline Bar Chart */}
           <div className="tp-overview-section-header tp-scroll-reveal">
             <div>
-              <h2>Authentication Outcomes Timeline</h2>
+              <h2>Authentication outcomes timeline</h2>
+              <span className="tp-overview-section-sub">Stacked telemetry · Nominal vs failure indicators</span>
             </div>
-            <span>Stacked telemetry · Nominal vs Failure indicators</span>
           </div>
 
           <EvidenceCharts
@@ -1258,27 +1225,86 @@ export default function Dashboard({ user, onSignOut }) {
 
           <hr className="tp-section-divider" />
 
-          {/* 5. Data Quality Signals */}
-          <div className="tp-forensic-review tp-scroll-reveal tp-stagger-parent">
-            <div className="tp-forensic-review-title">
-              <img src="/icons/3d/warning-triangle.png" alt="" className="tp-3d-inline-icon" aria-hidden="true" />
-              <div><strong>Data quality signals</strong><span>Indicators detected in collected events, not verified incidents</span></div>
+          {/* 5. Data Quality Signals (4 Compact Metric Cards) */}
+          <div className="tp-overview-section-header tp-scroll-reveal">
+            <div>
+              <h2>Data quality signals</h2>
+              <span className="tp-overview-section-sub">Indicators detected in collected events, not verified incidents</span>
             </div>
-            <div className="tp-forensic-review-items">
-              <div><strong>{loading ? '…' : parsingIssues}</strong><span>Events with parsing gaps</span></div>
-              <div><strong>{loading ? '…' : timestampIssues}</strong><span>Inferred or conflicting timestamps</span></div>
-              <div><strong>{loading ? '…' : clockAhead}</strong><span>Events dated after receipt</span></div>
-              <div><strong>{loading ? '…' : failures}</strong><span>Events matching failure indicators</span></div>
+          </div>
+
+          <div className="tp-overview-metrics-grid tp-scroll-reveal tp-stagger-parent">
+            <div className="tp-metric-card" style={{ '--card-idx': 0 }}>
+              <div className="tp-metric-accent-bar accent-amber" aria-hidden="true" />
+              <div className="tp-metric-header">
+                <span className="tp-metric-label">Parsing gaps</span>
+              </div>
+              <div className="tp-metric-body">
+                <strong className="tp-metric-value">{loading ? '…' : parsingIssues}</strong>
+                <span className="tp-metric-chip accent-amber">
+                  <span className="tp-metric-chip-pip" aria-hidden="true" />
+                  GAPS
+                </span>
+              </div>
+              <span className="tp-metric-note">Events with parsing gaps</span>
+            </div>
+
+            <div className="tp-metric-card" style={{ '--card-idx': 1 }}>
+              <div className="tp-metric-accent-bar accent-amber" aria-hidden="true" />
+              <div className="tp-metric-header">
+                <span className="tp-metric-label">Timestamp issues</span>
+              </div>
+              <div className="tp-metric-body">
+                <strong className="tp-metric-value">{loading ? '…' : timestampIssues}</strong>
+                <span className="tp-metric-chip accent-amber">
+                  <span className="tp-metric-chip-pip" aria-hidden="true" />
+                  SKEW
+                </span>
+              </div>
+              <span className="tp-metric-note">Inferred or conflicting timestamps</span>
+            </div>
+
+            <div className="tp-metric-card" style={{ '--card-idx': 2 }}>
+              <div className="tp-metric-accent-bar accent-sage" aria-hidden="true" />
+              <div className="tp-metric-header">
+                <span className="tp-metric-label">Future dated</span>
+              </div>
+              <div className="tp-metric-body">
+                <strong className="tp-metric-value">{loading ? '…' : clockAhead}</strong>
+                <span className="tp-metric-chip accent-sage">
+                  <span className="tp-metric-chip-pip" aria-hidden="true" />
+                  NOMINAL
+                </span>
+              </div>
+              <span className="tp-metric-note">Events dated after receipt</span>
+            </div>
+
+            <div className="tp-metric-card" style={{ '--card-idx': 3 }}>
+              <div className="tp-metric-accent-bar accent-red" aria-hidden="true" />
+              <div className="tp-metric-header">
+                <span className="tp-metric-label">Failure indicators</span>
+              </div>
+              <div className="tp-metric-body">
+                <strong className="tp-metric-value">{loading ? '…' : failures}</strong>
+                <span className={`tp-metric-chip ${failures > 0 ? 'accent-red' : 'accent-sage'}`}>
+                  <span className="tp-metric-chip-pip" aria-hidden="true" />
+                  {failures > 0 ? 'ALERT' : 'CLEAN'}
+                </span>
+              </div>
+              <span className="tp-metric-note">Events matching failure indicators</span>
             </div>
           </div>
 
           <hr className="tp-section-divider" />
 
           {/* 6. Recent Security Events */}
-          <div className="tp-forensic-section-title tp-scroll-reveal">
-            <div><span className="tp-forensic-section-index">02 / EVIDENCE</span><h2>Recent security events</h2></div>
+          <div className="tp-overview-section-header tp-scroll-reveal">
+            <div>
+              <h2>Recent security events</h2>
+              <span className="tp-overview-section-sub">Latest telemetry records ready for inspection</span>
+            </div>
             <button className="tp-forensic-all-events" onClick={() => openPage('timeline')}>
-              Open event explorer <ChevronRight size={16} />
+              Open event explorer <ChevronRight size={15} />
             </button>
           </div>
           <section className="tp-card tp-events-card tp-forensic-events tp-scroll-reveal">

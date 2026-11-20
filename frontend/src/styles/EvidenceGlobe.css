@@ -16,15 +16,15 @@
 }
 
 .aiori-globe-svg {
-  width: clamp(580px, 54vw, 860px);
-  height: auto;
+  width: 100% !important;
+  max-width: 320px !important;
+  height: 240px !important;
+  max-height: 240px !important;
   overflow: visible;
   cursor: grab;
   touch-action: none;
   outline: none;
-  filter:
-    drop-shadow(0 8px 28px rgba(35, 84, 58, 0.16))
-    drop-shadow(0 2px 8px rgba(35, 84, 58, 0.08));
+  filter: drop-shadow(0 4px 16px rgba(35, 84, 58, 0.12));
   transition: filter 0.3s ease;
 }
 
@@ -139,116 +139,9 @@
   to { stroke-dashoffset: -24; }
 }
 
-/* --- AIORI-3 Spotlight Center Badge (Bottom Left) --- */
-.aiori-spotlight-pill {
-  position: absolute;
-  bottom: 8px;
-  left: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  background: rgba(255, 255, 255, 0.95);
-  border: 1px solid #CFE2D4;
-  border-radius: 12px;
-  padding: 8px 16px;
-  box-shadow: 0 4px 16px rgba(35, 84, 58, 0.08);
-  backdrop-filter: blur(8px);
-  animation: aiori-pill-pop 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  max-width: 380px;
-  z-index: 4;
-}
-
-@keyframes aiori-pill-pop {
-  0% {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.aiori-spotlight-top {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.aiori-spotlight-top strong {
-  font-size: 12.5px;
-  font-weight: 700;
-  color: #173826;
-  letter-spacing: -0.2px;
-}
-
-.aiori-active-chip {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 9.5px;
-  font-weight: 600;
-  background: #E8F5EB;
-  color: #1B5E38;
-  border: 1px solid #BFE3C7;
-  padding: 1px 6px;
-  border-radius: 8px;
-}
-
-.aiori-spotlight-sub {
-  font-size: 10.5px;
-  color: #4D6B58;
-}
-
-.aiori-spotlight-sub .mono {
-  font-family: 'IBM Plex Mono', monospace;
-  font-weight: 600;
-  color: #1E4631;
-}
-
-/* --- Readouts (Bottom Right) --- */
-.tp-globe-readout {
-  position: absolute;
-  bottom: 8px;
-  right: 12px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: rgba(255, 255, 255, 0.95) !important;
-  border: 1px solid #CFE2D4 !important;
-  border-radius: 12px !important;
-  padding: 10px 16px !important;
-  box-shadow: 0 4px 16px rgba(35, 84, 58, 0.08) !important;
-  backdrop-filter: blur(8px) !important;
-  z-index: 4;
-  margin: 0 !important;
-}
-
-.tp-globe-stat {
-  font-family: 'Inter', system-ui, sans-serif;
-  font-size: 11.5px;
-  color: #3F614E !important;
-}
-
-.tp-globe-stat strong {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 14px;
-  font-weight: 700;
-  color: #13281E !important;
-  margin-right: 3px;
-}
-
-.tp-globe-stat.is-flagged strong {
-  color: #C0392B !important;
-}
-
-.tp-globe-note {
-  font-size: 11px;
-  color: #5D7A6B;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .aiori-india-pulse circle,
-  .center-chakra-dot,
-  .aiori-trail-dash {
+  .center-chakra-dot {
     animation: none !important;
   }
 }

@@ -1,13 +1,11 @@
 import React, { useEffect, useMemo, useRef, useState, useCallback, memo } from 'react';
 import { isLand } from './landmask';
-import handImg from './assets/pointing-hand.png';
 import './styles/EvidenceGlobe.css';
 
-/* THE EVIDENCE GLOBE — AIORI-3 CUTE CARTOON EDITION
+/* THE EVIDENCE GLOBE — AIORI-3 TELEMETRY EDITION
    ---------------------------------------------------------------------------
-   A rotating dot-matrix Earth featuring the cute 3D cartoon boy mascot
-   swiping and rotating the globe with his small pointing finger, locking
-   dead-center onto India with radiant tricolor pulses.
+   A rotating dot-matrix Earth locking onto India (21.5°N, 78.5°E) with
+   tricolor landmass highlight and radiating pulses.
    --------------------------------------------------------------------------- */
 
 const R = 145;
@@ -100,66 +98,46 @@ function EvidenceGlobe({
   const [tilt, setTilt] = useState(0.1);
   const [dragging, setDragging] = useState(false);
 
-  // Animation State: 'swiping' -> 'spinning' -> 'locked'
-  const [introState, setIntroState] = useState('swiping');
-  const [swipeProgress, setSwipeProgress] = useState(0); // 0 to 1
+  // Animation State: 'spinning' -> 'locked'
+  const [introState, setIntroState] = useState('locked');
   const [pulseCount, setPulseCount] = useState(0);
 
   const raf = useRef(0);
   const drag = useRef(null);
 
-  // Play/Replay the cartoon finger swipe animation sequence
+  // Smooth rotation settling onto India
   const startIntroSequence = useCallback(() => {
-    setIntroState('swiping');
-    setSwipeProgress(0);
-    const startSpin = (TARGET_SPIN - 180 + 360) % 360;
+    setIntroState('spinning');
+    const startSpin = (TARGET_SPIN - 160 + 360) % 360;
     setSpin(startSpin);
     setTilt(0.12);
 
-    // Phase 1: Cartoon character swipes finger across globe (~950ms)
-    const swipeStart = performance.now();
-    const swipeDuration = 950;
+    const spinStart = performance.now();
+    const spinDuration = 1800;
+    const initialSpin = startSpin;
+    const deltaSpin = (TARGET_SPIN - initialSpin + 720) % 360 + 360;
+    const initialTilt = 0.12;
 
-    const animateSwipe = now => {
-      const elapsed = now - swipeStart;
-      const p = Math.min(1, elapsed / swipeDuration);
-      setSwipeProgress(p);
+    const animateSpin = tNow => {
+      const sElapsed = tNow - spinStart;
+      const sp = Math.min(1, sElapsed / spinDuration);
+      const ease = 1 - Math.pow(1 - sp, 3.5);
 
-      if (p < 1) {
-        raf.current = requestAnimationFrame(animateSwipe);
-      } else {
-        // Phase 2: Rapid spin with natural cubic deceleration to India (~2200ms)
-        setIntroState('spinning');
-        const spinStart = performance.now();
-        const spinDuration = 2200;
-        const initialSpin = startSpin;
-        const deltaSpin = (TARGET_SPIN - initialSpin + 720) % 360 + 360; // 1 full spin + target
-        const initialTilt = 0.12;
+      setSpin((initialSpin + deltaSpin * ease) % 360);
+      setTilt(initialTilt + (TARGET_TILT - initialTilt) * ease);
 
-        const animateSpin = tNow => {
-          const sElapsed = tNow - spinStart;
-          const sp = Math.min(1, sElapsed / spinDuration);
-          const ease = 1 - Math.pow(1 - sp, 3.5);
-
-          setSpin((initialSpin + deltaSpin * ease) % 360);
-          setTilt(initialTilt + (TARGET_TILT - initialTilt) * ease);
-
-          if (sp < 1) {
-            raf.current = requestAnimationFrame(animateSpin);
-          } else {
-            // Phase 3: Locked dead-center on India with Tricolor celebration
-            setSpin(TARGET_SPIN);
-            setTilt(TARGET_TILT);
-            setIntroState('locked');
-            setPulseCount(c => c + 1);
-          }
-        };
-
+      if (sp < 1) {
         raf.current = requestAnimationFrame(animateSpin);
+      } else {
+        // Locked dead-center on India with Tricolor celebration
+        setSpin(TARGET_SPIN);
+        setTilt(TARGET_TILT);
+        setIntroState('locked');
+        setPulseCount(c => c + 1);
       }
     };
 
-    raf.current = requestAnimationFrame(animateSwipe);
+    raf.current = requestAnimationFrame(animateSpin);
   }, []);
 
   // Run on mount
@@ -289,25 +267,6 @@ function EvidenceGlobe({
     });
   }, [model.markers, spin, tilt]);
 
-  // Pointing Hand Motion Dynamics (using user's cartoon pointing hand icon)
-  const handX = introState === 'swiping'
-    ? 68 + swipeProgress * 40
-    : introState === 'spinning'
-    ? 80
-    : 102;
-
-  const handY = introState === 'swiping'
-    ? 136.5 + Math.sin(swipeProgress * Math.PI) * 4
-    : introState === 'spinning'
-    ? 134
-    : 140.5;
-
-  const handAngle = introState === 'swiping'
-    ? -4 + swipeProgress * 8
-    : introState === 'spinning'
-    ? -6
-    : 0;
-
   const empty = model.total === 0;
 
   return (
@@ -315,7 +274,7 @@ function EvidenceGlobe({
       <div className="tp-globe-stage">
         <svg
           className="tp-globe-svg aiori-globe-svg"
-          viewBox="-50 0 420 310"
+          viewBox="0 0 420 310"
           role="img"
           tabIndex={0}
           data-dragging={dragging || undefined}
@@ -428,84 +387,8 @@ function EvidenceGlobe({
               <circle cx={CX} cy={CY} r={3.4} fill="#0A2351" stroke="#FFFFFF" strokeWidth="1.2" className="center-chakra-dot" />
             </g>
           )}
-
-          {/* High-Tech India Telemetry Target Reticle */}
-          {introState === 'locked' && (
-            <g className="aiori-telemetry-reticle">
-              {/* Telemetry Radar Rings */}
-              <circle cx={CX} cy={CY} r="18" fill="none" stroke="#FF9933" strokeWidth="1.2" strokeDasharray="3 3" opacity="0.9" />
-              <circle cx={CX} cy={CY} r="28" fill="none" stroke="#52B788" strokeWidth="1" strokeDasharray="4 4" opacity="0.65" />
-            </g>
-          )}
-
-          {/* ============================================================== */}
-          {/* THE POINTING HAND (USER'S CARTOON ASSET WITH BUILT-IN BLUE CUFF)*/}
-          {/* ============================================================== */}
-          <g
-            className="aiori-pointing-hand-rig"
-            transform={`translate(${handX}, ${handY}) rotate(${handAngle})`}
-            style={{
-              transformOrigin: '20px 20px',
-              transition: introState === 'swiping' ? 'none' : 'transform 0.4s cubic-bezier(0.18, 0.9, 0.3, 1)',
-            }}
-          >
-            {/* The user-provided cartoon pointing hand icon with built-in blue cuff */}
-            <image
-              href={handImg}
-              x="0"
-              y="0"
-              width="60"
-              height="40.5"
-              preserveAspectRatio="xMidYMid meet"
-            />
-
-            {/* Glowing Touch Contact Point at the index fingertip */}
-            {introState === 'swiping' && (
-              <g transform="translate(60, 14.5)">
-                <circle cx="0" cy="0" r="7" fill="none" stroke="#FF9933" strokeWidth="2.2" className="aiori-touch-ring" />
-                <circle cx="0" cy="0" r="3.5" fill="#FFFFFF" />
-              </g>
-            )}
-          </g>
-
-          {/* Dynamic Motion Swoosh Particle Trails when Swiping */}
-          {introState === 'swiping' && (
-            <g className="aiori-swipe-swoosh">
-              <path
-                d="M 140 146 C 175 138, 220 150, 265 170"
-                fill="none"
-                stroke="rgba(255, 255, 255, 0.85)"
-                strokeWidth="3.5"
-                strokeDasharray="9 5"
-                strokeLinecap="round"
-                className="aiori-trail-dash"
-              />
-              <path
-                d="M 146 158 C 180 150, 226 162, 272 182"
-                fill="none"
-                stroke="#FF9933"
-                strokeWidth="2.5"
-                strokeDasharray="7 5"
-                strokeLinecap="round"
-                opacity="0.9"
-              />
-            </g>
-          )}
         </svg>
       </div>
-
-      {/* Overview Readouts */}
-      <figcaption className="tp-globe-readout">
-        {empty ? (
-          <span className="tp-globe-note">No evidence collected yet</span>
-        ) : (
-          <>
-            <span className="tp-globe-stat"><strong>{model.total}</strong> events</span>
-            <span className="tp-globe-stat"><strong>{model.devices}</strong> devices</span>
-            <span className="tp-globe-stat is-flagged"><strong>{model.failures}</strong> failures</span>
-          </>
-        )}
-      </figcaption>
     </figure>
   );
 }

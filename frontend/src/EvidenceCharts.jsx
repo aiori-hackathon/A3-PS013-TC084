@@ -21,15 +21,11 @@ const longDay = iso => asDate(iso).toLocaleDateString(undefined, {
   weekday: 'short', day: 'numeric', month: 'short',
 });
 
-const columnLabel = (iso, index) => {
+const columnLabel = (iso) => {
   const d = asDate(iso);
   const date = d.getUTCDate();
-  const isFirstOfMonth = date === 1;
-  const isFirstColumn = index === 0;
-  if (isFirstOfMonth || isFirstColumn) {
-    return `${date} ${d.toLocaleDateString(undefined, { month: 'short' })}`;
-  }
-  return String(date);
+  const month = d.toLocaleDateString('en-US', { month: 'short' });
+  return `${date} ${month}`;
 };
 
 function Empty({ children }) {
@@ -207,9 +203,9 @@ function EvidenceCharts({
       .map(([label, count]) => ({ label, count }))
       .sort((a, b) => b.count - a.count);
 
-    const timelineData = days.map((d, i) => ({
+    const timelineData = days.map((d) => ({
       key: d.key,
-      date: columnLabel(d.key, i),
+      date: columnLabel(d.key),
       fullDate: longDay(d.key),
       failed: d.failed,
       ok: d.ok,
@@ -236,11 +232,17 @@ function EvidenceCharts({
           <div className="tp-chart-title-group">
             <span className="tp-chart-kicker">TELEMETRY TIMELINE</span>
             <h3>Authentication outcomes</h3>
-            <p>Failed against successful events per day, last {DAYS} days</p>
+            <p>Failed vs nominal authentication events per day (14-day observation horizon)</p>
           </div>
-          <div className="tp-chart-horizon-badge">
-            <span className="tp-chart-radar-pip" />
-            <span>14-Day Horizon · Active Reticle</span>
+          <div className="tp-chart-head-right">
+            <div className="tp-legend-keys-inline">
+              <span className="tp-legend-item"><i className="is-failed" /> Failures</span>
+              <span className="tp-legend-item"><i className="is-ok" /> Nominal</span>
+            </div>
+            <div className="tp-chart-horizon-badge">
+              <span className="tp-chart-radar-pip" />
+              <span>{data.inWindow} events</span>
+            </div>
           </div>
         </header>
 
@@ -248,16 +250,22 @@ function EvidenceCharts({
           <Empty>No events fall inside the last {DAYS} days. Older evidence is still on the timeline.</Empty>
         ) : (
           <div className="tp-recharts-timeline-wrap">
-            <ResponsiveContainer width="100%" height={210}>
+            <ResponsiveContainer width="100%" height={240}>
               <BarChart
                 data={data.timelineData}
-                margin={{ top: 10, right: 10, left: -24, bottom: 0 }}
+                margin={{ top: 8, right: 12, left: -22, bottom: 0 }}
               >
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2EBE5" opacity={0.65} />
+                <CartesianGrid
+                  strokeDasharray="0"
+                  vertical={false}
+                  stroke="#D4E5D8"
+                  strokeOpacity={0.4}
+                />
                 <XAxis
                   dataKey="date"
+                  interval={1}
                   tickLine={false}
-                  axisLine={{ stroke: '#CFE0D4' }}
+                  axisLine={{ stroke: '#D4E5D8' }}
                   tick={{ fill: '#3E5C4A', fontSize: 10.5, fontFamily: 'IBM Plex Mono, monospace' }}
                 />
                 <YAxis
@@ -273,7 +281,9 @@ function EvidenceCharts({
                   stackId="auth"
                   fill="#FF4D6A"
                   radius={[0, 0, 0, 0]}
-                  animationDuration={800}
+                  barSize={22}
+                  minPointSize={2}
+                  animationDuration={600}
                   animationEasing="ease-out"
                 />
                 <Bar
@@ -282,24 +292,13 @@ function EvidenceCharts({
                   stackId="auth"
                   fill="#25543D"
                   radius={[4, 4, 0, 0]}
-                  animationDuration={800}
+                  barSize={22}
+                  minPointSize={2}
+                  animationDuration={600}
                   animationEasing="ease-out"
                 />
               </BarChart>
             </ResponsiveContainer>
-
-            <footer className="tp-chart-legend">
-              <div className="tp-legend-keys">
-                <span><i className="is-failed" /> Failure indicators</span>
-                <span><i className="is-ok" /> Other events</span>
-                <span><i className="is-monitored" /> Monitored nominal</span>
-              </div>
-              <div className="tp-legend-stats">
-                <span className="tp-chart-legend-note">Peak day: {data.peak}</span>
-                <span className="tp-chart-legend-divider">·</span>
-                <span className="tp-chart-horizon-count">Total in horizon: {data.inWindow}</span>
-              </div>
-            </footer>
           </div>
         )}
       </article>

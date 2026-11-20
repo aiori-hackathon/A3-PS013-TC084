@@ -5,8 +5,8 @@
 .tp-charts {
   display: grid !important;
   grid-template-columns: repeat(3, 1fr) !important;
-  gap: 16px !important;
-  margin: 16px 0 24px !important;
+  gap: 14px !important;
+  margin: 0 !important;
   width: 100% !important;
   box-sizing: border-box !important;
 }
@@ -15,23 +15,23 @@
   background: #FFFFFF !important;
   border: 1px solid #D4E5D8 !important;
   border-radius: 16px !important;
-  padding: 20px 24px 18px !important;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 6px 16px rgba(0,0,0,0.04) !important;
-  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1) !important;
+  padding: 16px 20px !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.04) !important;
+  transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1) !important;
   box-sizing: border-box !important;
 }
 
 .tp-chart-card:hover {
-  transform: translateY(-4px) !important;
+  transform: translateY(-3px) !important;
   border-color: #25543D !important;
-  box-shadow: 0 12px 28px -4px rgba(37, 84, 61, 0.12), 0 4px 12px rgba(0,0,0,0.04) !important;
+  box-shadow: 0 10px 24px -4px rgba(37, 84, 61, 0.12), 0 4px 10px rgba(0,0,0,0.04) !important;
 }
 
 /* 1. Full-width Timeline card on top */
 .tp-chart-timeline-card {
   grid-column: 1 / -1 !important;
-  min-height: 310px !important;
-  padding: 22px 24px 18px !important;
+  min-height: auto !important;
+  padding: 16px 20px !important;
 }
 
 /* 2, 3, 4. Three compact balanced columns below */
@@ -40,15 +40,15 @@
   display: flex !important;
   flex-direction: column !important;
   justify-content: space-between !important;
-  min-height: 260px !important;
+  min-height: 240px !important;
 }
 
 .tp-chart-head {
   display: flex !important;
-  align-items: flex-start !important;
+  align-items: center !important;
   justify-content: space-between !important;
   gap: 12px !important;
-  margin-bottom: 12px !important;
+  margin-bottom: 10px !important;
 }
 
 .tp-chart-title-group {
@@ -82,14 +82,46 @@
   margin: 0 !important;
 }
 
+.tp-chart-head-right {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+}
+
+.tp-legend-keys-inline {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+}
+
+.tp-legend-item {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  color: #3D5949 !important;
+}
+
+.tp-legend-item i {
+  display: inline-block !important;
+  width: 8px !important;
+  height: 8px !important;
+  border-radius: 2px !important;
+}
+
+.tp-legend-item i.is-failed { background: #FF4D6A !important; }
+.tp-legend-item i.is-ok     { background: #25543D !important; }
+
 .tp-chart-horizon-badge {
   display: inline-flex !important;
   align-items: center !important;
-  gap: 6px !important;
-  padding: 3px 8px !important;
+  gap: 5px !important;
+  padding: 2px 7px !important;
   background: #EAF4EC !important;
   border: 1px solid #C1DEC8 !important;
-  border-radius: 6px !important;
+  border-radius: 9999px !important;
   font-family: 'IBM Plex Mono', monospace !important;
   font-size: 10px !important;
   font-weight: 700 !important;
@@ -98,8 +130,8 @@
 }
 
 .tp-chart-radar-pip {
-  width: 6px !important;
-  height: 6px !important;
+  width: 5px !important;
+  height: 5px !important;
   border-radius: 50% !important;
   background: #138808 !important;
   box-shadow: 0 0 6px rgba(19, 136, 8, 0.6) !important;

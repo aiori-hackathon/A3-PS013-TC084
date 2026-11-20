@@ -18,7 +18,7 @@
   gap: 0;
   max-width: 1240px;
   margin: 0 auto;
-  padding: 8px 0 48px 0;
+  padding: 0 0 28px 0;
   box-sizing: border-box;
 }
 
@@ -27,9 +27,9 @@
   width: 100%;
   height: 1px;
   border: none;
-  background: #D4E5D8;
-  margin: 36px 0;
-  opacity: 0.85;
+  background: #E2EBE4;
+  margin: 20px 0;
+  opacity: 0.9;
 }
 
 /* Section Header Badges (Matching About Us eyebrow style) */
@@ -37,53 +37,55 @@
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  padding: 4px 12px;
+  padding: 3px 10px;
   background: #E8F2EA;
   border: 1px solid #C1DEC8;
   border-radius: 9999px;
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: #25543D;
-  margin-bottom: 10px;
+  margin-bottom: 6px;
 }
 
 .tp-overview-eyebrow span {
-  font-size: 13px;
+  font-size: 12px;
 }
 
 /* ---------------------------------------------------------------------------
-   Overview Hero Header (About Us Inspired)
+   Overview Hero Header (Compact 260-290px Height)
    --------------------------------------------------------------------------- */
 .tp-overview-hero-wrapper {
   background: #FFFFFF;
   border: 1px solid #D4E5D8;
-  border-radius: 18px;
-  padding: 28px 32px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 8px 24px -4px rgba(37, 84, 61, 0.06);
+  border-radius: 16px;
+  padding: 20px 28px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 6px 16px rgba(0, 0, 0, 0.04);
   display: grid;
-  grid-template-columns: 1fr 340px;
-  gap: 28px;
+  grid-template-columns: 1fr 280px;
+  gap: 20px;
   align-items: center;
-  margin-bottom: 8px;
+  min-height: 240px;
+  max-height: 285px;
   position: relative;
   overflow: hidden;
+  margin-bottom: 0;
 }
 
 .tp-overview-hero-content {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   min-width: 0;
 }
 
 .tp-overview-title {
-  font-size: 32px;
+  font-size: 26px;
   font-weight: 800;
-  letter-spacing: -0.03em;
-  line-height: 1.2;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
   color: #0F172A;
   margin: 0;
 }
@@ -95,39 +97,40 @@
 }
 
 .tp-overview-subtitle {
-  font-size: 14.5px;
+  font-size: 13.5px;
   color: #3D5949;
-  line-height: 1.55;
-  margin: 0 0 12px 0;
-  max-width: 640px;
+  line-height: 1.5;
+  margin: 0 0 6px 0;
+  max-width: 580px;
 }
 
 .tp-overview-hero-meta {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 10px;
+  margin-top: 4px;
 }
 
 .tp-overview-status-pill {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  padding: 4px 11px;
+  gap: 6px;
+  padding: 3px 10px;
   background: #F1F5F2;
   border: 1px solid #D4E5D8;
   border-radius: 9999px;
-  font-size: 11.5px;
+  font-size: 11px;
   font-weight: 600;
   color: #25543D;
 }
 
 .tp-overview-status-dot {
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background: #10B981;
-  box-shadow: 0 0 8px #10B981;
+  box-shadow: 0 0 6px #10B981;
 }
 
 .tp-overview-hero-globe-slot {
@@ -135,7 +138,9 @@
   align-items: center;
   justify-content: center;
   position: relative;
-  min-height: 220px;
+  height: 240px;
+  max-height: 240px;
+  overflow: hidden;
 }
 
 /* ---------------------------------------------------------------------------
@@ -144,7 +149,7 @@
 .tp-overview-metrics-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
+  gap: 14px;
   margin: 0;
   width: 100%;
   box-sizing: border-box;
@@ -154,22 +159,22 @@
   background: #FFFFFF !important;
   border: 1px solid #D4E5D8 !important;
   border-radius: 16px !important;
-  padding: 22px 22px 18px !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 6px 16px rgba(0, 0, 0, 0.04) !important;
+  padding: 16px 18px 14px !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.04) !important;
   display: flex !important;
   flex-direction: column !important;
   justify-content: space-between !important;
-  min-height: 128px !important;
+  min-height: 110px !important;
   position: relative !important;
   overflow: hidden !important;
-  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1) !important;
+  transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1) !important;
   box-sizing: border-box !important;
 }
 
 .tp-metric-card:hover {
-  transform: translateY(-4px) !important;
+  transform: translateY(-3px) !important;
   border-color: #25543D !important;
-  box-shadow: 0 12px 28px -4px rgba(37, 84, 61, 0.12), 0 4px 12px rgba(0, 0, 0, 0.04) !important;
+  box-shadow: 0 10px 24px -4px rgba(37, 84, 61, 0.12), 0 4px 10px rgba(0, 0, 0, 0.04) !important;
 }
 
 /* 4px Colored Accent Strip at Top */
@@ -186,6 +191,7 @@
 .tp-metric-accent-bar.accent-red { background: #FF4D6A; }
 .tp-metric-accent-bar.accent-green { background: #2FBF84; }
 .tp-metric-accent-bar.accent-sage { background: #25543D; }
+.tp-metric-accent-bar.accent-amber { background: #F59E0B; }
 
 .tp-metric-header {
   display: flex !important;
@@ -218,10 +224,10 @@
   margin-bottom: 6px !important;
 }
 
-/* 36px Bold IBM Plex Mono Value */
+/* 32px Bold IBM Plex Mono Value */
 .tp-metric-value {
   font-family: 'IBM Plex Mono', monospace !important;
-  font-size: 36px !important;
+  font-size: 32px !important;
   font-weight: 700 !important;
   color: #0F172A !important;
   letter-spacing: -0.02em !important;
@@ -268,6 +274,12 @@
   border: 1px solid #C1DEC8 !important;
 }
 
+.tp-metric-chip.accent-amber {
+  background: #FEF3C7 !important;
+  color: #B45309 !important;
+  border: 1px solid #FDE68A !important;
+}
+
 .tp-metric-chip-pip {
   width: 5px !important;
   height: 5px !important;
@@ -287,7 +299,7 @@
 .tp-overview-tools-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 16px;
+  gap: 14px;
   width: 100%;
   box-sizing: border-box;
 }
@@ -296,41 +308,41 @@
   background: #FFFFFF !important;
   border: 1px solid #D4E5D8 !important;
   border-radius: 16px !important;
-  padding: 16px 16px 14px !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 6px 16px rgba(0, 0, 0, 0.04) !important;
+  padding: 14px 14px 12px !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.04) !important;
   display: flex !important;
   flex-direction: column !important;
   justify-content: space-between !important;
-  min-height: 270px !important;
+  min-height: 245px !important;
   text-align: left !important;
   text-decoration: none !important;
   cursor: pointer !important;
   position: relative !important;
   overflow: hidden !important;
-  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1) !important;
+  transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1) !important;
   box-sizing: border-box !important;
 }
 
 .tp-tool-card:hover {
-  transform: translateY(-4px) !important;
+  transform: translateY(-3px) !important;
   border-color: #25543D !important;
-  box-shadow: 0 14px 28px -4px rgba(37, 84, 61, 0.12), 0 4px 12px rgba(0, 0, 0, 0.04) !important;
+  box-shadow: 0 10px 24px -4px rgba(37, 84, 61, 0.12), 0 4px 10px rgba(0, 0, 0, 0.04) !important;
 }
 
 /* Top Illustration Preview Slot */
 .tp-tool-illustration {
   width: 100%;
-  height: 82px;
-  border-radius: 12px;
+  height: 72px;
+  border-radius: 10px;
   background: linear-gradient(145deg, #F8FAFC 0%, #EEF2F6 100%);
   border: 1px solid #E2E8F0;
   overflow: hidden;
   position: relative;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .tp-tool-card:hover .tp-tool-illustration {
@@ -534,22 +546,24 @@
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   width: 100%;
 }
 
 .tp-overview-section-header h2 {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 800;
   color: #0F172A;
   letter-spacing: -0.02em;
   margin: 0;
+  display: inline;
 }
 
-.tp-overview-section-header span {
+.tp-overview-section-sub {
   font-size: 12px;
   color: #638170;
   font-weight: 500;
+  margin-left: 10px;
 }
 
 /* Responsive Media Queries */
