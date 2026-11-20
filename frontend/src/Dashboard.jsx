@@ -716,7 +716,6 @@ export default function Dashboard({ user, onSignOut }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const progressBarRef = useRef(null);
   const [backToTopVisible, setBackToTopVisible] = useState(false);
-  const [globeReplayKey, setGlobeReplayKey] = useState(0);
 
   // Ultra-lightweight native scroll progress & back-to-top handler (zero JS friction)
   useEffect(() => {
@@ -971,8 +970,26 @@ export default function Dashboard({ user, onSignOut }) {
       {page === 'overview' && (
         <div className="tp-overview-container">
           {/* 1. Overview Hero Header with Docked Globe */}
-          <section className="tp-overview-hero-wrapper tp-scroll-reveal" aria-label="Overview Hero">
-            <div className="tp-overview-hero-content">
+          <section
+            className="tp-overview-hero-wrapper tp-scroll-reveal"
+            aria-label="Overview Hero"
+            style={{
+              background: 'transparent',
+              border: 'none',
+              outline: 'none',
+              boxShadow: 'none',
+              borderRadius: 0,
+            }}
+          >
+            <div
+              className="tp-overview-hero-content"
+              style={{
+                background: 'transparent',
+                border: 'none',
+                outline: 'none',
+                boxShadow: 'none',
+              }}
+            >
               <div className="tp-overview-eyebrow">
                 <span>🇮🇳</span> AIORI-3 · TELEMETRY HUB
               </div>
@@ -991,24 +1008,23 @@ export default function Dashboard({ user, onSignOut }) {
                 <div className="tp-overview-status-pill">
                   <span>Locked: 21.5°N, 78.5°E</span>
                 </div>
-                <button
-                  type="button"
-                  className="tp-overview-status-pill tp-replay-pill"
-                  onClick={() => setGlobeReplayKey(k => k + 1)}
-                  title="Replay hand motion globe animation"
-                >
-                  <span>↺ Replay</span>
-                </button>
               </div>
             </div>
-            <div className="tp-overview-hero-globe-slot">
+            <div
+              className="tp-overview-hero-globe-slot"
+              style={{
+                background: 'transparent',
+                border: 'none',
+                outline: 'none',
+                boxShadow: 'none',
+              }}
+            >
               <EvidenceGlobe
                 events={events}
                 severityOf={severity}
                 deviceOf={device}
                 isFailure={fail}
                 timestampOf={timestamp}
-                replayKey={globeReplayKey}
               />
             </div>
           </section>

@@ -1,11 +1,12 @@
 /* ===========================================================================
-   THE EVIDENCE GLOBE — AIORI-3 HAND SWIPE & TRICOLOR CELEBRATION
+   THE EVIDENCE GLOBE — AIORI-3 CYBER-EMERALD TELEMETRY GLOBE
    ---------------------------------------------------------------------------
-   Light Pista Theme with Indian Tricolor Accents & Hand Swipe Interaction
+   Light Pista Theme with Vibrant Cyber-Emerald Land Dots & Indian Tricolor
+   Pure, unboxed canvas: zero lines, zero outlines, zero arbitrary boxes.
    =========================================================================== */
 
 .tp-globe.aiori-globe-container {
-  margin: 0;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -13,6 +14,7 @@
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
+  outline: none !important;
 }
 
 .aiori-globe-svg {
@@ -23,8 +25,11 @@
   overflow: visible;
   cursor: grab;
   touch-action: none;
-  outline: none;
-  filter: drop-shadow(0 4px 16px rgba(35, 84, 58, 0.12));
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  filter: drop-shadow(0 6px 20px rgba(35, 84, 58, 0.12));
   transition: filter 0.3s ease;
 }
 
@@ -35,6 +40,7 @@
 .aiori-globe-svg:focus,
 .aiori-globe-svg:focus-visible {
   outline: none !important;
+  border: none !important;
 }
 
 .tp-globe-rim {
@@ -43,9 +49,9 @@
 
 .tp-globe-atmo {
   fill: none;
-  stroke: #52B788;
+  stroke: #34D399;
   stroke-width: 2.5;
-  opacity: 0.45;
+  opacity: 0.35;
 }
 
 /* --- Surface Dots --- */
@@ -53,100 +59,27 @@
   transition: fill 0.3s ease, opacity 0.3s ease;
 }
 
-.tp-globe-surface .is-grid {
-  fill: rgba(82, 183, 136, 0.15) !important;
+.tp-globe-surface .is-india {
+  transition: fill 0.3s ease, opacity 0.3s ease;
 }
 
-/* --- India Tricolor Radiating Pulse --- */
-.aiori-india-pulse circle {
-  transform-origin: 195px 158px;
-  animation: aiori-ripple 2.4s cubic-bezier(0.1, 0.8, 0.3, 1) infinite;
-}
-
-.aiori-india-pulse .ripple-saffron {
-  animation-delay: 0s;
-}
-
-.aiori-india-pulse .ripple-white {
-  animation-delay: 0.25s;
-}
-
-.aiori-india-pulse .ripple-green {
-  animation-delay: 0.5s;
-}
-
-.aiori-india-pulse .center-chakra-dot {
-  animation: aiori-dot-pulse 1.8s ease-in-out infinite;
-}
-
-@keyframes aiori-ripple {
-  0% {
-    r: 6px;
-    opacity: 0.95;
-    stroke-width: 2.5px;
-  }
-  60% {
-    opacity: 0.6;
-    stroke-width: 1.5px;
-  }
-  100% {
-    r: 52px;
-    opacity: 0;
-    stroke-width: 0.5px;
-  }
+/* --- India Center Telemetry Pin Pulse --- */
+.aiori-india-beacon .center-chakra-dot {
+  animation: aiori-dot-pulse 2s ease-in-out infinite;
 }
 
 @keyframes aiori-dot-pulse {
   0%, 100% {
     transform: scale(1);
-    filter: drop-shadow(0 0 4px #10B981);
+    filter: drop-shadow(0 0 3px #10B981);
   }
   50% {
-    transform: scale(1.35);
+    transform: scale(1.3);
     filter: drop-shadow(0 0 6px #F59E0B);
   }
 }
 
-/* --- AIORI-3 Center Lock Badge --- */
-.aiori-center-lock-tag {
-  animation: aiori-badge-fade 0.45s ease-out forwards;
-}
-
-@keyframes aiori-badge-fade {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-/* --- Hand Motion Rig --- */
-.aiori-pointing-hand-rig {
-  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.28));
-  pointer-events: none;
-}
-
-/* --- Touch Ring & Trails --- */
-.aiori-touch-ring {
-  animation: aiori-touch-pulse 0.45s ease-out infinite;
-}
-
-@keyframes aiori-touch-pulse {
-  0% { r: 3px; opacity: 1; }
-  100% { r: 10px; opacity: 0; }
-}
-
-.aiori-trail-dash {
-  animation: aiori-dash 0.6s linear infinite;
-}
-
-@keyframes aiori-dash {
-  to { stroke-dashoffset: -24; }
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .aiori-india-pulse circle,
   .center-chakra-dot {
     animation: none !important;
   }
