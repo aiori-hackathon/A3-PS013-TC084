@@ -129,9 +129,15 @@ html body .tp-investigation-modal button.tp-ai-submit-btn,
 html body .tp-investigation-modal .tp-button.tp-ai-submit-btn,
 html body .tp-investigation-modal button.tp-inv-note-submit-btn,
 html body .tp-investigation-modal .tp-button.tp-inv-note-submit-btn,
+html body .tp-investigation-modal button.tp-inv-create-submit-btn,
+html body .tp-investigation-modal .tp-button.tp-inv-create-submit-btn,
 .tp-investigation-modal .tp-button.primary,
 :is(.tp-app, body) .tp-investigation-modal .tp-button.primary,
 .tp-investigation-modal button.tp-button.primary,
+.tp-investigation-modal button[type='submit'],
+.tp-inv-form button[type='submit'],
+.tp-inv-form .tp-button.primary,
+button.tp-inv-create-submit-btn,
 button.tp-ai-submit-btn,
 button.tp-inv-note-submit-btn {
   background-color: #1A5436 !important;
@@ -159,7 +165,9 @@ button.tp-inv-note-submit-btn {
 
 html body .tp-investigation-modal button.tp-ai-submit-btn:hover:not(:disabled),
 html body .tp-investigation-modal button.tp-inv-note-submit-btn:hover:not(:disabled),
+html body .tp-investigation-modal button.tp-inv-create-submit-btn:hover:not(:disabled),
 .tp-investigation-modal .tp-button.primary:hover:not(:disabled),
+.tp-inv-form button[type='submit']:hover:not(:disabled),
 :is(.tp-app, body) .tp-investigation-modal .tp-button.primary:hover:not(:disabled) {
   background-color: #246B46 !important;
   background: #246B46 !important;
@@ -172,7 +180,9 @@ html body .tp-investigation-modal button.tp-inv-note-submit-btn:hover:not(:disab
 
 html body .tp-investigation-modal button.tp-ai-submit-btn:disabled,
 html body .tp-investigation-modal button.tp-inv-note-submit-btn:disabled,
+html body .tp-investigation-modal button.tp-inv-create-submit-btn:disabled,
 .tp-investigation-modal .tp-button.primary:disabled,
+.tp-inv-form button[type='submit']:disabled,
 :is(.tp-app, body) .tp-investigation-modal .tp-button.primary:disabled {
   background-color: #6E9B82 !important;
   background: #6E9B82 !important;
@@ -187,6 +197,7 @@ html body .tp-investigation-modal button.tp-inv-note-submit-btn:disabled,
 
 html body .tp-investigation-modal button.tp-ai-submit-btn svg,
 html body .tp-investigation-modal button.tp-inv-note-submit-btn svg,
+html body .tp-investigation-modal button.tp-inv-create-submit-btn svg,
 .tp-investigation-modal .tp-button.primary svg,
 :is(.tp-app, body) .tp-investigation-modal .tp-button.primary svg {
   color: #FFFFFF !important;
@@ -197,7 +208,10 @@ html body .tp-investigation-modal button.tp-inv-note-submit-btn svg,
 }
 
 html body .tp-investigation-modal button.tp-ai-submit-btn span,
-html body .tp-investigation-modal button.tp-inv-note-submit-btn span {
+html body .tp-investigation-modal button.tp-inv-note-submit-btn span,
+html body .tp-investigation-modal button.tp-inv-create-submit-btn span,
+.tp-investigation-modal .tp-button.primary span,
+.tp-inv-form button[type='submit'] span {
   color: #FFFFFF !important;
   -webkit-text-fill-color: #FFFFFF !important;
   font-weight: 750 !important;

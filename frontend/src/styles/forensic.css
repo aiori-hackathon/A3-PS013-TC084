@@ -32,7 +32,14 @@
      Every piece of machine-generated data in this app is set in it.
    =========================================================================== */
 
+:root,
+[data-theme='forensic'],
+.tp-overlay,
+.tp-overlay[data-theme='forensic'],
 html .tp-app.tp-app[data-theme='forensic'] {
+  --tp-purple:        #1A5436;
+  --tp-purple-light:  #E8F2EB;
+
   /* --- surfaces ---------------------------------------------------------
      AIORI-3 Light Pista Research Workstation Palette.
      Fresh pistachio mist canvas with crisp white cards & soft sage panels. */
@@ -4089,34 +4096,105 @@ html :is(.tp-app.tp-app[data-theme='forensic'], [data-theme='forensic']) .tp-inv
   color: var(--fx-text) !important;
 }
 
-/* The submit inside the case windows. It is the action the window exists
-   for, so it carries the signal colour like every other primary action, and
-   it is written the way it is written in the markup rather than shouted. */
-html :is(.tp-app.tp-app[data-theme='forensic'], [data-theme='forensic']) .tp-investigation-modal .tp-button.primary,
-html :is(.tp-app.tp-app[data-theme='forensic'], [data-theme='forensic']) .tp-inv-form .tp-button.primary {
+/* The submit inside the case windows and create modals: solid vibrant forest green */
+html :is(.tp-app.tp-app[data-theme='forensic'], [data-theme='forensic'], body) .tp-investigation-modal .tp-button.primary,
+html :is(.tp-app.tp-app[data-theme='forensic'], [data-theme='forensic'], body) .tp-inv-form .tp-button.primary,
+html :is(.tp-app.tp-app[data-theme='forensic'], [data-theme='forensic'], body) .tp-inv-form button[type='submit'],
+.tp-investigation-modal .tp-button.primary,
+.tp-inv-form .tp-button.primary,
+.tp-inv-form button[type='submit'],
+button.tp-inv-create-submit-btn,
+button.tp-ai-submit-btn,
+button.tp-inv-note-submit-btn {
   min-height: 42px !important;
-  padding: 0 18px !important;
-  border-radius: var(--fx-r-md) !important;
-  background-color: var(--fx-signal) !important;
+  padding: 10px 20px !important;
+  border-radius: 8px !important;
+  background-color: #1A5436 !important;
+  background: #1A5436 !important;
   background-image: none !important;
-  border: 1px solid var(--fx-signal) !important;
-  color: var(--fx-on-signal) !important;
-  font-family: var(--fx-sans) !important;
+  border: 1.5px solid #14432B !important;
+  border-color: #14432B !important;
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  font-family: var(--fx-sans, Inter, sans-serif) !important;
   font-size: 14px !important;
-  font-weight: 600 !important;
+  font-weight: 700 !important;
   letter-spacing: normal !important;
   text-transform: none !important;
+  box-shadow: 0 3px 10px rgba(26, 84, 54, 0.35) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  cursor: pointer !important;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
-html :is(.tp-app.tp-app[data-theme='forensic'], [data-theme='forensic']) .tp-investigation-modal .tp-button.primary:hover,
-html :is(.tp-app.tp-app[data-theme='forensic'], [data-theme='forensic']) .tp-inv-form .tp-button.primary:hover {
-  background-color: color-mix(in srgb, var(--fx-signal) 86%, #ffffff) !important;
-  border-color: color-mix(in srgb, var(--fx-signal) 86%, #ffffff) !important;
+
+html :is(.tp-app.tp-app[data-theme='forensic'], [data-theme='forensic'], body) .tp-investigation-modal .tp-button.primary:hover:not(:disabled),
+html :is(.tp-app.tp-app[data-theme='forensic'], [data-theme='forensic'], body) .tp-inv-form .tp-button.primary:hover:not(:disabled),
+html :is(.tp-app.tp-app[data-theme='forensic'], [data-theme='forensic'], body) .tp-inv-form button[type='submit']:hover:not(:disabled),
+.tp-investigation-modal .tp-button.primary:hover:not(:disabled),
+.tp-inv-form .tp-button.primary:hover:not(:disabled),
+.tp-inv-form button[type='submit']:hover:not(:disabled),
+button.tp-inv-create-submit-btn:hover:not(:disabled),
+button.tp-ai-submit-btn:hover:not(:disabled),
+button.tp-inv-note-submit-btn:hover:not(:disabled) {
+  background-color: #246B46 !important;
+  background: #246B46 !important;
+  border-color: #1A5436 !important;
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  box-shadow: 0 5px 16px rgba(26, 84, 54, 0.45) !important;
+  transform: translateY(-1px) !important;
 }
-html :is(.tp-app.tp-app[data-theme='forensic'], [data-theme='forensic']) .tp-investigation-modal .tp-button.primary:disabled {
-  opacity: 0.55 !important;
+
+html :is(.tp-app.tp-app[data-theme='forensic'], [data-theme='forensic'], body) .tp-investigation-modal .tp-button.primary:disabled,
+html :is(.tp-app.tp-app[data-theme='forensic'], [data-theme='forensic'], body) .tp-inv-form .tp-button.primary:disabled,
+html :is(.tp-app.tp-app[data-theme='forensic'], [data-theme='forensic'], body) .tp-inv-form button[type='submit']:disabled,
+.tp-investigation-modal .tp-button.primary:disabled,
+.tp-inv-form .tp-button.primary:disabled,
+.tp-inv-form button[type='submit']:disabled,
+button.tp-inv-create-submit-btn:disabled,
+button.tp-ai-submit-btn:disabled,
+button.tp-inv-note-submit-btn:disabled {
+  background-color: #6E9B82 !important;
+  background: #6E9B82 !important;
+  border-color: #5D8A71 !important;
+  color: #F0F7F3 !important;
+  -webkit-text-fill-color: #F0F7F3 !important;
+  opacity: 0.85 !important;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+  transform: none !important;
 }
-html :is(.tp-app.tp-app[data-theme='forensic'], [data-theme='forensic']) .tp-investigation-modal .tp-button.primary svg {
-  color: var(--fx-on-signal) !important;
+
+html :is(.tp-app.tp-app[data-theme='forensic'], [data-theme='forensic'], body) .tp-investigation-modal .tp-button.primary svg,
+html :is(.tp-app.tp-app[data-theme='forensic'], [data-theme='forensic'], body) .tp-inv-form .tp-button.primary svg,
+.tp-investigation-modal .tp-button.primary svg,
+button.tp-inv-create-submit-btn svg,
+button.tp-ai-submit-btn svg,
+button.tp-inv-note-submit-btn svg {
+  color: #FFFFFF !important;
+  stroke: #FFFFFF !important;
+  display: inline-block !important;
+  visibility: visible !important;
+}
+
+html :is(.tp-app.tp-app[data-theme='forensic'], [data-theme='forensic'], body) .tp-investigation-modal .tp-button.primary span,
+html :is(.tp-app.tp-app[data-theme='forensic'], [data-theme='forensic'], body) .tp-inv-form .tp-button.primary span,
+html :is(.tp-app.tp-app[data-theme='forensic'], [data-theme='forensic'], body) .tp-inv-form button[type='submit'] span,
+.tp-investigation-modal .tp-button.primary span,
+.tp-inv-form .tp-button.primary span,
+.tp-inv-form button[type='submit'] span,
+button.tp-inv-create-submit-btn span,
+button.tp-ai-submit-btn span,
+button.tp-inv-note-submit-btn span {
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  font-weight: 700 !important;
+  display: inline-block !important;
+  visibility: visible !important;
 }
 
 /* Explicit high-visibility styles for AI submit and Note submit buttons */

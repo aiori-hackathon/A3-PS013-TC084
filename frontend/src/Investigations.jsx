@@ -519,7 +519,12 @@ export default function Investigations({ events = [] }) {
     </section>
 
     {creating && typeof document !== 'undefined' && createPortal(
-      <div className="tp-overlay tp-inv-modal-overlay tp-inv-create-overlay" data-theme={pageTheme} onMouseDown={() => setCreating(false)}>
+      <div
+        className="tp-overlay tp-inv-modal-overlay tp-inv-create-overlay"
+        data-theme={pageTheme}
+        style={{ '--fx-signal': '#25543D', '--fx-on-signal': '#FFFFFF', '--tp-purple': '#1A5436' }}
+        onMouseDown={() => setCreating(false)}
+      >
         <aside className="tp-drawer tp-investigation-modal tp-investigation-create-modal" role="dialog" aria-modal="true" aria-label="Create investigation" onMouseDown={e => e.stopPropagation()}>
           <div className="tp-drawer-header"><div><span>New case</span><h2>Create investigation</h2></div><button onClick={() => setCreating(false)} aria-label="Close"><X size={21}/></button></div>
           {createScanOn && <InvestigationScan states={createStates} stages={CREATE_STAGES} />}
@@ -527,7 +532,19 @@ export default function Investigations({ events = [] }) {
             <label>Title<input required minLength={3} maxLength={160} value={draft.title} onChange={e => setDraft({ ...draft, title: e.target.value })} placeholder="e.g. Repeated SSH login failures"/></label>
             <label>Description<textarea maxLength={3000} rows={5} value={draft.description} onChange={e => setDraft({ ...draft, description: e.target.value })} placeholder="Describe the incident and initial findings"/></label>
             <label>Severity<select value={draft.severity} onChange={e => setDraft({ ...draft, severity: e.target.value })}>{['low', 'medium', 'high', 'critical'].map(s => <option key={s} value={s}>{s}</option>)}</select></label>
-            <button className="tp-button primary" type="submit" disabled={busy}>{busy ? 'Creating…' : 'Create investigation'}</button>
+            <button
+              className="tp-button primary is-primary tp-inv-create-submit-btn"
+              data-variant="primary"
+              type="submit"
+              disabled={busy}
+              style={{
+                backgroundColor: busy ? '#6E9B82' : '#1A5436',
+                color: '#FFFFFF',
+                borderColor: busy ? '#5D8A71' : '#14432B',
+              }}
+            >
+              <span style={{ color: '#FFFFFF' }}>{busy ? 'Creating…' : 'Create investigation'}</span>
+            </button>
           </form>
         </aside>
       </div>,
@@ -535,7 +552,12 @@ export default function Investigations({ events = [] }) {
     )}
 
     {active && !creating && typeof document !== 'undefined' && createPortal(
-      <div className="tp-overlay tp-inv-modal-overlay tp-inv-detail-overlay" data-theme={pageTheme} onMouseDown={() => setActive(null)}>
+      <div
+        className="tp-overlay tp-inv-modal-overlay tp-inv-detail-overlay"
+        data-theme={pageTheme}
+        style={{ '--fx-signal': '#25543D', '--fx-on-signal': '#FFFFFF', '--tp-purple': '#1A5436' }}
+        onMouseDown={() => setActive(null)}
+      >
         <aside className="tp-drawer tp-inv-drawer tp-investigation-modal tp-investigation-detail-modal" role="dialog" aria-modal="true" aria-label="Investigation details" onMouseDown={e => e.stopPropagation()}>
           <div className="tp-drawer-header"><div><span>TP-{String(active.id).padStart(4, '0')}</span><h2>{active.title}</h2><span className={`tp-inv-pill ${active.severity}`}>{active.severity}</span></div><button onClick={() => setActive(null)} aria-label="Close"><X size={21}/></button></div>
           <div className="tp-drawer-body tp-inv-detail">
