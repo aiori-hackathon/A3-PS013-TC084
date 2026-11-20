@@ -1,11 +1,13 @@
 import React, { useEffect, useMemo, useRef, useState, useCallback, memo } from 'react';
 import { isLand } from './landmask';
+import handImg from './assets/pointing-hand.png';
 import './styles/EvidenceGlobe.css';
 
-/* THE EVIDENCE GLOBE — AIORI-3 TELEMETRY EDITION
+/* THE EVIDENCE GLOBE — AIORI-3 HAND SWIPE & TRICOLOR TELEMETRY
    ---------------------------------------------------------------------------
-   A rotating dot-matrix Earth locking onto India (21.5°N, 78.5°E) with
-   tricolor landmass highlight and radiating pulses.
+   A rotating dot-matrix Earth featuring the pointing hand motion animation
+   swiping and rotating the globe, then locking onto India (21.5°N, 78.5°E)
+   with radiant tricolor celebration pulses.
    --------------------------------------------------------------------------- */
 
 const R = 145;
@@ -90,54 +92,79 @@ function EvidenceGlobe({
   deviceOf = e => e.device_id,
   isFailure = () => false,
   timestampOf = e => e.timestamp,
+  replayKey = 0,
 }) {
   const grid = useMemo(() => buildGrid(), []);
 
   // Spin & Tilt state
-  const [spin, setSpin] = useState(TARGET_SPIN - 160);
-  const [tilt, setTilt] = useState(0.1);
+  const [spin, setSpin] = useState(TARGET_SPIN - 180);
+  const [tilt, setTilt] = useState(0.12);
   const [dragging, setDragging] = useState(false);
 
-  // Animation State: 'spinning' -> 'locked'
-  const [introState, setIntroState] = useState('locked');
+  // Animation State: 'swiping' -> 'spinning' -> 'locked'
+  const [introState, setIntroState] = useState('swiping');
+  const [swipeProgress, setSwipeProgress] = useState(0); // 0 to 1
   const [pulseCount, setPulseCount] = useState(0);
 
   const raf = useRef(0);
   const drag = useRef(null);
 
-  // Smooth rotation settling onto India
+  // Play/Replay the hand motion swipe and globe rotation animation sequence
   const startIntroSequence = useCallback(() => {
-    setIntroState('spinning');
-    const startSpin = (TARGET_SPIN - 160 + 360) % 360;
+    setIntroState('swiping');
+    setSwipeProgress(0);
+    const startSpin = (TARGET_SPIN - 180 + 360) % 360;
     setSpin(startSpin);
     setTilt(0.12);
 
-    const spinStart = performance.now();
-    const spinDuration = 1800;
-    const initialSpin = startSpin;
-    const deltaSpin = (TARGET_SPIN - initialSpin + 720) % 360 + 360;
-    const initialTilt = 0.12;
+    // Phase 1: Hand swipes across the globe (~950ms)
+    const swipeStart = performance.now();
+    const swipeDuration = 950;
 
-    const animateSpin = tNow => {
-      const sElapsed = tNow - spinStart;
-      const sp = Math.min(1, sElapsed / spinDuration);
-      const ease = 1 - Math.pow(1 - sp, 3.5);
+    const animateSwipe = now => {
+      const elapsed = now - swipeStart;
+      const p = Math.min(1, elapsed / swipeDuration);
+      setSwipeProgress(p);
 
-      setSpin((initialSpin + deltaSpin * ease) % 360);
-      setTilt(initialTilt + (TARGET_TILT - initialTilt) * ease);
+      // Interpolate spin slightly during finger drag
+      const curSpin = (startSpin + p * 45) % 360;
+      setSpin(curSpin);
 
-      if (sp < 1) {
-        raf.current = requestAnimationFrame(animateSpin);
+      if (p < 1) {
+        raf.current = requestAnimationFrame(animateSwipe);
       } else {
-        // Locked dead-center on India with Tricolor celebration
-        setSpin(TARGET_SPIN);
-        setTilt(TARGET_TILT);
-        setIntroState('locked');
-        setPulseCount(c => c + 1);
+        // Phase 2: Rapid spin decelerating to India
+        setIntroState('spinning');
+        const spinStart = performance.now();
+        const spinDuration = 1800;
+        const initialSpin = curSpin;
+        const deltaSpin = (TARGET_SPIN - initialSpin + 720) % 360 + 360;
+        const initialTilt = 0.12;
+
+        const animateSpin = tNow => {
+          const sElapsed = tNow - spinStart;
+          const sp = Math.min(1, sElapsed / spinDuration);
+          const ease = 1 - Math.pow(1 - sp, 3.5);
+
+          setSpin((initialSpin + deltaSpin * ease) % 360);
+          setTilt(initialTilt + (TARGET_TILT - initialTilt) * ease);
+
+          if (sp < 1) {
+            raf.current = requestAnimationFrame(animateSpin);
+          } else {
+            // Phase 3: Locked dead-center on India with Tricolor celebration
+            setSpin(TARGET_SPIN);
+            setTilt(TARGET_TILT);
+            setIntroState('locked');
+            setPulseCount(c => c + 1);
+          }
+        };
+
+        raf.current = requestAnimationFrame(animateSpin);
       }
     };
 
-    raf.current = requestAnimationFrame(animateSpin);
+    raf.current = requestAnimationFrame(animateSwipe);
   }, []);
 
   // Run on mount
@@ -158,6 +185,13 @@ function EvidenceGlobe({
       cancelAnimationFrame(raf.current);
     };
   }, [startIntroSequence]);
+
+  // Replay when replayKey changes
+  useEffect(() => {
+    if (replayKey > 0) {
+      startIntroSequence();
+    }
+  }, [replayKey, startIntroSequence]);
 
   // Pointer drag gestures
   const onPointerDown = e => {
@@ -266,6 +300,25 @@ function EvidenceGlobe({
       };
     });
   }, [model.markers, spin, tilt]);
+
+  // Pointing Hand Motion Dynamics (swiping finger and pointing interaction)
+  const handX = introState === 'swiping'
+    ? 68 + swipeProgress * 40
+    : introState === 'spinning'
+    ? 80
+    : 102;
+
+  const handY = introState === 'swiping'
+    ? 136.5 + Math.sin(swipeProgress * Math.PI) * 4
+    : introState === 'spinning'
+    ? 134
+    : 140.5;
+
+  const handAngle = introState === 'swiping'
+    ? -4 + swipeProgress * 8
+    : introState === 'spinning'
+    ? -6
+    : 0;
 
   const empty = model.total === 0;
 
@@ -386,6 +439,69 @@ function EvidenceGlobe({
               <circle cx={CX} cy={CY} r={8} fill="none" stroke="#138808" strokeWidth="2.4" className="ripple-green" />
               {/* Ashoka Navy Blue Center Pin */}
               <circle cx={CX} cy={CY} r={3.4} fill="#0A2351" stroke="#FFFFFF" strokeWidth="1.2" className="center-chakra-dot" />
+            </g>
+          )}
+
+          {/* Telemetry Target Reticle */}
+          {introState === 'locked' && (
+            <g className="aiori-telemetry-reticle">
+              <circle cx={CX} cy={CY} r="18" fill="none" stroke="#FF9933" strokeWidth="1.2" strokeDasharray="3 3" opacity="0.9" />
+              <circle cx={CX} cy={CY} r="28" fill="none" stroke="#52B788" strokeWidth="1" strokeDasharray="4 4" opacity="0.65" />
+            </g>
+          )}
+
+          {/* ============================================================== */}
+          {/* THE POINTING HAND (CARTOON HAND SWIPE & POINTING INTERACTION)  */}
+          {/* ============================================================== */}
+          <g
+            className="aiori-pointing-hand-rig"
+            transform={`translate(${handX}, ${handY}) rotate(${handAngle})`}
+            style={{
+              transformOrigin: '20px 20px',
+              transition: introState === 'swiping' ? 'none' : 'transform 0.4s cubic-bezier(0.18, 0.9, 0.3, 1)',
+              pointerEvents: 'none',
+            }}
+          >
+            {/* Cartoon pointing hand asset */}
+            <image
+              href={handImg}
+              x="0"
+              y="0"
+              width="60"
+              height="40.5"
+              preserveAspectRatio="xMidYMid meet"
+            />
+
+            {/* Glowing Touch Contact Point at the index fingertip */}
+            {introState === 'swiping' && (
+              <g transform="translate(60, 14.5)">
+                <circle cx="0" cy="0" r="7" fill="none" stroke="#FF9933" strokeWidth="2.2" className="aiori-touch-ring" />
+                <circle cx="0" cy="0" r="3.5" fill="#FFFFFF" />
+              </g>
+            )}
+          </g>
+
+          {/* Dynamic Motion Swoosh Particle Trails when Swiping */}
+          {introState === 'swiping' && (
+            <g className="aiori-swipe-swoosh" style={{ pointerEvents: 'none' }}>
+              <path
+                d="M 140 146 C 175 138, 220 150, 265 170"
+                fill="none"
+                stroke="rgba(255, 255, 255, 0.85)"
+                strokeWidth="3.5"
+                strokeDasharray="9 5"
+                strokeLinecap="round"
+                className="aiori-trail-dash"
+              />
+              <path
+                d="M 146 158 C 180 150, 226 162, 272 182"
+                fill="none"
+                stroke="#FF9933"
+                strokeWidth="2.5"
+                strokeDasharray="7 5"
+                strokeLinecap="round"
+                opacity="0.9"
+              />
             </g>
           )}
         </svg>

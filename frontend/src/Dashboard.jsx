@@ -716,6 +716,7 @@ export default function Dashboard({ user, onSignOut }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const progressBarRef = useRef(null);
   const [backToTopVisible, setBackToTopVisible] = useState(false);
+  const [globeReplayKey, setGlobeReplayKey] = useState(0);
 
   // Ultra-lightweight native scroll progress & back-to-top handler (zero JS friction)
   useEffect(() => {
@@ -990,6 +991,14 @@ export default function Dashboard({ user, onSignOut }) {
                 <div className="tp-overview-status-pill">
                   <span>Locked: 21.5°N, 78.5°E</span>
                 </div>
+                <button
+                  type="button"
+                  className="tp-overview-status-pill tp-replay-pill"
+                  onClick={() => setGlobeReplayKey(k => k + 1)}
+                  title="Replay hand motion globe animation"
+                >
+                  <span>↺ Replay</span>
+                </button>
               </div>
             </div>
             <div className="tp-overview-hero-globe-slot">
@@ -999,11 +1008,10 @@ export default function Dashboard({ user, onSignOut }) {
                 deviceOf={device}
                 isFailure={fail}
                 timestampOf={timestamp}
+                replayKey={globeReplayKey}
               />
             </div>
           </section>
-
-          <hr className="tp-section-divider" />
 
           {/* 2. Operational Signals Section Header & Metric Cards */}
           <div className="tp-overview-section-header tp-scroll-reveal">

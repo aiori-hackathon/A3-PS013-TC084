@@ -73,7 +73,7 @@
   min-height: 380px !important;
   position: relative !important;
   overflow: visible !important;
-  margin-bottom: 0 !important;
+  margin-bottom: 24px !important;
 }
 
 .tp-overview-hero-content {
@@ -139,6 +139,19 @@
   border-radius: 50% !important;
   background: #10B981 !important;
   box-shadow: 0 0 8px #10B981 !important;
+}
+
+.tp-replay-pill {
+  cursor: pointer !important;
+  user-select: none !important;
+  transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+
+.tp-replay-pill:hover {
+  background: #E8F2EA !important;
+  border-color: #25543D !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 6px rgba(37, 84, 61, 0.12) !important;
 }
 
 .tp-overview-hero-globe-slot {
