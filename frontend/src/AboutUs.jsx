@@ -280,7 +280,7 @@ export default function AboutUs() {
           </div>
         </TiltCard>
 
-        {/* Member 2: Prince Yadav */}
+        {/* Member 2: Sujal Pathak */}
         <TiltCard style={{ '--card-idx': 1 }}>
           <div className="tp-team-photo-wrap">
             <a
@@ -288,8 +288,8 @@ export default function AboutUs() {
               target="_blank"
               rel="noopener noreferrer"
               className="tp-team-card-link-badge"
-              title="View Prince's LinkedIn Profile"
-              aria-label="View Prince's LinkedIn Profile"
+              title="View Sujal's LinkedIn Profile"
+              aria-label="View Sujal's LinkedIn Profile"
               onClick={handleExternalClick('https://www.linkedin.com/in/prince-yadav-794706325/')}
             >
               <ArrowUpRight size={16} />
@@ -297,7 +297,7 @@ export default function AboutUs() {
 
             <img
               src="/prince-yadav.jpg"
-              alt="Prince Yadav"
+              alt="Sujal Pathak"
               className="tp-team-photo"
               loading="lazy"
             />
@@ -307,7 +307,7 @@ export default function AboutUs() {
             <span className="tp-team-role-pill prince">
               <Activity size={12} /> Core Systems & Ingestion
             </span>
-            <h2 className="tp-team-name">Prince Yadav</h2>
+            <h2 className="tp-team-name">Sujal Pathak</h2>
             <div className="tp-team-tagline">
               Pipeline orchestration, real-time telemetry, and attack graph modeling.
             </div>
@@ -330,7 +330,7 @@ export default function AboutUs() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="tp-team-social-btn"
-                  title="GitHub Profile (princeyadav-oss)"
+                  title="GitHub Profile"
                   aria-label="GitHub Profile"
                   onClick={handleExternalClick('https://github.com/princeyadav-oss')}
                 >
@@ -353,7 +353,7 @@ export default function AboutUs() {
                   rel="noopener noreferrer"
                   className="tp-team-social-btn"
                   title="Email via Gmail (py4149560@gmail.com)"
-                  aria-label="Email Prince Yadav via Gmail"
+                  aria-label="Email Sujal Pathak via Gmail"
                   onClick={handleExternalClick('https://mail.google.com/mail/?view=cm&fs=1&to=py4149560@gmail.com')}
                 >
                   <Mail size={14} />
