@@ -2528,9 +2528,9 @@ html .tp-app.tp-app[data-theme='forensic'] .tp-content:has(.tp-benchmark) > .tp-
   }
 
   html .tp-app.tp-app[data-theme='forensic'] .tp-forensic-intro-side > span {
-    font-family: 'IBM Plex Mono', monospace !important;
-    font-size: 10px !important;
-    letter-spacing: 0.1em !important;
+    font-family: 'Inter', system-ui, sans-serif !important;
+    font-size: 11.5px !important;
+    letter-spacing: normal !important;
     font-weight: 700 !important;
     color: #2D6A4F !important;
     text-transform: uppercase !important;

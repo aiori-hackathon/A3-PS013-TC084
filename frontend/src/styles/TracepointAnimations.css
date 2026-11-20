@@ -55,25 +55,25 @@
 }
 
 .aiori-brand-badge {
-  font-family: 'IBM Plex Mono', monospace !important;
-  font-size: 9.5px !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: 11px !important;
   font-weight: 700 !important;
   background: #E2F0E5 !important;
   color: #1A5436 !important;
   border: 1px solid #B7DEBF !important;
-  padding: 2px 6px !important;
+  padding: 2px 7px !important;
   border-radius: 6px !important;
   white-space: nowrap !important;
-  letter-spacing: 0.5px !important;
+  letter-spacing: normal !important;
   flex-shrink: 0 !important;
 }
 
 .aiori-brand-sub {
-  font-family: 'IBM Plex Mono', monospace !important;
-  font-size: 8.5px !important;
-  font-weight: 700 !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: 11px !important;
+  font-weight: 650 !important;
   color: #25543D !important;
-  letter-spacing: 0.8px !important;
+  letter-spacing: normal !important;
   text-transform: uppercase !important;
   line-height: 1.2 !important;
 }
@@ -202,9 +202,9 @@ html .tp-app.tp-app[data-theme='forensic'] .tp-forensic-intro-side,
 
 html .tp-app.tp-app[data-theme='forensic'] .tp-forensic-intro-side > span,
 .tp-forensic-intro-side > span {
-  font-family: 'IBM Plex Mono', monospace !important;
-  font-size: 10px !important;
-  letter-spacing: 0.1em !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-size: 11.5px !important;
+  letter-spacing: normal !important;
   font-weight: 700 !important;
   color: #2D6A4F !important;
   text-transform: uppercase !important;
@@ -433,22 +433,22 @@ html .tp-app .aiori-spotlight-sub .mono,
 }
 
 .tp-portal-code {
-  font-family: 'IBM Plex Mono', monospace !important;
-  font-size: 9px !important;
-  font-weight: 750 !important;
-  letter-spacing: 0.04em !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: normal !important;
   color: #4E6B5A !important;
   background: #EAF3EC !important;
-  padding: 2px 5px !important;
+  padding: 2px 6px !important;
   border-radius: 4px !important;
 }
 
 .tp-portal-badge {
-  font-family: 'IBM Plex Mono', monospace !important;
-  font-size: 8.5px !important;
-  font-weight: 750 !important;
-  letter-spacing: 0.06em !important;
-  padding: 2px 5px !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: normal !important;
+  padding: 2px 6px !important;
   border-radius: 4px !important;
   text-transform: uppercase !important;
 }
@@ -613,11 +613,11 @@ html .tp-app .aiori-spotlight-sub .mono,
 
 .tp-app.tp-app[data-theme='forensic'] .tp-forensic-metrics .tp-metric strong,
 .tp-metric strong.tp-metric-value {
-  font-family: 'IBM Plex Mono', monospace !important;
-  font-size: 28px !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: 32px !important;
   font-weight: 800 !important;
   color: #11261B !important;
-  letter-spacing: -0.6px !important;
+  letter-spacing: -0.03em !important;
   line-height: 1.1 !important;
   margin: 0 !important;
   display: block !important;
@@ -629,11 +629,11 @@ html .tp-app .aiori-spotlight-sub .mono,
 }
 
 .tp-metric-chip {
-  font-family: 'IBM Plex Mono', monospace !important;
-  font-size: 8.5px !important;
-  font-weight: 750 !important;
-  letter-spacing: 0.05em !important;
-  padding: 2px 6px !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: normal !important;
+  padding: 2px 7px !important;
   border-radius: 4px !important;
   text-transform: uppercase !important;
 }
@@ -738,10 +738,10 @@ body *::-moz-selection,
 }
 
 .tp-chart-kicker {
-  font-family: 'IBM Plex Mono', monospace !important;
-  font-size: 9px !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-size: 11px !important;
   font-weight: 750 !important;
-  letter-spacing: 0.08em !important;
+  letter-spacing: normal !important;
   color: #2D6A4F !important;
   text-transform: uppercase !important;
 }
@@ -768,13 +768,14 @@ body *::-moz-selection,
   display: inline-flex !important;
   align-items: center !important;
   gap: 6px !important;
-  padding: 3px 8px !important;
+  padding: 3px 9px !important;
   background: #EAF3EC !important;
   border: 1px solid #CFE2D4 !important;
   border-radius: 9999px !important;
-  font-family: 'IBM Plex Mono', monospace !important;
-  font-size: 9.5px !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-size: 11px !important;
   font-weight: 650 !important;
+  letter-spacing: normal !important;
   color: #23543D !important;
 }
 
@@ -800,12 +801,13 @@ body *::-moz-selection,
   justify-content: space-between !important;
   height: 72px !important;
   padding-bottom: 16px !important;
-  font-family: 'IBM Plex Mono', monospace !important;
-  font-size: 8.5px !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-size: 10px !important;
   font-weight: 650 !important;
+  letter-spacing: normal !important;
   color: #7A9B86 !important;
   text-align: right !important;
-  width: 16px !important;
+  width: 18px !important;
   flex-shrink: 0 !important;
   user-select: none !important;
   border-right: 1px solid #E2EDE5 !important;
@@ -856,15 +858,16 @@ body *::-moz-selection,
 
 .tp-chart-active-tag {
   position: absolute !important;
-  top: -17px !important;
+  top: -18px !important;
   left: 50% !important;
   transform: translateX(-50%) !important;
   background: #132A1E !important;
   color: #52B788 !important;
-  font-family: 'IBM Plex Mono', monospace !important;
-  font-size: 8.5px !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-size: 10px !important;
   font-weight: 800 !important;
-  padding: 1px 4px !important;
+  letter-spacing: normal !important;
+  padding: 1px 5px !important;
   border-radius: 3px !important;
   border: 1px solid #2D6A4F !important;
   white-space: nowrap !important;
@@ -921,8 +924,9 @@ body *::-moz-selection,
 }
 
 .tp-chart-col-label {
-  font-family: 'IBM Plex Mono', monospace !important;
-  font-size: 8.5px !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-size: 10px !important;
+  letter-spacing: normal !important;
   color: #6B8B77 !important;
   display: flex !important;
   flex-direction: column !important;
@@ -933,7 +937,8 @@ body *::-moz-selection,
 
 .tp-chart-col-label em {
   font-style: normal !important;
-  font-size: 7.5px !important;
+  font-size: 9px !important;
+  letter-spacing: normal !important;
   color: #8BA896 !important;
 }
 
@@ -976,8 +981,9 @@ body *::-moz-selection,
   display: flex !important;
   align-items: center !important;
   gap: 7px !important;
-  font-family: 'IBM Plex Mono', monospace !important;
-  font-size: 10px !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-size: 11px !important;
+  letter-spacing: normal !important;
   color: #3A5647 !important;
   font-weight: 600 !important;
 }
@@ -985,8 +991,9 @@ body *::-moz-selection,
 .tp-chart-horizon-count {
   background: transparent !important;
   color: #23543D !important;
-  font-family: 'IBM Plex Mono', monospace !important;
-  font-size: 10px !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-size: 11px !important;
+  letter-spacing: normal !important;
   font-weight: 700 !important;
 }
 
@@ -1041,9 +1048,10 @@ body *::-moz-selection,
   border-radius: 6px !important;
   background: #EAF3EC !important;
   border: 1px solid #CFE2D4 !important;
-  font-family: 'IBM Plex Mono', monospace !important;
-  font-size: 9.5px !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-size: 11px !important;
   font-weight: 750 !important;
+  letter-spacing: normal !important;
   color: #23543D !important;
   flex-shrink: 0 !important;
 }
@@ -1082,27 +1090,29 @@ body *::-moz-selection,
 }
 
 .tp-chart-ranked-value {
-  font-family: 'IBM Plex Mono', monospace !important;
-  font-size: 11px !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-size: 12px !important;
+  letter-spacing: normal !important;
   font-weight: 700 !important;
   color: #23543D !important;
 }
 
 .tp-chart-ranked-value small {
-  font-size: 9px !important;
+  font-size: 10px !important;
   color: #5D7A6B !important;
   font-weight: 500 !important;
   margin-left: 2px !important;
 }
 
 .tp-ranked-pct-pill {
-  font-family: 'IBM Plex Mono', monospace !important;
-  font-size: 9px !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-size: 11px !important;
+  letter-spacing: normal !important;
   font-weight: 750 !important;
   background: #E8F5EB !important;
   color: #138808 !important;
   border: 1px solid #A3D9B1 !important;
-  padding: 1px 5px !important;
+  padding: 1px 6px !important;
   border-radius: 4px !important;
 }
 

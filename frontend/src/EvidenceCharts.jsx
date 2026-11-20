@@ -162,7 +162,7 @@ function RankedBarChart({ rows = [], total = 0, unit = 'events', verificationNot
               dataKey="count"
               position="right"
               formatter={(val) => `${val}`}
-              style={{ fill: '#11261B', fontSize: 10.5, fontWeight: 700, fontFamily: 'IBM Plex Mono, monospace' }}
+              style={{ fill: '#11261B', fontSize: 11, fontWeight: 700, fontFamily: "'Inter', system-ui, sans-serif" }}
             />
             {formattedData.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={entry.color} />
@@ -330,13 +330,13 @@ function EvidenceCharts({
                   interval={0}
                   tickLine={false}
                   axisLine={{ stroke: '#D4E5D8' }}
-                  tick={{ fill: '#3E5C4A', fontSize: 10.5, fontFamily: 'IBM Plex Mono, monospace' }}
+                  tick={{ fill: '#3E5C4A', fontSize: 11, fontFamily: "'Inter', system-ui, sans-serif" }}
                 />
                 <YAxis
                   allowDecimals={false}
                   tickLine={false}
                   axisLine={false}
-                  tick={{ fill: '#5C7A68', fontSize: 10, fontFamily: 'IBM Plex Mono, monospace' }}
+                  tick={{ fill: '#5C7A68', fontSize: 11, fontFamily: "'Inter', system-ui, sans-serif" }}
                 />
                 <Tooltip content={<TimelineTooltip />} cursor={{ fill: 'rgba(82, 183, 136, 0.08)' }} />
                 <Bar
