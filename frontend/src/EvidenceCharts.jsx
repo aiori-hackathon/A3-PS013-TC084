@@ -3,6 +3,8 @@ import {
   ResponsiveContainer,
   BarChart,
   Bar,
+  PieChart,
+  Pie,
   XAxis,
   YAxis,
   Tooltip,
@@ -12,7 +14,7 @@ import {
 } from 'recharts';
 import './styles/EvidenceCharts.css';
 
-const DAYS = 14;
+const DAYS = 7;
 
 const dayKey = d => d.toISOString().slice(0, 10);
 const asDate = iso => new Date(`${iso}T00:00:00Z`);
@@ -63,6 +65,30 @@ function TimelineTooltip({ active, payload }) {
           <span className="tp-recharts-pip ok" />
           <span>Nominal / other:</span>
           <strong>{d.ok}</strong>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* Custom Recharts Tooltip for Donut / Pie Chart */
+function PieTooltip({ active, payload, total }) {
+  if (!active || !payload || !payload.length) return null;
+  const d = payload[0];
+  if (!d) return null;
+  const pct = total ? Math.round((d.value / total) * 100) : 0;
+
+  return (
+    <div className="tp-recharts-tooltip" role="tooltip">
+      <div className="tp-recharts-tooltip-head">
+        <span className="mono" style={{ color: d.payload?.color || '#25543D', fontWeight: 700 }}>{d.name}</span>
+        <span className="tp-recharts-tooltip-badge">{pct}% of total</span>
+      </div>
+      <div className="tp-recharts-tooltip-body">
+        <div className="tp-recharts-tooltip-row">
+          <span className="tp-recharts-pip" style={{ background: d.payload?.color || '#25543D' }} />
+          <span>Recorded telemetry:</span>
+          <strong>{d.value} events</strong>
         </div>
       </div>
     </div>
@@ -212,9 +238,47 @@ function EvidenceCharts({
       total: d.failed + d.ok,
     }));
 
+    // Telemetry Posture Distribution
+    let nominalCount = 0;
+    let failureCount = 0;
+    let warningCount = 0;
+    let auditCount = 0;
+
+    events.forEach(e => {
+      const isFail = isFailure(e);
+      const sev = (e.severity || '').toLowerCase();
+      if (isFail) {
+        failureCount += 1;
+      } else if (sev === 'warning' || sev === 'warn') {
+        warningCount += 1;
+      } else if (sev === 'info' || sev === 'notice') {
+        nominalCount += 1;
+      } else {
+        auditCount += 1;
+      }
+    });
+
+    const postureData = [];
+    if (nominalCount > 0) {
+      postureData.push({ name: 'Nominal events', value: nominalCount, color: '#25543D' });
+    }
+    if (failureCount > 0) {
+      postureData.push({ name: 'Failure alerts', value: failureCount, color: '#FF4D6A' });
+    }
+    if (warningCount > 0) {
+      postureData.push({ name: 'Warnings / Skew', value: warningCount, color: '#F59E0B' });
+    }
+    if (auditCount > 0) {
+      postureData.push({ name: 'System / Audit', value: auditCount, color: '#10B981' });
+    }
+    if (postureData.length === 0) {
+      postureData.push({ name: 'Nominal events', value: Math.max(1, events.length), color: '#25543D' });
+    }
+
     return {
       days,
       timelineData,
+      postureData,
       peak: Math.max(1, ...days.map(d => d.failed + d.ok)),
       inWindow: days.reduce((n, d) => n + d.failed + d.ok, 0),
       types: rank(types).slice(0, 6),
@@ -226,13 +290,13 @@ function EvidenceCharts({
 
   return (
     <section className="tp-charts tp-scroll-reveal tp-stagger-parent" aria-label="Collected event analysis">
-      {/* 1. Full-Width Telemetry Timeline Chart (Recharts) */}
+      {/* 1. 7-Day Telemetry Timeline Chart (Recharts) */}
       <article className="tp-card tp-chart-card tp-chart-timeline-card">
         <header className="tp-chart-head">
           <div className="tp-chart-title-group">
             <span className="tp-chart-kicker">TELEMETRY TIMELINE</span>
             <h3>Authentication outcomes</h3>
-            <p>Failed vs nominal authentication events per day (14-day observation horizon)</p>
+            <p>Failed vs nominal authentication events per day (7-day horizon)</p>
           </div>
           <div className="tp-chart-head-right">
             <div className="tp-legend-keys-inline">
@@ -250,7 +314,7 @@ function EvidenceCharts({
           <Empty>No events fall inside the last {DAYS} days. Older evidence is still on the timeline.</Empty>
         ) : (
           <div className="tp-recharts-timeline-wrap">
-            <ResponsiveContainer width="100%" height={240}>
+            <ResponsiveContainer width="100%" height={235}>
               <BarChart
                 data={data.timelineData}
                 margin={{ top: 8, right: 12, left: -22, bottom: 0 }}
@@ -263,7 +327,7 @@ function EvidenceCharts({
                 />
                 <XAxis
                   dataKey="date"
-                  interval={1}
+                  interval={0}
                   tickLine={false}
                   axisLine={{ stroke: '#D4E5D8' }}
                   tick={{ fill: '#3E5C4A', fontSize: 10.5, fontFamily: 'IBM Plex Mono, monospace' }}
@@ -281,7 +345,7 @@ function EvidenceCharts({
                   stackId="auth"
                   fill="#FF4D6A"
                   radius={[0, 0, 0, 0]}
-                  barSize={22}
+                  barSize={28}
                   minPointSize={2}
                   animationDuration={600}
                   animationEasing="ease-out"
@@ -292,7 +356,7 @@ function EvidenceCharts({
                   stackId="auth"
                   fill="#25543D"
                   radius={[4, 4, 0, 0]}
-                  barSize={22}
+                  barSize={28}
                   minPointSize={2}
                   animationDuration={600}
                   animationEasing="ease-out"
@@ -301,6 +365,69 @@ function EvidenceCharts({
             </ResponsiveContainer>
           </div>
         )}
+      </article>
+
+      {/* 2. Telemetry Posture Pie / Donut Chart */}
+      <article className="tp-card tp-chart-card tp-chart-pie-card">
+        <header className="tp-chart-head">
+          <div className="tp-chart-title-group">
+            <span className="tp-chart-kicker">SECURITY POSTURE</span>
+            <h3>Event distribution</h3>
+            <p>Outcome ratio across {data.total} collected events</p>
+          </div>
+          <div className="tp-chart-horizon-badge">
+            <span className="tp-chart-radar-pip" />
+            <span>{data.total} total</span>
+          </div>
+        </header>
+
+        <div className="tp-pie-container">
+          <div className="tp-pie-chart-slot">
+            <ResponsiveContainer width="100%" height={160}>
+              <PieChart>
+                <Pie
+                  data={data.postureData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={46}
+                  outerRadius={68}
+                  paddingAngle={3}
+                  dataKey="value"
+                  animationDuration={800}
+                  stroke="#FFFFFF"
+                  strokeWidth={2}
+                >
+                  {data.postureData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip content={<PieTooltip total={data.total} />} />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="tp-pie-center-label" aria-hidden="true">
+              <strong>{data.total}</strong>
+              <small>EVENTS</small>
+            </div>
+          </div>
+
+          <div className="tp-pie-legend-list">
+            {data.postureData.map((item, idx) => {
+              const pct = data.total ? Math.round((item.value / data.total) * 100) : 0;
+              return (
+                <div className="tp-pie-legend-row" key={idx}>
+                  <div className="tp-pie-legend-label-wrap">
+                    <span className="tp-pie-legend-dot" style={{ background: item.color }} />
+                    <span className="tp-pie-legend-name">{item.name}</span>
+                  </div>
+                  <div className="tp-pie-legend-stats">
+                    <strong>{item.value}</strong>
+                    <span className="tp-pie-legend-pct">({pct}%)</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </article>
 
       {/* Ranked profiles rendered only when explicitly requested (keeps Overview clean) */}

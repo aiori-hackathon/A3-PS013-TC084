@@ -238,7 +238,24 @@ html body #root .tp-overview-hero-globe-slot .aiori-globe-svg,
   border: none !important;
   outline: none !important;
   box-shadow: none !important;
-  filter: drop-shadow(0 12px 32px rgba(35, 84, 58, 0.18)) !important;
+  filter: drop-shadow(0 6px 20px rgba(35, 84, 58, 0.12)) !important;
+}
+
+/* Explicitly eliminate any black lines, outlines, or borders near hero globe */
+.tp-overview-hero-wrapper,
+.tp-overview-hero-content,
+.tp-overview-hero-globe-slot,
+.tp-overview-hero-globe-slot *,
+.tp-globe,
+.tp-globe-stage,
+.aiori-globe-svg {
+  border-left: none !important;
+  border-right: none !important;
+  border-top: none !important;
+  border-bottom: none !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 /* ---------------------------------------------------------------------------

@@ -36,19 +36,11 @@ function buildGrid() {
       const inIndia = lat >= 7.5 && lat <= 36.5 && lon >= 68 && lon <= 92;
       let tricolor = null;
       if (inIndia) {
-        if (lat >= 24) tricolor = '#FF9933'; // Saffron
+        if (lat >= 24) tricolor = '#F59E0B'; // Saffron
         else if (lat >= 16.5) tricolor = '#FFFFFF'; // White
-        else tricolor = '#138808'; // India Green
+        else tricolor = '#10B981'; // India Green
       }
       cells.push({ lat, lon, phi, land: true, inIndia, tricolor });
-    }
-  }
-  for (let lat = -84; lat <= 84; lat += LAT_STEP * 2.2) {
-    const phi = (lat * Math.PI) / 180;
-    const ringR = Math.cos(phi);
-    const count = Math.max(5, Math.round(46 * ringR));
-    for (let j = 0; j < count; j += 1) {
-      cells.push({ lat, lon: -180 + (j / count) * 360, phi, land: false, inIndia: false, tricolor: null });
     }
   }
   return cells;
@@ -340,17 +332,17 @@ function EvidenceGlobe({
           aria-label="Interactive AIORI-3 Evidence Globe"
         >
           <defs>
-            {/* Deep Pista-Pine Sphere Gradient */}
+            {/* Luminous Cyber-Emerald Deep Sphere Gradient */}
             <radialGradient id="tp-globe-shade-pista" cx="35%" cy="30%" r="85%">
-              <stop offset="0%" stopColor="#1E4430" stopOpacity="0.95" />
-              <stop offset="48%" stopColor="#122A1E" stopOpacity="0.98" />
-              <stop offset="100%" stopColor="#0B1A12" stopOpacity="1" />
+              <stop offset="0%" stopColor="#1C4B3A" stopOpacity="0.96" />
+              <stop offset="55%" stopColor="#123527" stopOpacity="0.98" />
+              <stop offset="100%" stopColor="#0A2218" stopOpacity="1" />
             </radialGradient>
 
             <radialGradient id="tp-globe-rim-pista" cx="50%" cy="50%" r="50%">
-              <stop offset="88%" stopColor="#2D6A4F" stopOpacity="0" />
-              <stop offset="97%" stopColor="#52B788" stopOpacity="0.45" />
-              <stop offset="100%" stopColor="#74C69D" stopOpacity="0.15" />
+              <stop offset="82%" stopColor="#10B981" stopOpacity="0" />
+              <stop offset="94%" stopColor="#34D399" stopOpacity="0.4" />
+              <stop offset="100%" stopColor="#6EE7B7" stopOpacity="0.75" />
             </radialGradient>
 
             <filter id="tp-globe-atmo-blur" x="-30%" y="-30%" width="160%" height="160%">
@@ -358,7 +350,7 @@ function EvidenceGlobe({
             </filter>
 
             <filter id="tp-tricolor-glow" x="-50%" y="-50%" width="200%" height="200%">
-              <feGaussianBlur stdDeviation="2.5" result="blur" />
+              <feGaussianBlur stdDeviation="2" result="blur" />
               <feMerge>
                 <feMergeNode in="blur" />
                 <feMergeNode in="SourceGraphic" />
@@ -372,6 +364,9 @@ function EvidenceGlobe({
             cx={CX}
             cy={CY}
             r={R + 3}
+            stroke="#34D399"
+            strokeWidth="2.5"
+            opacity="0.35"
             filter="url(#tp-globe-atmo-blur)"
           />
 
@@ -385,19 +380,25 @@ function EvidenceGlobe({
               const isIndiaHighlight = introState === 'locked' && d.inIndia;
               const fill = isIndiaHighlight
                 ? d.tricolor
-                : d.land
-                ? '#52B788'
-                : 'rgba(82, 183, 136, 0.15)';
+                : '#34D399';
+
+              const r = isIndiaHighlight
+                ? 1.9 + d.z * 1.5
+                : 1.15 + d.z * 1.35;
+
+              const opacity = isIndiaHighlight
+                ? 0.98
+                : Math.min(1, 0.65 + d.z * 0.35);
 
               return (
                 <circle
                   key={i}
                   cx={d.x}
                   cy={d.y}
-                  r={isIndiaHighlight ? 1.7 + d.z * 1.5 : d.land ? 0.95 + d.z * 1.25 : 0.45 + d.z * 0.4}
+                  r={r}
                   fill={fill}
-                  className={d.land ? 'is-land' : 'is-grid'}
-                  opacity={isIndiaHighlight ? 0.95 : d.land ? 0.4 + d.z * 0.58 : 0.08 + d.z * 0.15}
+                  className={isIndiaHighlight ? 'is-india' : 'is-land'}
+                  opacity={opacity}
                   filter={isIndiaHighlight ? 'url(#tp-tricolor-glow)' : undefined}
                 />
               );
@@ -432,21 +433,21 @@ function EvidenceGlobe({
           {introState === 'locked' && (
             <g className="aiori-india-pulse" key={pulseCount}>
               {/* Saffron Ripple */}
-              <circle cx={CX} cy={CY} r={18} fill="none" stroke="#FF9933" strokeWidth="2.2" className="ripple-saffron" />
+              <circle cx={CX} cy={CY} r={18} fill="none" stroke="#F59E0B" strokeWidth="2" className="ripple-saffron" />
               {/* White Ripple */}
-              <circle cx={CX} cy={CY} r={13} fill="none" stroke="#FFFFFF" strokeWidth="1.8" className="ripple-white" />
+              <circle cx={CX} cy={CY} r={13} fill="none" stroke="#FFFFFF" strokeWidth="1.6" className="ripple-white" />
               {/* India Green Ripple */}
-              <circle cx={CX} cy={CY} r={8} fill="none" stroke="#138808" strokeWidth="2.4" className="ripple-green" />
-              {/* Ashoka Navy Blue Center Pin */}
-              <circle cx={CX} cy={CY} r={3.4} fill="#0A2351" stroke="#FFFFFF" strokeWidth="1.2" className="center-chakra-dot" />
+              <circle cx={CX} cy={CY} r={8} fill="none" stroke="#10B981" strokeWidth="2.2" className="ripple-green" />
+              {/* Center Chakra Pin */}
+              <circle cx={CX} cy={CY} r={3.2} fill="#10B981" stroke="#FFFFFF" strokeWidth="1.2" className="center-chakra-dot" />
             </g>
           )}
 
           {/* Telemetry Target Reticle */}
           {introState === 'locked' && (
             <g className="aiori-telemetry-reticle">
-              <circle cx={CX} cy={CY} r="18" fill="none" stroke="#FF9933" strokeWidth="1.2" strokeDasharray="3 3" opacity="0.9" />
-              <circle cx={CX} cy={CY} r="28" fill="none" stroke="#52B788" strokeWidth="1" strokeDasharray="4 4" opacity="0.65" />
+              <circle cx={CX} cy={CY} r="18" fill="none" stroke="#F59E0B" strokeWidth="1" strokeDasharray="3 3" opacity="0.75" />
+              <circle cx={CX} cy={CY} r="28" fill="none" stroke="#34D399" strokeWidth="0.8" strokeDasharray="4 4" opacity="0.5" />
             </g>
           )}
 
