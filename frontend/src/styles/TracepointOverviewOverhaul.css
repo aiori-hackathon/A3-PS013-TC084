@@ -761,6 +761,16 @@ html body #root .tp-app[data-theme='dark'] .tp-floating-tag {
   border-color: #3F1218 !important;
 }
 
+.tp-terminal-screen-wrap.accent-amber {
+  background: #141006 !important;
+  border-color: #3F2C0B !important;
+}
+
+.tp-terminal-screen-wrap.accent-sage {
+  background: #06140D !important;
+  border-color: #0E3520 !important;
+}
+
 .tp-terminal-card.is-alert-terminal:hover .tp-terminal-screen-wrap.accent-red {
   border-color: #7F1D1D !important;
 }
@@ -780,6 +790,16 @@ html body #root .tp-app[data-theme='dark'] .tp-floating-tag {
 .tp-terminal-screen-wrap.accent-red .tp-term-bar {
   background: #0E0406 !important;
   border-bottom: 1px solid rgba(239, 68, 68, 0.18) !important;
+}
+
+.tp-terminal-screen-wrap.accent-amber .tp-term-bar {
+  background: #0D0904 !important;
+  border-bottom: 1px solid rgba(245, 158, 11, 0.2) !important;
+}
+
+.tp-terminal-screen-wrap.accent-sage .tp-term-bar {
+  background: #040E09 !important;
+  border-bottom: 1px solid rgba(16, 185, 129, 0.2) !important;
 }
 
 .tp-term-dots {
@@ -849,6 +869,18 @@ html body #root .tp-app[data-theme='dark'] .tp-floating-tag {
   border: 1px solid rgba(52, 211, 153, 0.3) !important;
 }
 
+.tp-term-badge.sage {
+  background: rgba(16, 185, 129, 0.2) !important;
+  color: #6EE7B7 !important;
+  border: 1px solid rgba(16, 185, 129, 0.4) !important;
+}
+
+.tp-term-badge.amber {
+  background: rgba(245, 158, 11, 0.2) !important;
+  color: #FBBF24 !important;
+  border: 1px solid rgba(245, 158, 11, 0.4) !important;
+}
+
 .tp-term-badge.purple {
   background: rgba(168, 85, 247, 0.15) !important;
   color: #C084FC !important;
@@ -913,6 +945,16 @@ html body #root .tp-app[data-theme='dark'] .tp-floating-tag {
   color: #E9D5FF !important;
 }
 
+/* Amber Warning Terminal Syntax */
+.t-warn-prompt { color: #F59E0B !important; font-weight: 800 !important; margin-right: 4px !important; }
+.t-warn-tag {
+  color: #FEF3C7 !important;
+  background: rgba(217, 119, 6, 0.45) !important;
+  padding: 0 3px !important;
+  border-radius: 2px !important;
+  font-weight: 700 !important;
+}
+
 /* Red Error Terminal Syntax */
 .t-err-prompt { color: #EF4444 !important; font-weight: 800 !important; margin-right: 4px !important; }
 .t-err-title { color: #FCA5A5 !important; font-weight: 700 !important; }
@@ -935,6 +977,9 @@ html body #root .tp-app[data-theme='dark'] .tp-floating-tag {
 }
 .t-cursor.red {
   color: #EF4444 !important;
+}
+.t-cursor.amber {
+  color: #F59E0B !important;
 }
 
 @keyframes tp-cursor-blink {
@@ -991,6 +1036,16 @@ html body #root .tp-app[data-theme='dark'] .tp-floating-tag {
 .tp-term-icon-wrap.accent-red {
   background: #FEF2F2 !important;
   color: #DC2626 !important;
+}
+
+.tp-term-icon-wrap.accent-amber {
+  background: #FEF3C7 !important;
+  color: #D97706 !important;
+}
+
+.tp-term-icon-wrap.accent-sage {
+  background: #E8F2EA !important;
+  color: #25543D !important;
 }
 
 .tp-term-data-mid {

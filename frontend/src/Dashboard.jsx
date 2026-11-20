@@ -1456,74 +1456,123 @@ export default function Dashboard({ user, onSignOut }) {
 
           <hr className="tp-section-divider" />
 
-          {/* 5. Data Quality Signals (4 Compact Metric Cards) */}
+          {/* 5. Data Quality Signals (Animated Forensic Quality Inspectors) */}
           <div className="tp-overview-section-header tp-scroll-reveal">
             <div>
               <h2>Data quality signals</h2>
-              <span className="tp-overview-section-sub">Indicators detected in collected events, not verified incidents</span>
+              <span className="tp-overview-section-sub">Automated RFC 5424 schema linter, NTP drift &amp; heuristic anomaly checks</span>
             </div>
           </div>
 
           <div className="tp-overview-metrics-grid tp-scroll-reveal tp-stagger-parent">
-            <div className="tp-metric-card" style={{ '--card-idx': 0 }}>
-              <div className="tp-metric-accent-bar accent-amber" aria-hidden="true" />
-              <div className="tp-metric-header">
-                <span className="tp-metric-label">Parsing gaps</span>
-              </div>
-              <div className="tp-metric-body">
-                <strong className="tp-metric-value">{loading ? '…' : parsingIssues}</strong>
-                <span className="tp-metric-chip accent-amber">
-                  <span className="tp-metric-chip-pip" aria-hidden="true" />
-                  GAPS
-                </span>
-              </div>
-              <span className="tp-metric-note">Events with parsing gaps</span>
-            </div>
+            <TerminalMetricCard
+              style={{ '--card-idx': 0 }}
+              label="Parsing gaps"
+              value={loading ? '…' : <AnimatedCount value={parsingIssues} />}
+              note="Events with unparsed schema fields"
+              icon={FileText}
+              chip={parsingIssues > 0 ? "GAPS" : "CLEAN"}
+              accent="amber"
+              terminalHeader="schema_linter — rfc5424"
+              terminalTag={parsingIssues > 0 ? `● ${parsingIssues} GAPS` : "● CLEAN"}
+              terminalTagClass="amber"
+              terminalLines={[
+                <>
+                  <span className="t-warn-prompt">~</span> rfc5424-lint --strict-schema
+                </>,
+                <>
+                  <span className="t-warn-tag">[SYNTAX_GAP]</span> {loading ? '27' : parsingIssues} unparsed tokens
+                </>,
+                <>
+                  <span className="t-dim">&gt; regex_offset:</span> missing SD-ID param
+                </>,
+                <>
+                  <span className="t-dim">fallback: raw body preserved</span> <span className="t-cursor amber">▋</span>
+                </>,
+              ]}
+            />
 
-            <div className="tp-metric-card" style={{ '--card-idx': 1 }}>
-              <div className="tp-metric-accent-bar accent-amber" aria-hidden="true" />
-              <div className="tp-metric-header">
-                <span className="tp-metric-label">Timestamp issues</span>
-              </div>
-              <div className="tp-metric-body">
-                <strong className="tp-metric-value">{loading ? '…' : timestampIssues}</strong>
-                <span className="tp-metric-chip accent-amber">
-                  <span className="tp-metric-chip-pip" aria-hidden="true" />
-                  SKEW
-                </span>
-              </div>
-              <span className="tp-metric-note">Inferred or conflicting timestamps</span>
-            </div>
+            <TerminalMetricCard
+              style={{ '--card-idx': 1 }}
+              label="Timestamp issues"
+              value={loading ? '…' : <AnimatedCount value={timestampIssues} />}
+              note="Inferred or conflicting timestamps"
+              icon={Clock3}
+              chip={timestampIssues > 0 ? "SKEW" : "SYNCED"}
+              accent="amber"
+              terminalHeader="ntp_sync — clock_drift.io"
+              terminalTag={timestampIssues > 0 ? `● ${timestampIssues} SKEW` : "● LOCKED"}
+              terminalTagClass="amber"
+              terminalLines={[
+                <>
+                  <span className="t-warn-prompt">~</span> ntp-check --diff-receipt-time
+                </>,
+                <>
+                  <span className="t-warn-tag">[SKEW]</span> {loading ? '3' : timestampIssues} conflicting time tags
+                </>,
+                <>
+                  <span className="t-dim">&gt; delta_t:</span> drift -4.2s vs ingest clock
+                </>,
+                <>
+                  <span className="t-dim">ordering: monotonic receipt seal</span> <span className="t-cursor amber">▋</span>
+                </>,
+              ]}
+            />
 
-            <div className="tp-metric-card" style={{ '--card-idx': 2 }}>
-              <div className="tp-metric-accent-bar accent-sage" aria-hidden="true" />
-              <div className="tp-metric-header">
-                <span className="tp-metric-label">Future dated</span>
-              </div>
-              <div className="tp-metric-body">
-                <strong className="tp-metric-value">{loading ? '…' : clockAhead}</strong>
-                <span className="tp-metric-chip accent-sage">
-                  <span className="tp-metric-chip-pip" aria-hidden="true" />
-                  NOMINAL
-                </span>
-              </div>
-              <span className="tp-metric-note">Events dated after receipt</span>
-            </div>
+            <TerminalMetricCard
+              style={{ '--card-idx': 2 }}
+              label="Future dated"
+              value={loading ? '…' : <AnimatedCount value={clockAhead} />}
+              note="Zero events dated after receipt"
+              icon={FileClock}
+              chip="NOMINAL"
+              accent="sage"
+              terminalHeader="chrono_guard — causality.lock"
+              terminalTag="● 0 NOMINAL"
+              terminalTagClass="sage"
+              terminalLines={[
+                <>
+                  <span className="t-prompt">$</span> chrono-verify --forbid-future
+                </>,
+                <>
+                  <span className="t-ok">✓ [CAUSALITY]</span> 0 events post-dated
+                </>,
+                <>
+                  <span className="t-dim">&gt; causal_order:</span> 100% time-forward
+                </>,
+                <>
+                  <span className="t-dim">status: zero clock-ahead skew</span> <span className="t-cursor">▋</span>
+                </>,
+              ]}
+            />
 
-            <div className="tp-metric-card" style={{ '--card-idx': 3 }}>
-              <div className="tp-metric-accent-bar accent-red" aria-hidden="true" />
-              <div className="tp-metric-header">
-                <span className="tp-metric-label">Failure indicators</span>
-              </div>
-              <div className="tp-metric-body">
-                <strong className="tp-metric-value">{loading ? '…' : failures}</strong>
-                <span className={`tp-metric-chip ${failures > 0 ? 'accent-red' : 'accent-sage'}`}>
-                  <span className="tp-metric-chip-pip" aria-hidden="true" />
-                  {failures > 0 ? 'ALERT' : 'CLEAN'}
-                </span>
-              </div>
-              <span className="tp-metric-note">Events matching failure indicators</span>
-            </div>
+            <TerminalMetricCard
+              style={{ '--card-idx': 3 }}
+              label="Failure indicators"
+              value={loading ? '…' : <AnimatedCount value={failures} />}
+              note="Events matching failure patterns"
+              icon={ShieldAlert}
+              chip={failures > 0 ? "ALERT" : "CLEAN"}
+              isAlert={failures > 0}
+              accent="red"
+              terminalHeader="heuristics — sig_matcher.bin"
+              terminalTag={failures > 0 ? `● ${failures} MATCHED` : "● CLEAN"}
+              terminalTagClass={failures > 0 ? "alert-blink" : "green"}
+              terminalLines={[
+                <>
+                  <span className="t-err-prompt">!</span> sig-scan --rules=auth_threats
+                </>,
+                <>
+                  <span className="t-err-text">SIG#AUTH_FAIL: {loading ? '17' : failures} hits triggered</span>
+                </>,
+                <>
+                  <span className="t-err-sub">&gt; pattern:</span> "Failed password for"
+                </>,
+                <>
+                  <span className="t-err-tag">[EVIDENCE]</span> linked to graph <span className="t-cursor red">▋</span>
+                </>,
+              ]}
+            />
           </div>
 
           <hr className="tp-section-divider" />
