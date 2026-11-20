@@ -757,6 +757,11 @@ export default function Dashboard({ user, onSignOut }) {
   // TRACEPOINT_PAGE_PERSIST_V1: remember the selected page for this tab.
   const [page, setPage] = useState(() => {
     try {
+      if (typeof window !== 'undefined') {
+        const urlParams = new URLSearchParams(window.location.search);
+        const tabParam = urlParams.get('tab');
+        if (tabParam && navigation.some(([id]) => id === tabParam)) return tabParam;
+      }
       const saved = window.sessionStorage.getItem('tracepoint.activePage');
       return navigation.some(([id]) => id === saved) ? saved : 'overview';
     } catch {
@@ -978,9 +983,44 @@ export default function Dashboard({ user, onSignOut }) {
     const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
     const a = document.createElement('a'); a.href = url; a.download = 'tracepoint-events.csv'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
-  const openPage = id => {
+  // TRACEPOINT_BROWSER_HISTORY_V1: keep browser back button from closing the website
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    // Anchor history at overview so pressing back never closes or leaves the application
+    const currentTab = page;
+    if (currentTab !== 'overview') {
+      window.history.replaceState({ page: 'overview' }, '', window.location.pathname);
+      window.history.pushState({ page: currentTab }, '', `${window.location.pathname}?tab=${currentTab}`);
+    } else {
+      window.history.replaceState({ page: 'overview' }, '', window.location.pathname);
+    }
+
+    const onPopState = (event) => {
+      const target = event.state?.page || 'overview';
+      setPage(target);
+      try { window.sessionStorage.setItem('tracepoint.activePage', target); } catch { /* ignore */ }
+      setSelected(null);
+      setMobileOpen(false);
+      window.scrollTo(0, 0);
+
+      if (target === 'overview') {
+        window.history.replaceState({ page: 'overview' }, '', window.location.pathname);
+      }
+    };
+
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, []);
+
+  const openPage = (id, pushHistory = true) => {
+    if (id === page) return;
     setPage(id);
     try { window.sessionStorage.setItem('tracepoint.activePage', id); } catch { /* storage unavailable */ }
+    if (pushHistory && typeof window !== 'undefined') {
+      const targetUrl = id === 'overview' ? window.location.pathname : `${window.location.pathname}?tab=${id}`;
+      window.history.pushState({ page: id }, '', targetUrl);
+    }
     setSelected(null);
     setMobileOpen(false);
     window.scrollTo(0, 0);
@@ -1032,7 +1072,7 @@ export default function Dashboard({ user, onSignOut }) {
     {/* TRACEPOINT_SINGLE_NAV_V1: status and account live in primary navigation */}
 
       <div className="tp-content">
-        {page !== 'about' && page !== 'overview' && page !== 'evidence' && (
+        {page !== 'about' && page !== 'overview' && page !== 'evidence' && page !== 'investigations' && page !== 'graph' && (
           <div className={`tp-page-header ${page === 'guide' ? 'tp-page-header-guide' : ''}`}>
             <div>
               <h1>{title}</h1>

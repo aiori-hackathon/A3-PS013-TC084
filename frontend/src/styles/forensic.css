@@ -4028,32 +4028,32 @@ html .tp-app.tp-app[data-theme='forensic'] .tp-ev-table td {
 
 /* The case windows: create and detail. Same split as everywhere else -
    headings and labels in the interface face, machine values in the mono. */
-html .tp-app.tp-app[data-theme='forensic'] .tp-inv-modal-overlay {
-  background: rgba(3, 5, 9, 0.62) !important;
-  backdrop-filter: blur(7px) saturate(0.8);
-  -webkit-backdrop-filter: blur(7px) saturate(0.8);
+html :is(.tp-app.tp-app[data-theme='forensic'] .tp-inv-modal-overlay, .tp-inv-modal-overlay[data-theme='forensic'], [data-theme='forensic'] .tp-inv-modal-overlay) {
+  background: rgba(3, 5, 9, 0.65) !important;
+  backdrop-filter: blur(8px) saturate(0.85) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(0.85) !important;
 }
-html .tp-app.tp-app[data-theme='forensic'] .tp-investigation-modal .tp-drawer-header h2 {
+html :is(.tp-app.tp-app[data-theme='forensic'], [data-theme='forensic']) .tp-investigation-modal .tp-drawer-header h2 {
   font-family: var(--fx-sans) !important;
   font-size: 22px !important;
   font-weight: 600 !important;
   letter-spacing: -0.015em !important;
   text-transform: none !important;
 }
-html .tp-app.tp-app[data-theme='forensic'] .tp-investigation-modal .tp-drawer-header > div > span {
+html :is(.tp-app.tp-app[data-theme='forensic'], [data-theme='forensic']) .tp-investigation-modal .tp-drawer-header > div > span {
   font-family: var(--fx-mono) !important;
   font-size: 12.5px !important;
   letter-spacing: normal !important;
   text-transform: none !important;
   color: var(--fx-text-dim) !important;
 }
-html .tp-app.tp-app[data-theme='forensic'] .tp-investigation-modal :is(h3, h4) {
+html :is(.tp-app.tp-app[data-theme='forensic'], [data-theme='forensic']) .tp-investigation-modal :is(h3, h4) {
   font-family: var(--fx-sans) !important;
   font-size: 15px !important;
   font-weight: 600 !important;
   letter-spacing: -0.01em !important;
 }
-html .tp-app.tp-app[data-theme='forensic'] :is(.tp-inv-form label, .tp-inv-status-label) {
+html :is(.tp-app.tp-app[data-theme='forensic'], [data-theme='forensic']) :is(.tp-inv-form label, .tp-inv-status-label) {
   font-family: var(--fx-sans) !important;
   font-size: 12.5px !important;
   font-weight: 500 !important;
@@ -4061,7 +4061,7 @@ html .tp-app.tp-app[data-theme='forensic'] :is(.tp-inv-form label, .tp-inv-statu
   text-transform: none !important;
   color: var(--fx-text-dim) !important;
 }
-html .tp-app.tp-app[data-theme='forensic'] :is(.tp-inv-form input, .tp-inv-form textarea, .tp-inv-form select) {
+html :is(.tp-app.tp-app[data-theme='forensic'], [data-theme='forensic']) :is(.tp-inv-form input, .tp-inv-form textarea, .tp-inv-form select) {
   background: var(--fx-surface) !important;
   border: 1px solid var(--fx-line-strong) !important;
   border-radius: var(--fx-r-md) !important;
@@ -4069,22 +4069,22 @@ html .tp-app.tp-app[data-theme='forensic'] :is(.tp-inv-form input, .tp-inv-form 
   font-family: var(--fx-sans) !important;
   font-size: 14px !important;
 }
-html .tp-app.tp-app[data-theme='forensic'] :is(.tp-inv-form input, .tp-inv-form textarea, .tp-inv-form select):focus-visible {
+html :is(.tp-app.tp-app[data-theme='forensic'], [data-theme='forensic']) :is(.tp-inv-form input, .tp-inv-form textarea, .tp-inv-form select):focus-visible {
   border-color: var(--fx-signal) !important;
   outline: none !important;
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--fx-signal) 18%, transparent) !important;
 }
-html .tp-app.tp-app[data-theme='forensic'] .tp-inv-note {
+html :is(.tp-app.tp-app[data-theme='forensic'], [data-theme='forensic']) .tp-inv-note {
   font-size: 13px !important;
   line-height: 1.6 !important;
   color: var(--fx-text-dim) !important;
 }
-html .tp-app.tp-app[data-theme='forensic'] .tp-inv-empty {
+html :is(.tp-app.tp-app[data-theme='forensic'], [data-theme='forensic']) .tp-inv-empty {
   font-family: var(--fx-sans) !important;
   font-size: 13.5px !important;
   color: var(--fx-text-dim) !important;
 }
-html .tp-app.tp-app[data-theme='forensic'] .tp-inv-empty strong {
+html :is(.tp-app.tp-app[data-theme='forensic'], [data-theme='forensic']) .tp-inv-empty strong {
   font-size: 16px !important;
   color: var(--fx-text) !important;
 }
@@ -4092,8 +4092,8 @@ html .tp-app.tp-app[data-theme='forensic'] .tp-inv-empty strong {
 /* The submit inside the case windows. It is the action the window exists
    for, so it carries the signal colour like every other primary action, and
    it is written the way it is written in the markup rather than shouted. */
-html .tp-app.tp-app[data-theme='forensic'] .tp-investigation-modal .tp-button.primary,
-html .tp-app.tp-app[data-theme='forensic'] .tp-inv-form .tp-button.primary {
+html :is(.tp-app.tp-app[data-theme='forensic'], [data-theme='forensic']) .tp-investigation-modal .tp-button.primary,
+html :is(.tp-app.tp-app[data-theme='forensic'], [data-theme='forensic']) .tp-inv-form .tp-button.primary {
   min-height: 42px !important;
   padding: 0 18px !important;
   border-radius: var(--fx-r-md) !important;
@@ -4107,15 +4107,15 @@ html .tp-app.tp-app[data-theme='forensic'] .tp-inv-form .tp-button.primary {
   letter-spacing: normal !important;
   text-transform: none !important;
 }
-html .tp-app.tp-app[data-theme='forensic'] .tp-investigation-modal .tp-button.primary:hover,
-html .tp-app.tp-app[data-theme='forensic'] .tp-inv-form .tp-button.primary:hover {
+html :is(.tp-app.tp-app[data-theme='forensic'], [data-theme='forensic']) .tp-investigation-modal .tp-button.primary:hover,
+html :is(.tp-app.tp-app[data-theme='forensic'], [data-theme='forensic']) .tp-inv-form .tp-button.primary:hover {
   background-color: color-mix(in srgb, var(--fx-signal) 86%, #ffffff) !important;
   border-color: color-mix(in srgb, var(--fx-signal) 86%, #ffffff) !important;
 }
-html .tp-app.tp-app[data-theme='forensic'] .tp-investigation-modal .tp-button.primary:disabled {
+html :is(.tp-app.tp-app[data-theme='forensic'], [data-theme='forensic']) .tp-investigation-modal .tp-button.primary:disabled {
   opacity: 0.55 !important;
 }
-html .tp-app.tp-app[data-theme='forensic'] .tp-investigation-modal .tp-button.primary svg {
+html :is(.tp-app.tp-app[data-theme='forensic'], [data-theme='forensic']) .tp-investigation-modal .tp-button.primary svg {
   color: var(--fx-on-signal) !important;
 }
 

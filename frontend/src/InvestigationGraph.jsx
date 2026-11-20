@@ -1,8 +1,9 @@
 import { useEvidenceTrustScores } from './useEvidenceTrustScores';
 import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Activity, AlertTriangle, ArrowRight, Fingerprint, GitBranch, RefreshCw, ShieldAlert } from 'lucide-react';
+import { Activity, AlertTriangle, ArrowRight, Fingerprint, GitBranch, RefreshCw, ShieldAlert, ChevronDown, ChevronUp, Database, CheckCircle2 } from 'lucide-react';
 import './styles/InvestigationGraph.css';
+import './styles/investigations.css';
 import './styles/TracepointInteractionPolish.css';
 
 const EMPTY_GRAPH_LIST = [];
@@ -42,6 +43,8 @@ export default function InvestigationGraph() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState(null);
+  const [edgeLimit, setEdgeLimit] = useState(10);
+  const [gapLimit, setGapLimit] = useState(10);
   const { scores: trustScores, scoreError: trustScoreError } = useEvidenceTrustScores();
   async function load() {
     setLoading(true);
@@ -100,40 +103,78 @@ export default function InvestigationGraph() {
 
   const gaps = nodes.filter(node => node.parse_status === 'partial' || !node.timestamp_utc);
   return <section className="tp-graph-root tp-graph-phase5">
-    <div className="tp-graph-intro tp-card tp-graph-phase5-hero">
-      <div>
-        <h2>
-          <img src="/icons/3d/network-mesh.png" alt="" className="tp-3d-title-icon" aria-hidden="true" />
-          Investigation Graph
-        </h2>
-        <p>Explainable correlations between collected security events. Each node references a stored evidence batch and line.</p>
-      </div>
-      <button className="tp-button" onClick={load} disabled={loading}><RefreshCw size={16} className={loading ? 'tp-spin' : ''}/> Refresh graph</button>
-    </div>
-    <div className="tp-graph-banner">
-      <img src="/icons/3d/checklist-book.png" alt="" className="tp-3d-banner-icon" aria-hidden="true" />
-      <span>Correlations are investigative leads, not proof of compromise. Each node references a stored cryptographic evidence batch and line.</span>
-    </div>
     {error && <div className="tp-error" role="alert">{error}</div>}
-    <div className="tp-graph-stats">
-      <div className="tp-card" data-tooltip="Number of event records represented in the loaded graph." title="Evidence-linked event count">
-        <img src="/icons/3d/evidence-chart.png" alt="" className="tp-3d-stat-icon" aria-hidden="true" />
-        <strong><AnimatedMetricCount value={nodes.length} /></strong>
-        <span>Evidence-linked events</span>
+
+    <div className="tp-graph-stats tp-scroll-reveal tp-stagger-parent">
+      <div className="tp-card tp-stat-card tp-stat-emerald" title="Evidence-linked event count">
+        <div className="tp-stat-glow-bar bar-emerald" />
+        <div className="tp-stat-top">
+          <span className="tp-stat-label">Evidence-Linked Events</span>
+          <div className="tp-stat-icon-wrap icon-emerald">
+            <Fingerprint size={18} />
+          </div>
+        </div>
+        <div className="tp-stat-middle">
+          <strong className="tp-stat-value">
+            <AnimatedMetricCount value={nodes.length} />
+          </strong>
+          <span className="tp-stat-badge badge-emerald">
+            <span className="tp-stat-pulse-dot dot-emerald" />
+            INDEXED
+          </span>
+        </div>
+        <small className="tp-stat-hint">Event records in loaded graph</small>
       </div>
-      <div className="tp-card" data-tooltip="Connections inferred from event sequence and available identifiers; review each relationship reason before drawing conclusions." title="Potential connections">
-        <img src="/icons/3d/network-mesh.png" alt="" className="tp-3d-stat-icon" aria-hidden="true" />
-        <strong><AnimatedMetricCount value={edges.length} /></strong>
-        <span>Potential connections</span>
+
+      <div className="tp-card tp-stat-card tp-stat-cyan" title="Potential connections">
+        <div className="tp-stat-glow-bar bar-cyan" />
+        <div className="tp-stat-top">
+          <span className="tp-stat-label">Potential Connections</span>
+          <div className="tp-stat-icon-wrap icon-cyan">
+            <GitBranch size={18} />
+          </div>
+        </div>
+        <div className="tp-stat-middle">
+          <strong className="tp-stat-value">
+            <AnimatedMetricCount value={edges.length} />
+          </strong>
+          <span className="tp-stat-badge badge-cyan">
+            <span className="tp-stat-pulse-dot dot-cyan" />
+            CORRELATED
+          </span>
+        </div>
+        <small className="tp-stat-hint">Inferred sequence relationships</small>
       </div>
-      <div className="tp-card" data-tooltip="Events with partial parsing or no normalized timestamp that need analyst review." title="Parsing or timestamp gaps">
-        <img src="/icons/3d/warning-triangle.png" alt="" className="tp-3d-stat-icon" aria-hidden="true" />
-        <strong><AnimatedMetricCount value={gaps.length} /></strong>
-        <span>Parsing or timestamp gaps</span>
+
+      <div className="tp-card tp-stat-card tp-stat-violet" title="Parsing or timestamp gaps">
+        <div className="tp-stat-glow-bar bar-violet" />
+        <div className="tp-stat-top">
+          <span className="tp-stat-label">Parsing & Timing Gaps</span>
+          <div className="tp-stat-icon-wrap icon-violet">
+            <AlertTriangle size={18} />
+          </div>
+        </div>
+        <div className="tp-stat-middle">
+          <strong className="tp-stat-value">
+            <AnimatedMetricCount value={gaps.length} />
+          </strong>
+          <span className="tp-stat-badge badge-violet">
+            <span className="tp-stat-pulse-dot dot-violet" />
+            REVIEW NEEDED
+          </span>
+        </div>
+        <small className="tp-stat-hint">Partial parse or missing timestamp</small>
       </div>
     </div>
-    <div className="tp-card tp-graph-panel tp-graph-phase5-panel">
-      <div className="tp-graph-panel-head"><div><h3>Authentication sequences</h3><p>Failed logins followed by successful logins for the same username within 30 minutes.</p></div><span className="tp-graph-legend"><i/> Tentative cross-device link</span></div>
+
+    <div className="tp-card tp-ev-card tp-graph-panel tp-graph-phase5-panel tp-scroll-reveal">
+      <div className="tp-card-head">
+        <div>
+          <h3>Authentication sequences</h3>
+          <p>Failed logins followed by successful logins for the same username within 30 minutes.</p>
+        </div>
+        <span className="tp-graph-legend"><i/> Tentative cross-device link</span>
+      </div>
       {!loading && !edges.length && (
         <div className="tp-graph-empty">
           <img src="/icons/3d/error-folder.png" alt="" className="tp-3d-empty-icon" aria-hidden="true" />
@@ -141,7 +182,7 @@ export default function InvestigationGraph() {
           <p>Try ingesting a sequence of failed and successful logins for the same user with valid timestamps.</p>
         </div>
       )}
-      <div className="tp-graph-sequences">{edges.map((edge, index) => {
+      <div className="tp-graph-sequences">{edges.slice(0, edgeLimit).map((edge, index) => {
         const source = lookup.get(edge.source), target = lookup.get(edge.target);
         if (!source || !target) return null;
         return <div className="tp-graph-sequence" key={`${edge.source}-${edge.target}-${index}`}>
@@ -159,14 +200,107 @@ export default function InvestigationGraph() {
           <p className="tp-graph-reason">{edge.reason}</p>
         </div>;
       })}</div>
+
+      {edges.length > 10 && (
+        <div className="tp-see-more-bar" role="navigation" aria-label="Authentication sequences pagination controls">
+          <div className="tp-see-more-actions">
+            <button
+              type="button"
+              className="tp-button tp-see-more-btn"
+              onClick={() => setEdgeLimit(prev => prev >= edges.length ? 10 : prev + 10)}
+            >
+              {edgeLimit >= edges.length ? (
+                <>
+                  <ChevronUp size={15} /> Show fewer sequences
+                </>
+              ) : (
+                <>
+                  <ChevronDown size={15} /> See more (+{Math.min(10, edges.length - edgeLimit)})
+                </>
+              )}
+            </button>
+            {edgeLimit < edges.length && edges.length - edgeLimit > 10 && (
+              <button
+                type="button"
+                className="tp-button tp-see-all-btn"
+                onClick={() => setEdgeLimit(edges.length)}
+              >
+                See all ({edges.length})
+              </button>
+            )}
+            {edgeLimit > 10 && edgeLimit < edges.length && (
+              <button
+                type="button"
+                className="tp-button tp-show-less-btn"
+                onClick={() => setEdgeLimit(10)}
+              >
+                <ChevronUp size={15} /> Show 10
+              </button>
+            )}
+          </div>
+          <span className="tp-see-more-count">
+            Showing {Math.min(edgeLimit, edges.length)} of {edges.length} authentication sequences
+          </span>
+        </div>
+      )}
     </div>
-    <div className="tp-card tp-graph-gaps tp-graph-phase5-gaps">
-      <h3>
-        <img src="/icons/3d/document-error.png" alt="" className="tp-3d-heading-icon" aria-hidden="true" />
-        Evidence requiring review
-      </h3>
-      <p>Incomplete or un-timestamped events are preserved but cannot establish reliable temporal connections.</p>{gaps.length ? gaps.slice(0, 12).map(node => <button key={node.id} onClick={() => setSelected(node)}><span>{node.device_id} · line {node.line_number}</span><small>{(node.parse_warnings || []).join(', ') || 'Timestamp unavailable'}</small><ArrowRight size={15}/></button>) : <div className="tp-graph-no-gaps">No parsing or timestamp gaps among loaded events.</div>}
+
+    <div className="tp-card tp-ev-card tp-graph-gaps tp-graph-phase5-gaps tp-scroll-reveal">
+      <div className="tp-card-head" style={{ padding: '0 0 16px' }}>
+        <div>
+          <h3>
+            <img src="/icons/3d/document-error.png" alt="" className="tp-3d-heading-icon" aria-hidden="true" />
+            Evidence requiring review
+          </h3>
+          <p>Incomplete or un-timestamped events are preserved but cannot establish reliable temporal connections.</p>
+        </div>
+      </div>
+      {gaps.length ? gaps.slice(0, gapLimit).map(node => <button key={node.id} onClick={() => setSelected(node)}><span>{node.device_id} · line {node.line_number}</span><small>{(node.parse_warnings || []).join(', ') || 'Timestamp unavailable'}</small><ArrowRight size={15}/></button>) : <div className="tp-graph-no-gaps">No parsing or timestamp gaps among loaded events.</div>}
+
+      {gaps.length > 10 && (
+        <div className="tp-see-more-bar" role="navigation" aria-label="Review gaps pagination controls" style={{ margin: '14px -22px -22px' }}>
+          <div className="tp-see-more-actions">
+            <button
+              type="button"
+              className="tp-button tp-see-more-btn"
+              onClick={() => setGapLimit(prev => prev >= gaps.length ? 10 : prev + 10)}
+            >
+              {gapLimit >= gaps.length ? (
+                <>
+                  <ChevronUp size={15} /> Show fewer items
+                </>
+              ) : (
+                <>
+                  <ChevronDown size={15} /> See more (+{Math.min(10, gaps.length - gapLimit)})
+                </>
+              )}
+            </button>
+            {gapLimit < gaps.length && gaps.length - gapLimit > 10 && (
+              <button
+                type="button"
+                className="tp-button tp-see-all-btn"
+                onClick={() => setGapLimit(gaps.length)}
+              >
+                See all ({gaps.length})
+              </button>
+            )}
+            {gapLimit > 10 && gapLimit < gaps.length && (
+              <button
+                type="button"
+                className="tp-button tp-show-less-btn"
+                onClick={() => setGapLimit(10)}
+              >
+                <ChevronUp size={15} /> Show 10
+              </button>
+            )}
+          </div>
+          <span className="tp-see-more-count">
+            Showing {Math.min(gapLimit, gaps.length)} of {gaps.length} review items
+          </span>
+        </div>
+      )}
     </div>
+
     {data?.truncated && <p className="tp-graph-caution">Graph limited to the first 1,500 timeline events. Results are not exhaustive.</p>}
     <p className="tp-graph-caution">Correlations are investigative leads, not proof of compromise. No AI is used.</p>
     {selected && createPortal(<div className="tp-overlay tp-graph-modal-overlay" data-theme={pageTheme} onMouseDown={() => setSelected(null)}><aside className="tp-drawer tp-graph-event-modal" role="dialog" aria-modal="true" aria-label="Graph event details" onMouseDown={e => e.stopPropagation()}><div className="tp-drawer-header"><div><span>Evidence-linked event</span><h2>{(selected.event_type || 'Unknown event').replaceAll('_', ' ')}</h2></div><button onClick={() => setSelected(null)} aria-label="Close details">✕</button></div><div className="tp-drawer-body"><h3><Fingerprint size={16}/> Evidence reference</h3>{[['Device', selected.device_id], ['Batch ID', selected.batch_id], ['Line number', selected.line_number], ['UTC timestamp', selected.timestamp_utc || 'Unavailable'], ['Username', selected.username || 'Unavailable'], ['Parse status', selected.parse_status || 'Unknown']].map(([label, value]) => <div className="tp-detail" key={label}><span>{label}</span><strong>{value}</strong></div>)}<TrustScoreDetails

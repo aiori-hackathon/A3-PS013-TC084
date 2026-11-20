@@ -1,6 +1,6 @@
 /* Append to frontend/src/Tracepoint.css */
-.tp-inv{display:flex;flex-direction:column;gap:20px}
-.tp-inv-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.tp-inv{display:flex;flex-direction:column;gap:20px;padding-bottom:32px;}
+.tp-inv-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-bottom:24px;}
 .tp-inv-metric{padding:21px;display:flex;flex-direction:column;gap:10px}
 .tp-inv-metric span{font-size:13px;color:#64748b;font-weight:600}
 .tp-inv-metric strong{font-size:30px;line-height:1.1;color:#202231}
@@ -36,8 +36,370 @@
 .tp-inv-note{border:1px solid #e8eaf1;background:#fafbfe;border-radius:8px;padding:13px;margin-top:12px}
 .tp-inv-note small{color:#8b93a1;font-size:11px}
 .tp-inv-note p{white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px;line-height:1.6;color:#333849;margin:8px 0 0}
-@media(max-width:850px){.tp-inv-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:480px){.tp-inv-metrics{grid-template-columns:1fr}.tp-inv-head-actions{width:100%}}
+/* ===========================================================================
+   ANIMATED & COLOURED STAT CARDS WITH RICH HOVER SHADOWS (UNIFIED DESIGN)
+   =========================================================================== */
+.tp-stat-card,
+.tp-app .tp-stat-card,
+.tp-graph-phase5 .tp-graph-stats > .tp-card.tp-stat-card,
+html .tp-app .tp-graph-phase5 .tp-graph-stats > .tp-card.tp-stat-card {
+  position: relative;
+  overflow: hidden;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  padding: 20px 22px !important;
+  min-height: 142px !important;
+  box-sizing: border-box !important;
+  border-radius: 12px !important;
+  background: #ffffff !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  border-top: none !important;
+  box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.05), 0 1px 3px rgba(0, 0, 0, 0.03) !important;
+  transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 0.28s ease,
+              border-color 0.28s ease,
+              background 0.28s ease !important;
+  cursor: default;
+}
+
+.tp-stat-card:hover,
+.tp-app .tp-stat-card:hover,
+.tp-graph-phase5 .tp-graph-stats > .tp-card.tp-stat-card:hover,
+html .tp-app .tp-graph-phase5 .tp-graph-stats > .tp-card.tp-stat-card:hover {
+  transform: translateY(-5px) scale(1.012) !important;
+}
+
+/* Shimmer reflection on hover */
+.tp-stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -120%;
+  width: 80%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+  transform: skewX(-22deg);
+  transition: left 0.65s ease;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.tp-stat-card:hover::before {
+  left: 140%;
+}
+
+/* Top accent glow bars */
+.tp-stat-glow-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  z-index: 2;
+  transition: height 0.25s ease, filter 0.25s ease;
+}
+
+.tp-stat-card:hover .tp-stat-glow-bar {
+  height: 5px;
+  filter: brightness(1.2) drop-shadow(0 2px 8px currentColor);
+}
+
+.tp-stat-glow-bar.bar-emerald {
+  background: linear-gradient(90deg, #059669 0%, #10b981 50%, #34d399 100%);
+  color: #10b981;
+}
+.tp-stat-glow-bar.bar-cyan {
+  background: linear-gradient(90deg, #0284c7 0%, #0ea5e9 50%, #38bdf8 100%);
+  color: #0ea5e9;
+}
+.tp-stat-glow-bar.bar-violet {
+  background: linear-gradient(90deg, #6d28d9 0%, #8b5cf6 50%, #a78bfa 100%);
+  color: #8b5cf6;
+}
+.tp-stat-glow-bar.bar-amber {
+  background: linear-gradient(90deg, #d97706 0%, #f59e0b 50%, #fbbf24 100%);
+  color: #f59e0b;
+}
+
+/* Color theme cards - Emerald */
+.tp-stat-emerald,
+.tp-app .tp-stat-emerald,
+.tp-graph-phase5 .tp-graph-stats > .tp-card.tp-stat-emerald,
+html .tp-app .tp-graph-phase5 .tp-graph-stats > .tp-card.tp-stat-emerald {
+  background: linear-gradient(150deg, rgba(16, 185, 129, 0.10) 0%, rgba(255, 255, 255, 0.96) 60%) !important;
+  border-color: rgba(16, 185, 129, 0.28) !important;
+}
+.tp-stat-emerald:hover,
+.tp-app .tp-stat-emerald:hover,
+.tp-graph-phase5 .tp-graph-stats > .tp-card.tp-stat-emerald:hover,
+html .tp-app .tp-graph-phase5 .tp-graph-stats > .tp-card.tp-stat-emerald:hover {
+  background: linear-gradient(150deg, rgba(16, 185, 129, 0.16) 0%, #ffffff 55%) !important;
+  border-color: #10B981 !important;
+  box-shadow: 0 18px 36px -4px rgba(16, 185, 129, 0.28),
+              0 6px 16px -2px rgba(0, 0, 0, 0.06),
+              0 0 0 1.5px rgba(16, 185, 129, 0.45) !important;
+}
+
+/* Color theme cards - Cyan */
+.tp-stat-cyan,
+.tp-app .tp-stat-cyan,
+.tp-graph-phase5 .tp-graph-stats > .tp-card.tp-stat-cyan,
+html .tp-app .tp-graph-phase5 .tp-graph-stats > .tp-card.tp-stat-cyan {
+  background: linear-gradient(150deg, rgba(14, 165, 233, 0.10) 0%, rgba(255, 255, 255, 0.96) 60%) !important;
+  border-color: rgba(14, 165, 233, 0.28) !important;
+}
+.tp-stat-cyan:hover,
+.tp-app .tp-stat-cyan:hover,
+.tp-graph-phase5 .tp-graph-stats > .tp-card.tp-stat-cyan:hover,
+html .tp-app .tp-graph-phase5 .tp-graph-stats > .tp-card.tp-stat-cyan:hover {
+  background: linear-gradient(150deg, rgba(14, 165, 233, 0.16) 0%, #ffffff 55%) !important;
+  border-color: #0ea5e9 !important;
+  box-shadow: 0 18px 36px -4px rgba(14, 165, 233, 0.28),
+              0 6px 16px -2px rgba(0, 0, 0, 0.06),
+              0 0 0 1.5px rgba(14, 165, 233, 0.45) !important;
+}
+
+/* Color theme cards - Violet */
+.tp-stat-violet,
+.tp-app .tp-stat-violet,
+.tp-graph-phase5 .tp-graph-stats > .tp-card.tp-stat-violet,
+html .tp-app .tp-graph-phase5 .tp-graph-stats > .tp-card.tp-stat-violet {
+  background: linear-gradient(150deg, rgba(139, 92, 246, 0.10) 0%, rgba(255, 255, 255, 0.96) 60%) !important;
+  border-color: rgba(139, 92, 246, 0.28) !important;
+}
+.tp-stat-violet:hover,
+.tp-app .tp-stat-violet:hover,
+.tp-graph-phase5 .tp-graph-stats > .tp-card.tp-stat-violet:hover,
+html .tp-app .tp-graph-phase5 .tp-graph-stats > .tp-card.tp-stat-violet:hover {
+  background: linear-gradient(150deg, rgba(139, 92, 246, 0.16) 0%, #ffffff 55%) !important;
+  border-color: #8b5cf6 !important;
+  box-shadow: 0 18px 36px -4px rgba(139, 92, 246, 0.28),
+              0 6px 16px -2px rgba(0, 0, 0, 0.06),
+              0 0 0 1.5px rgba(139, 92, 246, 0.45) !important;
+}
+
+/* Color theme cards - Amber */
+.tp-stat-amber,
+.tp-app .tp-stat-amber,
+.tp-graph-phase5 .tp-graph-stats > .tp-card.tp-stat-amber,
+html .tp-app .tp-graph-phase5 .tp-graph-stats > .tp-card.tp-stat-amber {
+  background: linear-gradient(150deg, rgba(245, 158, 11, 0.10) 0%, rgba(255, 255, 255, 0.96) 60%) !important;
+  border-color: rgba(245, 158, 11, 0.28) !important;
+}
+.tp-stat-amber:hover,
+.tp-app .tp-stat-amber:hover,
+.tp-graph-phase5 .tp-graph-stats > .tp-card.tp-stat-amber:hover,
+html .tp-app .tp-graph-phase5 .tp-graph-stats > .tp-card.tp-stat-amber:hover {
+  background: linear-gradient(150deg, rgba(245, 158, 11, 0.16) 0%, #ffffff 55%) !important;
+  border-color: #f59e0b !important;
+  box-shadow: 0 18px 36px -4px rgba(245, 158, 11, 0.28),
+              0 6px 16px -2px rgba(0, 0, 0, 0.06),
+              0 0 0 1.5px rgba(245, 158, 11, 0.45) !important;
+}
+
+/* Card Top section */
+.tp-stat-top {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  margin-bottom: 12px !important;
+}
+.tp-stat-label {
+  font-size: 13.5px !important;
+  font-weight: 700 !important;
+  color: #334155 !important;
+  letter-spacing: -0.01em !important;
+}
+.tp-stat-icon-wrap {
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 10px !important;
+  display: grid !important;
+  place-items: center !important;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 0.3s ease,
+              background-color 0.3s ease !important;
+}
+.tp-stat-card:hover .tp-stat-icon-wrap {
+  transform: scale(1.18) rotate(6deg) translateY(-2px) !important;
+}
+.tp-stat-icon-wrap.icon-emerald {
+  background: rgba(16, 185, 129, 0.14) !important;
+  color: #059669 !important;
+}
+.tp-stat-card:hover .tp-stat-icon-wrap.icon-emerald {
+  box-shadow: 0 0 14px rgba(16, 185, 129, 0.45) !important;
+  background: rgba(16, 185, 129, 0.22) !important;
+}
+.tp-stat-icon-wrap.icon-cyan {
+  background: rgba(14, 165, 233, 0.14) !important;
+  color: #0284c7 !important;
+}
+.tp-stat-card:hover .tp-stat-icon-wrap.icon-cyan {
+  box-shadow: 0 0 14px rgba(14, 165, 233, 0.45) !important;
+  background: rgba(14, 165, 233, 0.22) !important;
+}
+.tp-stat-icon-wrap.icon-violet {
+  background: rgba(139, 92, 246, 0.14) !important;
+  color: #7c3aed !important;
+}
+.tp-stat-card:hover .tp-stat-icon-wrap.icon-violet {
+  box-shadow: 0 0 14px rgba(139, 92, 246, 0.45) !important;
+  background: rgba(139, 92, 246, 0.22) !important;
+}
+.tp-stat-icon-wrap.icon-amber {
+  background: rgba(245, 158, 11, 0.14) !important;
+  color: #d97706 !important;
+}
+.tp-stat-card:hover .tp-stat-icon-wrap.icon-amber {
+  box-shadow: 0 0 14px rgba(245, 158, 11, 0.45) !important;
+  background: rgba(245, 158, 11, 0.22) !important;
+}
+
+/* Card Middle section */
+.tp-stat-middle {
+  display: flex !important;
+  align-items: baseline !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  margin-bottom: 10px !important;
+}
+.tp-stat-value,
+.tp-graph-phase5 .tp-graph-stats > .tp-card strong.tp-stat-value,
+html .tp-app .tp-graph-phase5 .tp-graph-stats > .tp-card strong.tp-stat-value {
+  font-size: 32px !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+  color: #0f172a !important;
+  font-variant-numeric: tabular-nums !important;
+  letter-spacing: -0.03em !important;
+  transition: transform 0.25s ease !important;
+  display: inline-block !important;
+}
+.tp-stat-card:hover .tp-stat-value {
+  transform: scale(1.05) !important;
+}
+.tp-stat-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  padding: 4px 9px !important;
+  border-radius: 999px !important;
+  font-size: 10.5px !important;
+  font-weight: 750 !important;
+  letter-spacing: 0.05em !important;
+  text-transform: uppercase !important;
+  white-space: nowrap !important;
+}
+.tp-stat-badge.badge-emerald {
+  background: rgba(16, 185, 129, 0.14) !important;
+  color: #065f46 !important;
+}
+.tp-stat-badge.badge-cyan {
+  background: rgba(14, 165, 233, 0.14) !important;
+  color: #0369a1 !important;
+}
+.tp-stat-badge.badge-violet {
+  background: rgba(139, 92, 246, 0.14) !important;
+  color: #5b21b6 !important;
+}
+.tp-stat-badge.badge-amber {
+  background: rgba(245, 158, 11, 0.14) !important;
+  color: #92400e !important;
+}
+
+/* Pulsing radar dots */
+.tp-stat-pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+  animation: tpStatPulse 1.8s infinite ease-in-out;
+}
+.tp-stat-pulse-dot.dot-emerald {
+  background-color: #10b981;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.8);
+}
+.tp-stat-pulse-dot.dot-cyan {
+  background-color: #0ea5e9;
+  box-shadow: 0 0 8px rgba(14, 165, 233, 0.8);
+}
+.tp-stat-pulse-dot.dot-violet {
+  background-color: #8b5cf6;
+  box-shadow: 0 0 8px rgba(139, 92, 246, 0.8);
+}
+.tp-stat-pulse-dot.dot-amber {
+  background-color: #f59e0b;
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.8);
+}
+
+@keyframes tpStatPulse {
+  0% { transform: scale(0.9); opacity: 0.75; }
+  50% { transform: scale(1.35); opacity: 1; filter: drop-shadow(0 0 4px currentColor); }
+  100% { transform: scale(0.9); opacity: 0.75; }
+}
+
+.tp-stat-hint {
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  color: #64748b !important;
+  margin-top: auto !important;
+}
+
+/* Dark theme support for stat cards */
+.tp-app[data-theme="dark"] .tp-stat-card {
+  background: #141c2a !important;
+  border-color: #263548 !important;
+}
+.tp-app[data-theme="dark"] .tp-stat-emerald {
+  background: linear-gradient(150deg, rgba(16, 185, 129, 0.14) 0%, #141c2a 65%) !important;
+  border-color: rgba(16, 185, 129, 0.32) !important;
+}
+.tp-app[data-theme="dark"] .tp-stat-emerald:hover {
+  background: linear-gradient(150deg, rgba(16, 185, 129, 0.22) 0%, #172336 60%) !important;
+  border-color: #10B981 !important;
+  box-shadow: 0 18px 36px -4px rgba(16, 185, 129, 0.35), 0 0 0 1.5px rgba(16, 185, 129, 0.45) !important;
+}
+.tp-app[data-theme="dark"] .tp-stat-cyan {
+  background: linear-gradient(150deg, rgba(14, 165, 233, 0.14) 0%, #141c2a 65%) !important;
+  border-color: rgba(14, 165, 233, 0.32) !important;
+}
+.tp-app[data-theme="dark"] .tp-stat-cyan:hover {
+  background: linear-gradient(150deg, rgba(14, 165, 233, 0.22) 0%, #172336 60%) !important;
+  border-color: #0ea5e9 !important;
+  box-shadow: 0 18px 36px -4px rgba(14, 165, 233, 0.35), 0 0 0 1.5px rgba(14, 165, 233, 0.45) !important;
+}
+.tp-app[data-theme="dark"] .tp-stat-violet {
+  background: linear-gradient(150deg, rgba(139, 92, 246, 0.14) 0%, #141c2a 65%) !important;
+  border-color: rgba(139, 92, 246, 0.32) !important;
+}
+.tp-app[data-theme="dark"] .tp-stat-violet:hover {
+  background: linear-gradient(150deg, rgba(139, 92, 246, 0.22) 0%, #172336 60%) !important;
+  border-color: #8b5cf6 !important;
+  box-shadow: 0 18px 36px -4px rgba(139, 92, 246, 0.35), 0 0 0 1.5px rgba(139, 92, 246, 0.45) !important;
+}
+.tp-app[data-theme="dark"] .tp-stat-amber {
+  background: linear-gradient(150deg, rgba(245, 158, 11, 0.14) 0%, #141c2a 65%) !important;
+  border-color: rgba(245, 158, 11, 0.32) !important;
+}
+.tp-app[data-theme="dark"] .tp-stat-amber:hover {
+  background: linear-gradient(150deg, rgba(245, 158, 11, 0.22) 0%, #172336 60%) !important;
+  border-color: #f59e0b !important;
+  box-shadow: 0 18px 36px -4px rgba(245, 158, 11, 0.35), 0 0 0 1.5px rgba(245, 158, 11, 0.45) !important;
+}
+.tp-app[data-theme="dark"] .tp-stat-value {
+  color: #f1f5f9 !important;
+}
+.tp-app[data-theme="dark"] .tp-stat-label {
+  color: #94a3b8 !important;
+}
+.tp-app[data-theme="dark"] .tp-stat-hint {
+  color: #64748b !important;
+}
+
+@media(max-width:1080px){.tp-inv-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:580px){.tp-inv-metrics{grid-template-columns:1fr}}
 
 /* TRACEPOINT_INV_GRAPH_PHASE5 — Investigations only */
 .tp-inv-phase5 { font-family: 'Geist', system-ui, sans-serif; display: flex; flex-direction: column; gap: 18px; }

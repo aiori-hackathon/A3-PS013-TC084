@@ -1,5 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Plus, Search, X, ShieldAlert, FileText, Link2, Send, RefreshCw } from 'lucide-react';
+import { createPortal } from 'react-dom';
+import {
+  Plus, Search, X, ShieldAlert, FileText, Link2, Send, RefreshCw,
+  ChevronDown, ChevronUp, FolderKanban, CheckCircle2, AlertCircle, Activity
+} from 'lucide-react';
 import './styles/Tracepoint.css';
 import './styles/investigations.css';
 import './styles/TracepointInteractionPolish.css';
@@ -68,6 +72,10 @@ export default function Investigations({ events = [] }) {
   const [note, setNote] = useState('');
   const [eventIndex, setEventIndex] = useState('');
   const [query, setQuery] = useState('');
+  const [caseLimit, setCaseLimit] = useState(10);
+  const pageTheme = typeof document !== 'undefined'
+    ? (document.querySelector('.tp-app')?.getAttribute('data-theme') || 'forensic')
+    : 'forensic';
   const [busy, setBusy] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -281,15 +289,91 @@ export default function Investigations({ events = [] }) {
         REGISTER" figure is the "Total cases" tile directly below it. It cost
         about 170px before the first case. */}
     <div className="tp-inv-metrics tp-scroll-reveal tp-stagger-parent">
-      {[['Total cases', counts.total], ['Open', counts.open], ['Investigating', counts.investigating], ['Resolved', counts.resolved]].map(([label, value]) =>
-        <div className="tp-card tp-inv-metric" key={label}><span>{label}</span><strong><AnimatedMetricCount value={value} /></strong></div>
-      )}
+      <div className="tp-card tp-stat-card tp-stat-violet">
+        <div className="tp-stat-glow-bar bar-violet" />
+        <div className="tp-stat-top">
+          <span className="tp-stat-label">Total Cases</span>
+          <div className="tp-stat-icon-wrap icon-violet">
+            <FolderKanban size={18} />
+          </div>
+        </div>
+        <div className="tp-stat-middle">
+          <strong className="tp-stat-value">
+            <AnimatedMetricCount value={counts.total} />
+          </strong>
+          <span className="tp-stat-badge badge-violet">
+            <span className="tp-stat-pulse-dot dot-violet" />
+            REGISTERED
+          </span>
+        </div>
+        <small className="tp-stat-hint">Incident cases documented</small>
+      </div>
+
+      <div className="tp-card tp-stat-card tp-stat-amber">
+        <div className="tp-stat-glow-bar bar-amber" />
+        <div className="tp-stat-top">
+          <span className="tp-stat-label">Open Cases</span>
+          <div className="tp-stat-icon-wrap icon-amber">
+            <ShieldAlert size={18} />
+          </div>
+        </div>
+        <div className="tp-stat-middle">
+          <strong className="tp-stat-value">
+            <AnimatedMetricCount value={counts.open} />
+          </strong>
+          <span className="tp-stat-badge badge-amber">
+            <span className="tp-stat-pulse-dot dot-amber" />
+            ACTIVE
+          </span>
+        </div>
+        <small className="tp-stat-hint">Awaiting analyst triage</small>
+      </div>
+
+      <div className="tp-card tp-stat-card tp-stat-cyan">
+        <div className="tp-stat-glow-bar bar-cyan" />
+        <div className="tp-stat-top">
+          <span className="tp-stat-label">Investigating</span>
+          <div className="tp-stat-icon-wrap icon-cyan">
+            <Search size={18} />
+          </div>
+        </div>
+        <div className="tp-stat-middle">
+          <strong className="tp-stat-value">
+            <AnimatedMetricCount value={counts.investigating} />
+          </strong>
+          <span className="tp-stat-badge badge-cyan">
+            <span className="tp-stat-pulse-dot dot-cyan" />
+            IN PROGRESS
+          </span>
+        </div>
+        <small className="tp-stat-hint">Under active evidence review</small>
+      </div>
+
+      <div className="tp-card tp-stat-card tp-stat-emerald">
+        <div className="tp-stat-glow-bar bar-emerald" />
+        <div className="tp-stat-top">
+          <span className="tp-stat-label">Resolved Cases</span>
+          <div className="tp-stat-icon-wrap icon-emerald">
+            <CheckCircle2 size={18} />
+          </div>
+        </div>
+        <div className="tp-stat-middle">
+          <strong className="tp-stat-value">
+            <AnimatedMetricCount value={counts.resolved} />
+          </strong>
+          <span className="tp-stat-badge badge-emerald">
+            <span className="tp-stat-pulse-dot dot-emerald" />
+            CLOSED
+          </span>
+        </div>
+        <small className="tp-stat-hint">Findings verified & closed</small>
+      </div>
     </div>
 
     {error && <div className="tp-error" role="alert">{error}</div>}
-    <section className="tp-card tp-inv-card tp-inv-phase5-register tp-scroll-reveal">
+    <section className="tp-card tp-ev-card tp-inv-card tp-inv-phase5-register tp-scroll-reveal">
       <div className="tp-card-head"><div><h2>Investigation cases</h2><p>Track incidents, evidence links, and analyst findings</p></div>
-        <div className="tp-inv-head-actions"><button className="tp-button" onClick={loadCases} disabled={loading}><RefreshCw size={15}/> Refresh</button><button className="tp-button primary" onClick={() => setCreating(true)}><Plus size={16}/> New investigation</button></div>
+        <div className="tp-inv-head-actions"><button className="tp-button primary" onClick={() => setCreating(true)}><Plus size={16}/> New investigation</button></div>
       </div>
       <div className="tp-toolbar"><label className="tp-search"><Search size={18}/><input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search investigations" aria-label="Search investigations"/></label></div>
       {loading ? <div className="tp-inv-empty">Loading investigations…</div> : visible.length === 0 ?
@@ -298,139 +382,194 @@ export default function Investigations({ events = [] }) {
           <strong>{cases.length ? 'No matching cases' : 'No investigations yet'}</strong>
           <p>{cases.length ? 'Try another search.' : 'Create your first case to begin documenting an incident.'}</p>
         </div> :
-        <div className="tp-ev-table-wrap"><table className="tp-ev-table tp-inv-phase5-table"><thead><tr><th>Case</th><th>Severity</th><th>Status</th><th>Events</th><th>Updated</th></tr></thead><tbody>
-          {visible.map(c => <tr key={c.id} className="tp-inv-clickable" tabIndex={0} role="button" onClick={() => openCase(c.id)} onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openCase(c.id); } }}><td><strong className="tp-inv-case">TP-{String(c.id).padStart(4, '0')}</strong><div className="tp-inv-title">{c.title}</div></td><td><span className={`tp-inv-pill ${c.severity}`}>{c.severity}</span></td><td><span className={`tp-inv-pill ${c.status}`}>{c.status}</span></td><td>{c.event_count}</td><td>{stamp(c.updated_at)}</td></tr>)}
-        </tbody></table></div>}
+        <>
+          <div className="tp-ev-table-wrap"><table className="tp-ev-table tp-inv-phase5-table"><thead><tr><th>Case</th><th>Severity</th><th>Status</th><th>Events</th><th>Updated</th></tr></thead><tbody>
+            {visible.slice(0, caseLimit).map(c => <tr key={c.id} className="tp-inv-clickable" tabIndex={0} role="button" onClick={() => openCase(c.id)} onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openCase(c.id); } }}><td><strong className="tp-inv-case">TP-{String(c.id).padStart(4, '0')}</strong><div className="tp-inv-title">{c.title}</div></td><td><span className={`tp-inv-pill ${c.severity}`}>{c.severity}</span></td><td><span className={`tp-inv-pill ${c.status}`}>{c.status}</span></td><td>{c.event_count}</td><td>{stamp(c.updated_at)}</td></tr>)}
+          </tbody></table></div>
+
+          {visible.length > 10 && (
+            <div className="tp-see-more-bar" role="navigation" aria-label="Investigation cases pagination controls">
+              <div className="tp-see-more-actions">
+                <button
+                  type="button"
+                  className="tp-button tp-see-more-btn"
+                  onClick={() => setCaseLimit(prev => prev >= visible.length ? 10 : prev + 10)}
+                >
+                  {caseLimit >= visible.length ? (
+                    <>
+                      <ChevronUp size={15} /> Show fewer cases
+                    </>
+                  ) : (
+                    <>
+                      <ChevronDown size={15} /> See more (+{Math.min(10, visible.length - caseLimit)})
+                    </>
+                  )}
+                </button>
+                {caseLimit < visible.length && visible.length - caseLimit > 10 && (
+                  <button
+                    type="button"
+                    className="tp-button tp-see-all-btn"
+                    onClick={() => setCaseLimit(visible.length)}
+                  >
+                    See all ({visible.length})
+                  </button>
+                )}
+                {caseLimit > 10 && caseLimit < visible.length && (
+                  <button
+                    type="button"
+                    className="tp-button tp-show-less-btn"
+                    onClick={() => setCaseLimit(10)}
+                  >
+                    <ChevronUp size={15} /> Show 10
+                  </button>
+                )}
+              </div>
+              <span className="tp-see-more-count">
+                Showing {Math.min(caseLimit, visible.length)} of {visible.length} investigation cases
+              </span>
+            </div>
+          )}
+        </>}
     </section>
 
-    {creating && <div className="tp-overlay tp-inv-modal-overlay tp-inv-create-overlay" onMouseDown={() => setCreating(false)}><aside className="tp-drawer tp-investigation-modal tp-investigation-create-modal" role="dialog" aria-modal="true" aria-label="Create investigation" onMouseDown={e => e.stopPropagation()}>
-      <div className="tp-drawer-header"><div><span>New case</span><h2>Create investigation</h2></div><button onClick={() => setCreating(false)} aria-label="Close"><X size={21}/></button></div>
-      {createScanOn && <InvestigationScan states={createStates} stages={CREATE_STAGES} />}
-      <form className="tp-drawer-body tp-inv-form" onSubmit={createCase} hidden={createScanOn}>
-        <label>Title<input required minLength={3} maxLength={160} value={draft.title} onChange={e => setDraft({ ...draft, title: e.target.value })} placeholder="e.g. Repeated SSH login failures"/></label>
-        <label>Description<textarea maxLength={3000} rows={5} value={draft.description} onChange={e => setDraft({ ...draft, description: e.target.value })} placeholder="Describe the incident and initial findings"/></label>
-        <label>Severity<select value={draft.severity} onChange={e => setDraft({ ...draft, severity: e.target.value })}>{['low', 'medium', 'high', 'critical'].map(s => <option key={s} value={s}>{s}</option>)}</select></label>
-        <button className="tp-button primary" type="submit" disabled={busy}>{busy ? 'Creating…' : 'Create investigation'}</button>
-      </form>
-    </aside></div>}
+    {creating && typeof document !== 'undefined' && createPortal(
+      <div className="tp-overlay tp-inv-modal-overlay tp-inv-create-overlay" data-theme={pageTheme} onMouseDown={() => setCreating(false)}>
+        <aside className="tp-drawer tp-investigation-modal tp-investigation-create-modal" role="dialog" aria-modal="true" aria-label="Create investigation" onMouseDown={e => e.stopPropagation()}>
+          <div className="tp-drawer-header"><div><span>New case</span><h2>Create investigation</h2></div><button onClick={() => setCreating(false)} aria-label="Close"><X size={21}/></button></div>
+          {createScanOn && <InvestigationScan states={createStates} stages={CREATE_STAGES} />}
+          <form className="tp-drawer-body tp-inv-form" onSubmit={createCase} hidden={createScanOn}>
+            <label>Title<input required minLength={3} maxLength={160} value={draft.title} onChange={e => setDraft({ ...draft, title: e.target.value })} placeholder="e.g. Repeated SSH login failures"/></label>
+            <label>Description<textarea maxLength={3000} rows={5} value={draft.description} onChange={e => setDraft({ ...draft, description: e.target.value })} placeholder="Describe the incident and initial findings"/></label>
+            <label>Severity<select value={draft.severity} onChange={e => setDraft({ ...draft, severity: e.target.value })}>{['low', 'medium', 'high', 'critical'].map(s => <option key={s} value={s}>{s}</option>)}</select></label>
+            <button className="tp-button primary" type="submit" disabled={busy}>{busy ? 'Creating…' : 'Create investigation'}</button>
+          </form>
+        </aside>
+      </div>,
+      document.body
+    )}
 
-    {active && !creating && <div className="tp-overlay tp-inv-modal-overlay tp-inv-detail-overlay" onMouseDown={() => setActive(null)}><aside className="tp-drawer tp-inv-drawer tp-investigation-modal tp-investigation-detail-modal" role="dialog" aria-modal="true" aria-label="Investigation details" onMouseDown={e => e.stopPropagation()}>
-      <div className="tp-drawer-header"><div><span>TP-{String(active.id).padStart(4, '0')}</span><h2>{active.title}</h2><span className={`tp-inv-pill ${active.severity}`}>{active.severity}</span></div><button onClick={() => setActive(null)} aria-label="Close"><X size={21}/></button></div>
-      <div className="tp-drawer-body tp-inv-detail">
-        <p className="tp-inv-description">{active.description || 'No description provided.'}</p>
-        <div className="tp-detail"><span>Created</span><strong>{stamp(active.created_at)}</strong></div>
-        <label className="tp-inv-status-label">Case status<select disabled={busy} value={active.status} onChange={e => perform(() => request(`${API}/${active.id}`, { method: 'PATCH', body: JSON.stringify({ status: e.target.value }) }))}>{['open', 'investigating', 'resolved'].map(s => <option value={s} key={s}>{s}</option>)}</select></label>
-        <button
-          type="button"
-          className="tp-button tp-inv-phase5-report"
-          onClick={() => {
-            window.open(
-              `/api/v1/investigations/${active.id}/report`,
-              "_blank"
-            );
-          }}
-        >
-          <FileText size={16}/> Download PDF report
-        </button>
-        <h3><Link2 size={16}/> Linked events ({active.events?.length || 0})</h3>
-        {(active.events || []).map(link => <div className="tp-inv-linked" key={link.id}><FileText size={15}/><span>{(() => { try { return eventLabel(JSON.parse(link.event_reference)); } catch { return link.event_reference; } })()}</span></div>)}
-        {available.length ? <div className="tp-inv-inline"><select aria-label="Select timeline event" value={eventIndex} onChange={e => setEventIndex(e.target.value)}><option value="">Select a timeline event…</option>{available.map(({ e, index }) => <option key={index} value={index}>{eventLabel(e)}</option>)}</select><button className="tp-button" disabled={busy || eventIndex === ''} onClick={() => perform(() => request(`${API}/${active.id}/events`, { method: 'POST', body: JSON.stringify({ event_reference: eventRef(events[Number(eventIndex)]) }) }))}>Link</button></div> : <p className="tp-inv-muted">No additional timeline events available.</p>}
-        <section className="tp-ai-chat" aria-label="AI evidence assistant">
-          <div className="tp-ai-chat-heading">
-            <div>
-              <span className="tp-ai-eyebrow">TRACEPOINT INTELLIGENCE</span>
-              <h3>Ask about this investigation</h3>
-              <p>Answers are grounded in the events linked to this case.</p>
-            </div>
-            <span className="tp-ai-status">AI ASSISTANT</span>
-          </div>
-
-          <div className="tp-ai-messages" aria-live="polite">
-            {chatMessages.length === 0 && (
-              <div className="tp-ai-empty">
-                Ask about login activity, suspicious users, event order, or gaps in the evidence.
+    {active && !creating && typeof document !== 'undefined' && createPortal(
+      <div className="tp-overlay tp-inv-modal-overlay tp-inv-detail-overlay" data-theme={pageTheme} onMouseDown={() => setActive(null)}>
+        <aside className="tp-drawer tp-inv-drawer tp-investigation-modal tp-investigation-detail-modal" role="dialog" aria-modal="true" aria-label="Investigation details" onMouseDown={e => e.stopPropagation()}>
+          <div className="tp-drawer-header"><div><span>TP-{String(active.id).padStart(4, '0')}</span><h2>{active.title}</h2><span className={`tp-inv-pill ${active.severity}`}>{active.severity}</span></div><button onClick={() => setActive(null)} aria-label="Close"><X size={21}/></button></div>
+          <div className="tp-drawer-body tp-inv-detail">
+            <p className="tp-inv-description">{active.description || 'No description provided.'}</p>
+            <div className="tp-detail"><span>Created</span><strong>{stamp(active.created_at)}</strong></div>
+            <label className="tp-inv-status-label">Case status<select disabled={busy} value={active.status} onChange={e => perform(() => request(`${API}/${active.id}`, { method: 'PATCH', body: JSON.stringify({ status: e.target.value }) }))}>{['open', 'investigating', 'resolved'].map(s => <option value={s} key={s}>{s}</option>)}</select></label>
+            <button
+              type="button"
+              className="tp-button tp-inv-phase5-report"
+              onClick={() => {
+                window.open(
+                  `/api/v1/investigations/${active.id}/report`,
+                  "_blank"
+                );
+              }}
+            >
+              <FileText size={16}/> Download PDF report
+            </button>
+            <h3><Link2 size={16}/> Linked events ({active.events?.length || 0})</h3>
+            {(active.events || []).map(link => <div className="tp-inv-linked" key={link.id}><FileText size={15}/><span>{(() => { try { return eventLabel(JSON.parse(link.event_reference)); } catch { return link.event_reference; } })()}</span></div>)}
+            {available.length ? <div className="tp-inv-inline"><select aria-label="Select timeline event" value={eventIndex} onChange={e => setEventIndex(e.target.value)}><option value="">Select a timeline event…</option>{available.map(({ e, index }) => <option key={index} value={index}>{eventLabel(e)}</option>)}</select><button className="tp-button" disabled={busy || eventIndex === ''} onClick={() => perform(() => request(`${API}/${active.id}/events`, { method: 'POST', body: JSON.stringify({ event_reference: eventRef(events[Number(eventIndex)]) }) }))}>Link</button></div> : <p className="tp-inv-muted">No additional timeline events available.</p>}
+            <section className="tp-ai-chat" aria-label="AI evidence assistant">
+              <div className="tp-ai-chat-heading">
+                <div>
+                  <span className="tp-ai-eyebrow">TRACEPOINT INTELLIGENCE</span>
+                  <h3>Ask about this investigation</h3>
+                  <p>Answers are grounded in the events linked to this case.</p>
+                </div>
+                <span className="tp-ai-status">AI ASSISTANT</span>
               </div>
-            )}
-            {chatMessages.map((message, index) => (
-              <article
-                className={`tp-ai-message ${message.role === 'user' ? 'user' : 'assistant'}`}
-                key={`${index}-${message.role}`}
-              >
-                <span className="tp-ai-message-role">
-                  {message.role === 'user' ? 'YOU' : 'TRACEPOINT AI'}
-                </span>
-                <p>{message.content}</p>
-                {message.sources?.length > 0 && (
-                  <div className="tp-ai-sources">
-                    <strong>Evidence referenced ({message.sources.length})</strong>
-                    {message.sources.map((source, sourceIndex) => (
-                      <details key={`${source.id || 'source'}-${sourceIndex}`}>
-                        <summary>
-                          {source.id || `Source ${sourceIndex + 1}`}
-                          {source.event_type ? ` · ${source.event_type}` : ''}
-                          {source.timestamp ? ` · ${source.timestamp}` : ''}
-                        </summary>
-                        <dl>
-                          {[
-                            ['Device', source.device_id],
-                            ['Batch', source.batch_id],
-                            ['Username', source.username],
-                            ['Severity', source.severity],
-                            ['Line', source.line_number],
-                            ['Message', source.message],
-                            ['Parse status', source.parse_status],
-                          ].filter(([, value]) => value !== null && value !== undefined && value !== '')
-                            .map(([label, value]) => (
-                              <div key={label}>
-                                <dt>{label}</dt>
-                                <dd>{String(value)}</dd>
-                              </div>
-                            ))}
-                        </dl>
-                      </details>
-                    ))}
+
+              <div className="tp-ai-messages" aria-live="polite">
+                {chatMessages.length === 0 && (
+                  <div className="tp-ai-empty">
+                    Ask about login activity, suspicious users, event order, or gaps in the evidence.
                   </div>
                 )}
-              </article>
-            ))}
-            {scanVisible && <InvestigationScan states={scanStates} />}
+                {chatMessages.map((message, index) => (
+                  <article
+                    className={`tp-ai-message ${message.role === 'user' ? 'user' : 'assistant'}`}
+                    key={`${index}-${message.role}`}
+                  >
+                    <span className="tp-ai-message-role">
+                      {message.role === 'user' ? 'YOU' : 'TRACEPOINT AI'}
+                    </span>
+                    <p>{message.content}</p>
+                    {message.sources?.length > 0 && (
+                      <div className="tp-ai-sources">
+                        <strong>Evidence referenced ({message.sources.length})</strong>
+                        {message.sources.map((source, sourceIndex) => (
+                          <details key={`${source.id || 'source'}-${sourceIndex}`}>
+                            <summary>
+                              {source.id || `Source ${sourceIndex + 1}`}
+                              {source.event_type ? ` · ${source.event_type}` : ''}
+                              {source.timestamp ? ` · ${source.timestamp}` : ''}
+                            </summary>
+                            <dl>
+                              {[
+                                ['Device', source.device_id],
+                                ['Batch', source.batch_id],
+                                ['Username', source.username],
+                                ['Severity', source.severity],
+                                ['Line', source.line_number],
+                                ['Message', source.message],
+                                ['Parse status', source.parse_status],
+                              ].filter(([, value]) => value !== null && value !== undefined && value !== '')
+                                .map(([label, value]) => (
+                                  <div key={label}>
+                                    <dt>{label}</dt>
+                                    <dd>{String(value)}</dd>
+                                  </div>
+                                ))}
+                            </dl>
+                          </details>
+                        ))}
+                      </div>
+                    )}
+                  </article>
+                ))}
+                {scanVisible && <InvestigationScan states={scanStates} />}
+              </div>
+
+              {chatError && <p className="tp-ai-error" role="alert">{chatError}</p>}
+
+              <form className="tp-ai-form" onSubmit={askInvestigationAssistant}>
+                <textarea
+                  rows={2}
+                  minLength={3}
+                  maxLength={2000}
+                  value={chatQuestion}
+                  onChange={e => setChatQuestion(e.target.value)}
+                  placeholder="Ask a question about the evidence…"
+                  aria-label="Question about this investigation"
+                  disabled={chatBusy}
+                  required
+                />
+                <button
+                  className="tp-button primary"
+                  type="submit"
+                  disabled={chatBusy || chatQuestion.trim().length < 3}
+                >
+                  <Send size={15} />
+                  {chatBusy ? 'Analysing…' : 'Ask AI'}
+                </button>
+              </form>
+              <p className="tp-ai-disclaimer">
+                Verify conclusions against the original logs. The assistant may make mistakes.
+              </p>
+            </section>
+
+            <h3>Analyst notes ({active.notes?.length || 0})</h3>
+            <form onSubmit={e => { e.preventDefault(); const content = note.trim(); if (!content) return; perform(async () => { await request(`${API}/${active.id}/notes`, { method: 'POST', body: JSON.stringify({ content }) }); setNote(''); }); }}>
+              <textarea rows={3} maxLength={5000} required value={note} onChange={e => setNote(e.target.value)} placeholder="Record findings, actions, or next steps…" aria-label="Analyst note"/>
+              <button className="tp-button primary" disabled={busy || !note.trim()} type="submit"><Send size={15}/> Add note</button>
+            </form>
+            {(active.notes || []).map(n => <div className="tp-inv-note" key={n.id}><small>{stamp(n.created_at)}</small><p>{n.content}</p></div>)}
           </div>
-
-          {chatError && <p className="tp-ai-error" role="alert">{chatError}</p>}
-
-          <form className="tp-ai-form" onSubmit={askInvestigationAssistant}>
-            <textarea
-              rows={2}
-              minLength={3}
-              maxLength={2000}
-              value={chatQuestion}
-              onChange={e => setChatQuestion(e.target.value)}
-              placeholder="Ask a question about the evidence…"
-              aria-label="Question about this investigation"
-              disabled={chatBusy}
-              required
-            />
-            <button
-              className="tp-button primary"
-              type="submit"
-              disabled={chatBusy || chatQuestion.trim().length < 3}
-            >
-              <Send size={15} />
-              {chatBusy ? 'Analysing…' : 'Ask AI'}
-            </button>
-          </form>
-          <p className="tp-ai-disclaimer">
-            Verify conclusions against the original logs. The assistant may make mistakes.
-          </p>
-        </section>
-
-        <h3>Analyst notes ({active.notes?.length || 0})</h3>
-        <form onSubmit={e => { e.preventDefault(); const content = note.trim(); if (!content) return; perform(async () => { await request(`${API}/${active.id}/notes`, { method: 'POST', body: JSON.stringify({ content }) }); setNote(''); }); }}>
-          <textarea rows={3} maxLength={5000} required value={note} onChange={e => setNote(e.target.value)} placeholder="Record findings, actions, or next steps…" aria-label="Analyst note"/>
-          <button className="tp-button primary" disabled={busy || !note.trim()} type="submit"><Send size={15}/> Add note</button>
-        </form>
-        {(active.notes || []).map(n => <div className="tp-inv-note" key={n.id}><small>{stamp(n.created_at)}</small><p>{n.content}</p></div>)}
-      </div>
-    </aside></div>}
+        </aside>
+      </div>,
+      document.body
+    )}
   </div>;
 }
