@@ -12,6 +12,11 @@ import {
   LoaderCircle,
   X,
   Copy,
+  ChevronDown,
+  ChevronUp,
+  Database,
+  Activity,
+  Layers,
 } from "lucide-react";
 import "./styles/Tracepoint.css";
 import "./styles/Custody.css";
@@ -66,6 +71,12 @@ export default function EvidenceLibrary({ refreshSignal = 0 }) {
   const { scores, scoreError } = useEvidenceTrustScores(refreshSignal);
   // TRACEPOINT_CUSTODY_V1
   const [custody, setCustody] = useState(null);
+  const [evidenceLimit, setEvidenceLimit] = useState(10);
+  const [custodyLimit, setCustodyLimit] = useState(10);
+
+  useEffect(() => {
+    setEvidenceLimit(10);
+  }, [search]);
 
   const keyFor = (batch) => `${batch.device_id}/${batch.batch_id}`;
 
@@ -167,6 +178,10 @@ export default function EvidenceLibrary({ refreshSignal = 0 }) {
     (batch) => results[keyFor(batch)]?.verified === true
   ).length;
 
+  const totalCustody = custody?.items?.length || 0;
+  const visibleCustody = (custody?.items || []).slice(0, custodyLimit);
+  const visibleBatches = filtered.slice(0, evidenceLimit);
+
   function statusFor(batch) {
     const key = keyFor(batch);
     const result = results[key];
@@ -196,31 +211,65 @@ export default function EvidenceLibrary({ refreshSignal = 0 }) {
 
   return (
     <div className="tp-ev tp-evidence-console">
-      <section className="tp-evidence-banner">
-        <div><span className="tp-evidence-eyebrow">EVIDENCE / COLLECTION REGISTER</span>
-          <h2>Collected evidence, accounted for.</h2>
-          <p>Review collection metadata, verify SHA-256 fingerprints and inspect trust assessments.</p>
-        </div>
-        <div className="tp-evidence-banner-side"><span>COLLECTION REGISTER</span>
-          <strong>{loading ? 'Loading…' : `${batches.length} batches`}</strong>
-          <small>Integrity checks run on demand</small>
-        </div>
-      </section>
       <div className="tp-ev-stats tp-evidence-stats tp-scroll-reveal tp-stagger-parent">
-        <div className="tp-card tp-ev-stat">
-          <span>Evidence batches</span>
-          <strong><AnimatedEvidenceCount value={batches.length} /></strong>
-          <small>Stored collection batches</small>
+        <div className="tp-card tp-ev-stat tp-ev-stat-emerald">
+          <div className="tp-ev-stat-glow-bar bar-emerald" />
+          <div className="tp-ev-stat-top">
+            <span className="tp-ev-stat-label">Evidence Batches</span>
+            <div className="tp-ev-stat-icon-wrap icon-emerald">
+              <Database size={18} />
+            </div>
+          </div>
+          <div className="tp-ev-stat-middle">
+            <strong className="tp-ev-stat-value">
+              <AnimatedEvidenceCount value={batches.length} />
+            </strong>
+            <span className="tp-ev-stat-badge badge-emerald">
+              <span className="tp-ev-stat-pulse-dot dot-emerald" />
+              COLLECTED
+            </span>
+          </div>
+          <small className="tp-ev-stat-hint">Stored collection batches</small>
         </div>
-        <div className="tp-card tp-ev-stat">
-          <span>Evidence records</span>
-          <strong><AnimatedEvidenceCount value={totalLines} /></strong>
-          <small>Collected log lines</small>
+
+        <div className="tp-card tp-ev-stat tp-ev-stat-cyan">
+          <div className="tp-ev-stat-glow-bar bar-cyan" />
+          <div className="tp-ev-stat-top">
+            <span className="tp-ev-stat-label">Evidence Records</span>
+            <div className="tp-ev-stat-icon-wrap icon-cyan">
+              <Activity size={18} />
+            </div>
+          </div>
+          <div className="tp-ev-stat-middle">
+            <strong className="tp-ev-stat-value">
+              <AnimatedEvidenceCount value={totalLines} />
+            </strong>
+            <span className="tp-ev-stat-badge badge-cyan">
+              <span className="tp-ev-stat-pulse-dot dot-cyan" />
+              TELEMETRY
+            </span>
+          </div>
+          <small className="tp-ev-stat-hint">Collected log lines indexed</small>
         </div>
-        <div className="tp-card tp-ev-stat">
-          <span>Verified this session</span>
-          <strong><AnimatedEvidenceCount value={verifiedCount} /></strong>
-          <small>Passed SHA-256 comparison</small>
+
+        <div className="tp-card tp-ev-stat tp-ev-stat-violet">
+          <div className="tp-ev-stat-glow-bar bar-violet" />
+          <div className="tp-ev-stat-top">
+            <span className="tp-ev-stat-label">Verified Integrity</span>
+            <div className="tp-ev-stat-icon-wrap icon-violet">
+              <ShieldCheck size={18} />
+            </div>
+          </div>
+          <div className="tp-ev-stat-middle">
+            <strong className="tp-ev-stat-value">
+              <AnimatedEvidenceCount value={verifiedCount} />
+            </strong>
+            <span className="tp-ev-stat-badge badge-violet">
+              <span className="tp-ev-stat-pulse-dot dot-violet" />
+              SHA-256 SEAL
+            </span>
+          </div>
+          <small className="tp-ev-stat-hint">Passed cryptographic comparison</small>
         </div>
       </div>
 
@@ -253,58 +302,103 @@ export default function EvidenceLibrary({ refreshSignal = 0 }) {
         ) : filtered.length === 0 ? (
           <div className="tp-ev-empty">No matching evidence batches found.</div>
         ) : (
-          <div className="tp-ev-table-wrap">
-            <table className="tp-ev-table tp-evidence-table">
-              <thead>
-                <tr>
-                  <th>Evidence batch</th>
-                  <th>Device</th>
-                  <th>Records</th>
-                  <th>Collected</th>
-                  <th>Integrity</th>
-                <th>Trust score</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((batch) => {
-                  const key = keyFor(batch);
+          <>
+            <div className="tp-ev-table-wrap">
+              <table className="tp-ev-table tp-evidence-table">
+                <thead>
+                  <tr>
+                    <th>Evidence batch</th>
+                    <th>Device</th>
+                    <th>Records</th>
+                    <th>Collected</th>
+                    <th>Integrity</th>
+                    <th>Trust score</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {visibleBatches.map((batch) => {
+                    const key = keyFor(batch);
 
-                  return (
-                    <tr key={key}>
-                      <td>
-                        <button
-                          className="tp-ev-batch-link tp-evidence-batch"
-                          onClick={() => setSelected(batch)}
-                        >
-                          <Fingerprint size={17} />
-                          <span>
-                            <strong>{batch.batch_id?.slice(0, 12)}…</strong>
-                            <small>{batch.log_type || "Unknown log type"}</small>
-                          </span>
-                        </button>
-                      </td>
-                      <td className="tp-evidence-device">{batch.device_id}</td>
-                      <td>{batch.line_count}</td>
-                      <td className="tp-evidence-date">{formatDate(batch.received_at)}</td>
-                      <td>{statusFor(batch)}</td>
-                    <td><TrustScoreBadge result={scores[key]} /></td>
-                      <td>
-                        <button
-                          className="tp-button tp-ev-verify"
-                          onClick={() => verify(batch)}
-                          disabled={verifying === key}
-                        >
-                          <ShieldCheck size={15} />
-                          {verifying === key ? "Checking" : "Verify"}
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+                    return (
+                      <tr key={key}>
+                        <td>
+                          <button
+                            className="tp-ev-batch-link tp-evidence-batch"
+                            onClick={() => setSelected(batch)}
+                          >
+                            <Fingerprint size={17} />
+                            <span>
+                              <strong>{batch.batch_id?.slice(0, 12)}…</strong>
+                              <small>{batch.log_type || "Unknown log type"}</small>
+                            </span>
+                          </button>
+                        </td>
+                        <td className="tp-evidence-device">{batch.device_id}</td>
+                        <td>{batch.line_count}</td>
+                        <td className="tp-evidence-date">{formatDate(batch.received_at)}</td>
+                        <td>{statusFor(batch)}</td>
+                        <td><TrustScoreBadge result={scores[key]} /></td>
+                        <td>
+                          <button
+                            className="tp-button tp-ev-verify"
+                            onClick={() => verify(batch)}
+                            disabled={verifying === key}
+                          >
+                            <ShieldCheck size={15} />
+                            {verifying === key ? "Checking" : "Verify"}
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            {filtered.length > 10 && (
+              <div className="tp-see-more-bar" role="navigation" aria-label="Evidence pagination controls">
+                <div className="tp-see-more-actions">
+                  <button
+                    type="button"
+                    className="tp-button tp-see-more-btn"
+                    onClick={() => setEvidenceLimit((prev) => (prev >= filtered.length ? 10 : prev + 10))}
+                  >
+                    {evidenceLimit >= filtered.length ? (
+                      <>
+                        <ChevronUp size={15} /> Show fewer batches
+                      </>
+                    ) : (
+                      <>
+                        <ChevronDown size={15} /> See more (+{Math.min(10, filtered.length - evidenceLimit)})
+                      </>
+                    )}
+                  </button>
+                  {evidenceLimit < filtered.length && filtered.length - evidenceLimit > 10 && (
+                    <button
+                      type="button"
+                      className="tp-button tp-see-all-btn"
+                      onClick={() => setEvidenceLimit(filtered.length)}
+                    >
+                      See all ({filtered.length})
+                    </button>
+                  )}
+                  {evidenceLimit > 10 && evidenceLimit < filtered.length && (
+                    <button
+                      type="button"
+                      className="tp-button tp-show-less-btn"
+                      onClick={() => setEvidenceLimit(10)}
+                    >
+                      <ChevronUp size={15} /> Show 10
+                    </button>
+                  )}
+                </div>
+                <span className="tp-see-more-count">
+                  Showing {visibleBatches.length} of {filtered.length} batches
+                </span>
+              </div>
+            )}
+          </>
         )}
       </section>
 
@@ -343,7 +437,7 @@ export default function EvidenceLibrary({ refreshSignal = 0 }) {
           <>
             <p className="tp-custody-detail">{custody.chain?.detail}</p>
             <ol className="tp-custody-list">
-              {custody.items.map((entry) => {
+              {visibleCustody.map((entry) => {
                 const detail = (() => {
                   try { return JSON.parse(entry.detail || "{}") || {}; }
                   catch { return {}; }
@@ -365,6 +459,50 @@ export default function EvidenceLibrary({ refreshSignal = 0 }) {
                 );
               })}
             </ol>
+
+            {totalCustody > 10 && (
+              <div className="tp-see-more-bar" role="navigation" aria-label="Custody pagination controls">
+                <div className="tp-see-more-actions">
+                  <button
+                    type="button"
+                    className="tp-button tp-see-more-btn"
+                    onClick={() => setCustodyLimit((prev) => (prev >= totalCustody ? 10 : prev + 10))}
+                  >
+                    {custodyLimit >= totalCustody ? (
+                      <>
+                        <ChevronUp size={15} /> Show fewer custody events
+                      </>
+                    ) : (
+                      <>
+                        <ChevronDown size={15} /> See more (+{Math.min(10, totalCustody - custodyLimit)})
+                      </>
+                    )}
+                  </button>
+                  {custodyLimit < totalCustody && totalCustody - custodyLimit > 10 && (
+                    <button
+                      type="button"
+                      className="tp-button tp-see-all-btn"
+                      onClick={() => setCustodyLimit(totalCustody)}
+                    >
+                      See all ({totalCustody})
+                    </button>
+                  )}
+                  {custodyLimit > 10 && custodyLimit < totalCustody && (
+                    <button
+                      type="button"
+                      className="tp-button tp-show-less-btn"
+                      onClick={() => setCustodyLimit(10)}
+                    >
+                      <ChevronUp size={15} /> Show 10
+                    </button>
+                  )}
+                </div>
+                <span className="tp-see-more-count">
+                  Showing {visibleCustody.length} of {totalCustody} custody events
+                </span>
+              </div>
+            )}
+
             <p className="tp-custody-caution">
               An intact chain shows these entries have not been altered since they
               were written. It does not show that the record is complete, and it

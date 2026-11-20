@@ -101,3 +101,317 @@
 .tp-app[data-theme="dark"] .tp-page-error strong { color: #e8eef7; }
 .tp-app[data-theme="dark"] .tp-page-error p { color: #b5c0d1; }
 .tp-app[data-theme="dark"] .tp-page-error svg:first-child { color: #e0a06a; }
+
+/* TRACEPOINT_EVIDENCE_PAGINATION — "See more" controls for Evidence & Custody tables */
+.tp-see-more-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 12px 24px;
+  background: #fafafc;
+  border-top: 1px solid #eceaf6;
+}
+
+.tp-see-more-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.tp-see-more-btn,
+.tp-see-all-btn,
+.tp-show-less-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px !important;
+  font-weight: 650 !important;
+  padding: 6px 14px !important;
+  height: 32px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+}
+
+.tp-see-more-count {
+  font-size: 12px;
+  font-weight: 500;
+  color: #72798a;
+  white-space: nowrap;
+}
+
+.tp-app[data-theme="dark"] .tp-see-more-bar {
+  background: #141c2b;
+  border-top-color: #2a3547;
+}
+
+.tp-app[data-theme="dark"] .tp-see-more-count {
+  color: #93a0b4;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-see-more-bar {
+  background: var(--fx-raised, #f6f8f7) !important;
+  border-top-color: var(--fx-line, #dce4e0) !important;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-see-more-count {
+  color: var(--fx-text-dim, #5c6c64) !important;
+  font-family: var(--fx-sans, 'Inter', sans-serif) !important;
+  font-size: 11.5px !important;
+}
+
+html .tp-app.tp-app[data-theme='forensic'] .tp-see-more-btn,
+html .tp-app.tp-app[data-theme='forensic'] .tp-see-all-btn,
+html .tp-app.tp-app[data-theme='forensic'] .tp-show-less-btn {
+  font-family: var(--fx-sans, 'Inter', sans-serif) !important;
+  font-size: 11.5px !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+}
+
+/* ===========================================================================
+   ANIMATED & COLOURED EVIDENCE STAT CARDS
+   =========================================================================== */
+.tp-ev-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 900px) {
+  .tp-ev-stats {
+    grid-template-columns: 1fr;
+  }
+}
+
+.tp-ev-stat {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 22px;
+  border-radius: 12px !important;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.04);
+  transition: transform 0.26s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.26s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.26s ease;
+}
+
+.tp-ev-stat:hover {
+  transform: translateY(-3px);
+}
+
+/* Glow bar on top of card */
+.tp-ev-stat-glow-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3.5px;
+  z-index: 2;
+}
+
+.tp-ev-stat-glow-bar.bar-emerald {
+  background: linear-gradient(90deg, #10B981 0%, #34D399 100%);
+}
+.tp-ev-stat-glow-bar.bar-cyan {
+  background: linear-gradient(90deg, #0284c7 0%, #38bdf8 100%);
+}
+.tp-ev-stat-glow-bar.bar-violet {
+  background: linear-gradient(90deg, #7c3aed 0%, #a78bfa 100%);
+}
+
+/* Card color variants */
+.tp-ev-stat-emerald {
+  background: linear-gradient(145deg, rgba(16, 185, 129, 0.06) 0%, #ffffff 65%);
+}
+.tp-ev-stat-emerald:hover {
+  border-color: rgba(16, 185, 129, 0.5) !important;
+  box-shadow: 0 12px 28px -4px rgba(16, 185, 129, 0.16);
+}
+
+.tp-ev-stat-cyan {
+  background: linear-gradient(145deg, rgba(14, 165, 233, 0.06) 0%, #ffffff 65%);
+}
+.tp-ev-stat-cyan:hover {
+  border-color: rgba(14, 165, 233, 0.5) !important;
+  box-shadow: 0 12px 28px -4px rgba(14, 165, 233, 0.16);
+}
+
+.tp-ev-stat-violet {
+  background: linear-gradient(145deg, rgba(124, 58, 237, 0.06) 0%, #ffffff 65%);
+}
+.tp-ev-stat-violet:hover {
+  border-color: rgba(124, 58, 237, 0.5) !important;
+  box-shadow: 0 12px 28px -4px rgba(124, 58, 237, 0.16);
+}
+
+/* Top bar with label and icon */
+.tp-ev-stat-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.tp-ev-stat-label {
+  font-size: 13px;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+  color: #475569;
+}
+
+.tp-ev-stat-icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  transition: transform 0.28s ease, filter 0.28s ease;
+}
+
+.tp-ev-stat:hover .tp-ev-stat-icon-wrap {
+  transform: scale(1.12) rotate(4deg);
+}
+
+.tp-ev-stat-icon-wrap.icon-emerald {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+}
+.tp-ev-stat-icon-wrap.icon-cyan {
+  background: rgba(14, 165, 233, 0.12);
+  color: #0284c7;
+}
+.tp-ev-stat-icon-wrap.icon-violet {
+  background: rgba(124, 58, 237, 0.12);
+  color: #7c3aed;
+}
+
+/* Middle bar with large animated number and chip badge */
+.tp-ev-stat-middle {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.tp-ev-stat-value {
+  font-size: 32px;
+  font-weight: 800;
+  line-height: 1;
+  color: #0f172a;
+  letter-spacing: -0.03em;
+  font-family: inherit;
+}
+
+.tp-ev-stat-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 4px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.tp-ev-stat-badge.badge-emerald {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+.tp-ev-stat-badge.badge-cyan {
+  background: rgba(14, 165, 233, 0.12);
+  color: #0284c7;
+  border: 1px solid rgba(14, 165, 233, 0.25);
+}
+.tp-ev-stat-badge.badge-violet {
+  background: rgba(124, 58, 237, 0.12);
+  color: #7c3aed;
+  border: 1px solid rgba(124, 58, 237, 0.25);
+}
+
+/* Pulsing radar dot inside badge */
+.tp-ev-stat-pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+  animation: tpEvPulse 2s ease-in-out infinite;
+}
+
+.tp-ev-stat-pulse-dot.dot-emerald {
+  background-color: #10B981;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.8);
+}
+.tp-ev-stat-pulse-dot.dot-cyan {
+  background-color: #0ea5e9;
+  box-shadow: 0 0 8px rgba(14, 165, 233, 0.8);
+}
+.tp-ev-stat-pulse-dot.dot-violet {
+  background-color: #8b5cf6;
+  box-shadow: 0 0 8px rgba(139, 92, 246, 0.8);
+}
+
+@keyframes tpEvPulse {
+  0% { transform: scale(0.9); opacity: 0.7; }
+  50% { transform: scale(1.3); opacity: 1; filter: drop-shadow(0 0 3px currentColor); }
+  100% { transform: scale(0.9); opacity: 0.7; }
+}
+
+.tp-ev-stat-hint {
+  font-size: 12px;
+  color: #64748b;
+  margin-top: auto;
+}
+
+/* Dark mode adjustments */
+.tp-app[data-theme="dark"] .tp-ev-stat {
+  background: #111827;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+.tp-app[data-theme="dark"] .tp-ev-stat-emerald {
+  background: linear-gradient(145deg, rgba(16, 185, 129, 0.12) 0%, #111827 70%);
+}
+.tp-app[data-theme="dark"] .tp-ev-stat-cyan {
+  background: linear-gradient(145deg, rgba(14, 165, 233, 0.12) 0%, #111827 70%);
+}
+.tp-app[data-theme="dark"] .tp-ev-stat-violet {
+  background: linear-gradient(145deg, rgba(124, 58, 237, 0.12) 0%, #111827 70%);
+}
+.tp-app[data-theme="dark"] .tp-ev-stat-value {
+  color: #f8fafc;
+}
+.tp-app[data-theme="dark"] .tp-ev-stat-label {
+  color: #cbd5e1;
+}
+.tp-app[data-theme="dark"] .tp-ev-stat-hint {
+  color: #94a3b8;
+}
+
+/* Forensic theme adjustments */
+html .tp-app.tp-app[data-theme='forensic'] .tp-ev-stat {
+  border-radius: var(--fx-r-md, 8px) !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-ev-stat-value {
+  color: var(--fx-text, #1b2621) !important;
+  font-family: var(--fx-sans, 'Inter', sans-serif) !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-ev-stat-label {
+  color: var(--fx-text-strong, #2c3a32) !important;
+  font-family: var(--fx-sans, 'Inter', sans-serif) !important;
+}
+html .tp-app.tp-app[data-theme='forensic'] .tp-ev-stat-hint {
+  color: var(--fx-text-dim, #5c6c64) !important;
+  font-family: var(--fx-sans, 'Inter', sans-serif) !important;
+}

@@ -1032,7 +1032,7 @@ export default function Dashboard({ user, onSignOut }) {
     {/* TRACEPOINT_SINGLE_NAV_V1: status and account live in primary navigation */}
 
       <div className="tp-content">
-        {page !== 'about' && page !== 'overview' && (
+        {page !== 'about' && page !== 'overview' && page !== 'evidence' && (
           <div className={`tp-page-header ${page === 'guide' ? 'tp-page-header-guide' : ''}`}>
             <div>
               <h1>{title}</h1>
