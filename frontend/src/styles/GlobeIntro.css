@@ -1,0 +1,300 @@
+/* ===========================================================================
+   TRACEPOINT GLOBE INTRO ANIMATION SEQUENCE
+   Cinematic 4-phase intro: Fullscreen -> Orbit -> India Lock -> Settle
+   =========================================================================== */
+
+.tp-globe-intro-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #F3F7F4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1),
+              opacity 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+  transform-origin: top right;
+}
+
+/* Subtle Pistachio Horizon Grid Pattern */
+.tp-globe-intro-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: 
+    radial-gradient(circle at 50% 50%, rgba(37, 84, 61, 0.04) 0%, transparent 70%),
+    linear-gradient(rgba(212, 229, 216, 0.35) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(212, 229, 216, 0.35) 1px, transparent 1px);
+  background-size: 100% 100%, 48px 48px, 48px 48px;
+  background-position: 0 0, 24px 24px, 24px 24px;
+  pointer-events: none;
+  opacity: 0.85;
+}
+
+/* Watermark in Top-Left / Bottom-Left */
+.tp-globe-intro-watermark {
+  position: absolute;
+  top: 28px;
+  left: 36px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 10;
+  animation: introFadeIn 0.8s ease-out both;
+}
+
+.tp-globe-intro-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tp-globe-intro-logo-text {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #13281E;
+}
+
+.tp-globe-intro-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  background: #E8F2EA;
+  border: 1px solid #C1DEC8;
+  border-radius: 9999px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  color: #25543D;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* Skip Button in Top-Right */
+.tp-globe-intro-skip {
+  position: absolute;
+  top: 28px;
+  right: 36px;
+  z-index: 20;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(8px);
+  border: 1px solid #D4E5D8;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #25543D;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(37, 84, 61, 0.08);
+  transition: all 0.2s ease;
+  animation: introFadeIn 0.8s ease-out 0.2s both;
+}
+
+.tp-globe-intro-skip:hover {
+  background: #25543D;
+  color: #FFFFFF;
+  border-color: #25543D;
+  box-shadow: 0 4px 14px rgba(37, 84, 61, 0.2);
+  transform: translateY(-1px);
+}
+
+/* Center Stage for Globe & Orbit */
+.tp-globe-intro-stage {
+  position: relative;
+  width: 480px;
+  height: 480px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+  transition: transform 0.5s ease-out;
+}
+
+/* The Nested Globe Container */
+.tp-globe-intro-globe-wrap {
+  position: relative;
+  width: 420px;
+  height: 380px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Orbit Path SVG Layer (Positioned over/around Globe) */
+.tp-globe-intro-orbit-svg {
+  position: absolute;
+  inset: -60px;
+  width: calc(100% + 120px);
+  height: calc(100% + 120px);
+  pointer-events: none;
+  z-index: 12;
+  overflow: visible;
+}
+
+/* Elliptical Orbit Track */
+.tp-orbit-track {
+  fill: none;
+  stroke: rgba(37, 84, 61, 0.28);
+  stroke-width: 1.6;
+  stroke-dasharray: 6 5;
+  animation: orbitTrackSpin 30s linear infinite;
+}
+
+/* The Satellite Craft Rig */
+.tp-satellite-group {
+  transition: transform 0.08s linear;
+  filter: drop-shadow(0 4px 12px rgba(37, 84, 61, 0.35));
+}
+
+/* Fading Orbit Arc Line in Sage #25543D */
+.tp-orbit-trail {
+  fill: none;
+  stroke: url(#tp-sage-trail-grad);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+/* India Pulse Waves on Zenith Lock */
+.tp-india-zenith-pulse {
+  animation: indiaZenithRipple 1.4s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+  transform-origin: center;
+}
+
+@keyframes indiaZenithRipple {
+  0% {
+    r: 6px;
+    opacity: 0.95;
+    stroke-width: 3.5px;
+  }
+  60% {
+    r: 42px;
+    opacity: 0.4;
+    stroke-width: 2px;
+  }
+  100% {
+    r: 68px;
+    opacity: 0;
+    stroke-width: 0.5px;
+  }
+}
+
+/* Telemetry Lock Banner (Below Globe) */
+.tp-globe-intro-banner {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  z-index: 10;
+  text-align: center;
+}
+
+.tp-globe-intro-lock-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  background: #FFFFFF;
+  border: 1.5px solid #25543D;
+  border-radius: 9999px;
+  box-shadow: 0 4px 16px rgba(37, 84, 61, 0.12);
+  animation: lockPillPop 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.tp-globe-intro-lock-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #34D399;
+  box-shadow: 0 0 10px #34D399, 0 0 4px #138808;
+  animation: lockDotBlink 1s ease-in-out infinite;
+}
+
+.tp-globe-intro-coords {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  font-weight: 700;
+  color: #25543D;
+  letter-spacing: 0.04em;
+}
+
+.tp-globe-intro-sub {
+  font-size: 12px;
+  font-weight: 600;
+  color: #638170;
+  letter-spacing: 0.02em;
+}
+
+/* Phase Transitions: Settling Phase */
+.tp-globe-intro-overlay.is-settling {
+  transform: scale(0.38) translate(calc(50vw - 220px), calc(-50vh + 150px));
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Phase Transitions: Complete / Hidden */
+.tp-globe-intro-overlay.is-done {
+  display: none !important;
+}
+
+/* Replay Trigger inside Dashboard Hero */
+.tp-intro-replay-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  background: #FFFFFF;
+  border: 1px solid #C1DEC8;
+  border-radius: 9999px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  color: #25543D;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-left: 8px;
+}
+
+.tp-intro-replay-btn:hover {
+  background: #25543D;
+  color: #FFFFFF;
+  border-color: #25543D;
+  box-shadow: 0 2px 8px rgba(37, 84, 61, 0.16);
+}
+
+/* Animations */
+@keyframes introFadeIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes lockPillPop {
+  0% { opacity: 0; transform: scale(0.85) translateY(12px); }
+  70% { transform: scale(1.04) translateY(-2px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes lockDotBlink {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.8); }
+}
+
+@keyframes orbitTrackSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Reduced Motion Override */
+@media (prefers-reduced-motion: reduce) {
+  .tp-globe-intro-overlay {
+    display: none !important;
+  }
+}

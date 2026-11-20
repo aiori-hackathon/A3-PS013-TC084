@@ -1,0 +1,585 @@
+/* ===========================================================================
+   TRACEPOINT OVERVIEW PAGE OVERHAUL — DESIGN SYSTEM & VISUAL UPGRADE
+   Matching the quality of the About Us page:
+   - 16px rounded cards with comfortable padding
+   - Subtle shadows with spring hover lift translateY(-4px)
+   - Colored top accent strips on metric cards
+   - Tool cards with custom visual illustration preview headers
+   - Thin 1px sage #D4E5D8 section dividers
+   - Clean typography with Inter + IBM Plex Mono
+   =========================================================================== */
+
+/* ---------------------------------------------------------------------------
+   Page Container & Consistent Vertical Spacing
+   --------------------------------------------------------------------------- */
+.tp-overview-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 8px 0 48px 0;
+  box-sizing: border-box;
+}
+
+/* Horizontal Section Divider */
+.tp-section-divider {
+  width: 100%;
+  height: 1px;
+  border: none;
+  background: #D4E5D8;
+  margin: 36px 0;
+  opacity: 0.85;
+}
+
+/* Section Header Badges (Matching About Us eyebrow style) */
+.tp-overview-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 12px;
+  background: #E8F2EA;
+  border: 1px solid #C1DEC8;
+  border-radius: 9999px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #25543D;
+  margin-bottom: 10px;
+}
+
+.tp-overview-eyebrow span {
+  font-size: 13px;
+}
+
+/* ---------------------------------------------------------------------------
+   Overview Hero Header (About Us Inspired)
+   --------------------------------------------------------------------------- */
+.tp-overview-hero-wrapper {
+  background: #FFFFFF;
+  border: 1px solid #D4E5D8;
+  border-radius: 18px;
+  padding: 28px 32px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 8px 24px -4px rgba(37, 84, 61, 0.06);
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 28px;
+  align-items: center;
+  margin-bottom: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.tp-overview-hero-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.tp-overview-title {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  color: #0F172A;
+  margin: 0;
+}
+
+.tp-overview-accent {
+  background: linear-gradient(135deg, #25543D 0%, #10B981 60%, #059669 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.tp-overview-subtitle {
+  font-size: 14.5px;
+  color: #3D5949;
+  line-height: 1.55;
+  margin: 0 0 12px 0;
+  max-width: 640px;
+}
+
+.tp-overview-hero-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.tp-overview-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 11px;
+  background: #F1F5F2;
+  border: 1px solid #D4E5D8;
+  border-radius: 9999px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #25543D;
+}
+
+.tp-overview-status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #10B981;
+  box-shadow: 0 0 8px #10B981;
+}
+
+.tp-overview-hero-globe-slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  min-height: 220px;
+}
+
+/* ---------------------------------------------------------------------------
+   Stat Metric Cards (4 Cards Grid with Top Accent Strips)
+   --------------------------------------------------------------------------- */
+.tp-overview-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.tp-metric-card {
+  background: #FFFFFF !important;
+  border: 1px solid #D4E5D8 !important;
+  border-radius: 16px !important;
+  padding: 22px 22px 18px !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 6px 16px rgba(0, 0, 0, 0.04) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  min-height: 128px !important;
+  position: relative !important;
+  overflow: hidden !important;
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1) !important;
+  box-sizing: border-box !important;
+}
+
+.tp-metric-card:hover {
+  transform: translateY(-4px) !important;
+  border-color: #25543D !important;
+  box-shadow: 0 12px 28px -4px rgba(37, 84, 61, 0.12), 0 4px 12px rgba(0, 0, 0, 0.04) !important;
+}
+
+/* 4px Colored Accent Strip at Top */
+.tp-metric-accent-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  border-radius: 16px 16px 0 0;
+}
+
+.tp-metric-accent-bar.accent-blue { background: #3B82F6; }
+.tp-metric-accent-bar.accent-red { background: #FF4D6A; }
+.tp-metric-accent-bar.accent-green { background: #2FBF84; }
+.tp-metric-accent-bar.accent-sage { background: #25543D; }
+
+.tp-metric-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  margin-bottom: 8px !important;
+}
+
+.tp-metric-label {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  color: #3D5949 !important;
+  letter-spacing: 0.01em !important;
+}
+
+.tp-metric-icon-wrap {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: #25543D !important;
+  opacity: 0.85;
+}
+
+.tp-metric-body {
+  display: flex !important;
+  align-items: baseline !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
+  margin-bottom: 6px !important;
+}
+
+/* 36px Bold IBM Plex Mono Value */
+.tp-metric-value {
+  font-family: 'IBM Plex Mono', monospace !important;
+  font-size: 36px !important;
+  font-weight: 700 !important;
+  color: #0F172A !important;
+  letter-spacing: -0.02em !important;
+  line-height: 1.1 !important;
+}
+
+/* Status Badge Pills */
+.tp-metric-chip {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  padding: 3px 8px !important;
+  border-radius: 9999px !important;
+  font-family: 'IBM Plex Mono', monospace !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.04em !important;
+  text-transform: uppercase !important;
+}
+
+.tp-metric-chip.accent-blue {
+  background: #EFF6FF !important;
+  color: #1D4ED8 !important;
+  border: 1px solid #BFDBFE !important;
+}
+
+.tp-metric-chip.alert,
+.tp-metric-chip.accent-red {
+  background: #FEF2F2 !important;
+  color: #DC2626 !important;
+  border: 1px solid #FECACA !important;
+}
+
+.tp-metric-chip.accent-green {
+  background: #ECFDF5 !important;
+  color: #047857 !important;
+  border: 1px solid #A7F3D0 !important;
+}
+
+.tp-metric-chip.normal,
+.tp-metric-chip.accent-sage {
+  background: #E8F2EA !important;
+  color: #25543D !important;
+  border: 1px solid #C1DEC8 !important;
+}
+
+.tp-metric-chip-pip {
+  width: 5px !important;
+  height: 5px !important;
+  border-radius: 50% !important;
+  background: currentColor !important;
+}
+
+.tp-metric-note {
+  font-size: 11px !important;
+  color: #638170 !important;
+  line-height: 1.35 !important;
+}
+
+/* ---------------------------------------------------------------------------
+   Tool Cards (5 Cards Grid with Visual Illustration Previews)
+   --------------------------------------------------------------------------- */
+.tp-overview-tools-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.tp-tool-card {
+  background: #FFFFFF !important;
+  border: 1px solid #D4E5D8 !important;
+  border-radius: 16px !important;
+  padding: 16px 16px 14px !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 6px 16px rgba(0, 0, 0, 0.04) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  min-height: 270px !important;
+  text-align: left !important;
+  text-decoration: none !important;
+  cursor: pointer !important;
+  position: relative !important;
+  overflow: hidden !important;
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1) !important;
+  box-sizing: border-box !important;
+}
+
+.tp-tool-card:hover {
+  transform: translateY(-4px) !important;
+  border-color: #25543D !important;
+  box-shadow: 0 14px 28px -4px rgba(37, 84, 61, 0.12), 0 4px 12px rgba(0, 0, 0, 0.04) !important;
+}
+
+/* Top Illustration Preview Slot */
+.tp-tool-illustration {
+  width: 100%;
+  height: 82px;
+  border-radius: 12px;
+  background: linear-gradient(145deg, #F8FAFC 0%, #EEF2F6 100%);
+  border: 1px solid #E2E8F0;
+  overflow: hidden;
+  position: relative;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.tp-tool-card:hover .tp-tool-illustration {
+  transform: scale(1.03);
+}
+
+/* Tool Metadata Tags */
+.tp-tool-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.tp-tool-code {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9.5px;
+  font-weight: 700;
+  color: #25543D;
+  background: #E8F2EA;
+  border: 1px solid #C1DEC8;
+  padding: 2px 7px;
+  border-radius: 9999px;
+  letter-spacing: 0.04em;
+}
+
+.tp-tool-badge {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.tp-tool-badge.live { background: #ECFDF5; color: #047857; border: 1px solid #A7F3D0; }
+.tp-tool-badge.active { background: #EFF6FF; color: #1D4ED8; border: 1px solid #BFDBFE; }
+.tp-tool-badge.sealed { background: #FAF5FF; color: #7E22CE; border: 1px solid #E9D5FF; }
+.tp-tool-badge.topology { background: #F0FDFA; color: #0F766E; border: 1px solid #99F6E4; }
+.tp-tool-badge.export { background: #FFFBEB; color: #B45309; border: 1px solid #FDE68A; }
+
+.tp-tool-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.tp-tool-title {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: #0F172A;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.tp-tool-desc {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 12px;
+  color: #3D5949;
+  line-height: 1.45;
+  margin: 0;
+}
+
+/* "Open tool →" Link with Hover Underline */
+.tp-tool-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 10px;
+  border-top: 1px solid #F1F5F2;
+  margin-top: auto;
+}
+
+.tp-tool-link-text {
+  font-size: 12px;
+  font-weight: 700;
+  color: #25543D;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  position: relative;
+  transition: color 0.2s ease;
+}
+
+.tp-tool-link-text::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 0;
+  height: 1.5px;
+  background: #25543D;
+  transition: width 0.25s ease;
+}
+
+.tp-tool-card:hover .tp-tool-link-text::after {
+  width: 100%;
+}
+
+.tp-tool-arrow {
+  transition: transform 0.25s ease;
+  color: #25543D;
+}
+
+.tp-tool-card:hover .tp-tool-arrow {
+  transform: translateX(4px);
+}
+
+/* ---------------------------------------------------------------------------
+   Mini Illustration Visuals for Tool Cards
+   --------------------------------------------------------------------------- */
+/* 1. Terminal Ingest Preview */
+.tp-ill-terminal {
+  width: 100%;
+  height: 100%;
+  background: #0F172A;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-sizing: border-box;
+}
+
+.tp-ill-terminal-bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.tp-ill-terminal-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+}
+
+.tp-ill-terminal-dot.r { background: #EF4444; }
+.tp-ill-terminal-dot.y { background: #F59E0B; }
+.tp-ill-terminal-dot.g { background: #10B981; }
+
+.tp-ill-terminal-code {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 8.5px;
+  line-height: 1.35;
+  color: #E2E8F0;
+  margin: 0;
+}
+
+.tp-ill-terminal-code .alert { color: #F87171; }
+.tp-ill-terminal-code .cmd { color: #34D399; font-weight: 700; }
+
+/* 2. Timeline Radar Preview */
+.tp-ill-timeline {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #064E3B 0%, #065F46 100%);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 3. Evidence Seal Vault Preview */
+.tp-ill-evidence {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #1E1B4B 0%, #312E81 100%);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 14px;
+  box-sizing: border-box;
+}
+
+/* 4. Investigation Graph Preview */
+.tp-ill-graph {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #042F2E 0%, #115E59 100%);
+  position: relative;
+}
+
+/* 5. Reports Dossier Preview */
+.tp-ill-reports {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #78350F 0%, #92400E 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+/* ---------------------------------------------------------------------------
+   Section Title & Responsive Layout
+   --------------------------------------------------------------------------- */
+.tp-overview-section-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  width: 100%;
+}
+
+.tp-overview-section-header h2 {
+  font-size: 20px;
+  font-weight: 800;
+  color: #0F172A;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.tp-overview-section-header span {
+  font-size: 12px;
+  color: #638170;
+  font-weight: 500;
+}
+
+/* Responsive Media Queries */
+@media (max-width: 1100px) {
+  .tp-overview-hero-wrapper {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+  .tp-overview-hero-content {
+    align-items: center;
+  }
+  .tp-overview-tools-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .tp-overview-metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 720px) {
+  .tp-overview-tools-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .tp-overview-metrics-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .tp-overview-tools-grid {
+    grid-template-columns: 1fr;
+  }
+}

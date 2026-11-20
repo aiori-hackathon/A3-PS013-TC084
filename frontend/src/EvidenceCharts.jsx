@@ -158,7 +158,16 @@ function RankedBarChart({ rows = [], total = 0, unit = 'events', verificationNot
   );
 }
 
-function EvidenceCharts({ events = [], timestampOf, eventTypeOf, deviceOf, isFailure }) {
+export { RankedBarChart };
+
+function EvidenceCharts({
+  events = [],
+  timestampOf,
+  eventTypeOf,
+  deviceOf,
+  isFailure,
+  showRanked = false,
+}) {
   const data = useMemo(() => {
     const today = new Date();
     today.setUTCHours(0, 0, 0, 0);
@@ -262,7 +271,7 @@ function EvidenceCharts({ events = [], timestampOf, eventTypeOf, deviceOf, isFai
                   dataKey="failed"
                   name="Failure indicators"
                   stackId="auth"
-                  fill="#D9534F"
+                  fill="#FF4D6A"
                   radius={[0, 0, 0, 0]}
                   animationDuration={800}
                   animationEasing="ease-out"
@@ -271,8 +280,8 @@ function EvidenceCharts({ events = [], timestampOf, eventTypeOf, deviceOf, isFai
                   dataKey="ok"
                   name="Nominal / other"
                   stackId="auth"
-                  fill="#2D6A4F"
-                  radius={[3, 3, 0, 0]}
+                  fill="#25543D"
+                  radius={[4, 4, 0, 0]}
                   animationDuration={800}
                   animationEasing="ease-out"
                 />
@@ -295,57 +304,62 @@ function EvidenceCharts({ events = [], timestampOf, eventTypeOf, deviceOf, isFai
         )}
       </article>
 
-      {/* 2. Profile 01: Event types (Compact 1/3 column) */}
-      <article className="tp-card tp-chart-card tp-ranked-card tp-chart-event-types-card">
-        <header className="tp-chart-head">
-          <div className="tp-chart-title-group">
-            <span className="tp-chart-kicker">PROFILE 01</span>
-            <h3>Event types</h3>
-            <p>Distribution across {data.total} collected events</p>
-          </div>
-        </header>
-        <RankedBarChart
-          rows={data.types}
-          total={data.total}
-          tone={0}
-          verificationNote="Signature classified · RFC 5424"
-        />
-      </article>
+      {/* Ranked profiles rendered only when explicitly requested (keeps Overview clean) */}
+      {showRanked && (
+        <>
+          {/* Profile 01: Event types */}
+          <article className="tp-card tp-chart-card tp-ranked-card tp-chart-event-types-card">
+            <header className="tp-chart-head">
+              <div className="tp-chart-title-group">
+                <span className="tp-chart-kicker">PROFILE 01</span>
+                <h3>Event types</h3>
+                <p>Distribution across {data.total} collected events</p>
+              </div>
+            </header>
+            <RankedBarChart
+              rows={data.types}
+              total={data.total}
+              tone={0}
+              verificationNote="Signature classified · RFC 5424"
+            />
+          </article>
 
-      {/* 3. Profile 02: Most targeted usernames (Compact 1/3 column) */}
-      <article className="tp-card tp-chart-card tp-ranked-card tp-chart-usernames-card">
-        <header className="tp-chart-head">
-          <div className="tp-chart-title-group">
-            <span className="tp-chart-kicker">PROFILE 02</span>
-            <h3>Most targeted usernames</h3>
-            <p>Accounts named in collected events</p>
-          </div>
-        </header>
-        <RankedBarChart
-          rows={data.users}
-          total={data.total}
-          tone={2}
-          unit="events"
-          verificationNote="PAM credential audit matched"
-        />
-      </article>
+          {/* Profile 02: Most targeted usernames */}
+          <article className="tp-card tp-chart-card tp-ranked-card tp-chart-usernames-card">
+            <header className="tp-chart-head">
+              <div className="tp-chart-title-group">
+                <span className="tp-chart-kicker">PROFILE 02</span>
+                <h3>Most targeted usernames</h3>
+                <p>Accounts named in collected events</p>
+              </div>
+            </header>
+            <RankedBarChart
+              rows={data.users}
+              total={data.total}
+              tone={2}
+              unit="events"
+              verificationNote="PAM credential audit matched"
+            />
+          </article>
 
-      {/* 4. Profile 03: Source devices (Compact 1/3 column) */}
-      <article className="tp-card tp-chart-card tp-ranked-card tp-chart-devices-card">
-        <header className="tp-chart-head">
-          <div className="tp-chart-title-group">
-            <span className="tp-chart-kicker">PROFILE 03</span>
-            <h3>Source devices</h3>
-            <p>Where the evidence was collected from</p>
-          </div>
-        </header>
-        <RankedBarChart
-          rows={data.devices}
-          total={data.total}
-          tone={3}
-          verificationNote="Hardware node fingerprint active"
-        />
-      </article>
+          {/* Profile 03: Source devices */}
+          <article className="tp-card tp-chart-card tp-ranked-card tp-chart-devices-card">
+            <header className="tp-chart-head">
+              <div className="tp-chart-title-group">
+                <span className="tp-chart-kicker">PROFILE 03</span>
+                <h3>Source devices</h3>
+                <p>Where the evidence was collected from</p>
+              </div>
+            </header>
+            <RankedBarChart
+              rows={data.devices}
+              total={data.total}
+              tone={3}
+              verificationNote="Hardware node fingerprint active"
+            />
+          </article>
+        </>
+      )}
     </section>
   );
 }

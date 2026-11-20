@@ -13,27 +13,25 @@
 
 .tp-chart-card {
   background: #FFFFFF !important;
-  border: 1px solid #CFE2D4 !important;
-  border-radius: 14px !important;
-  padding: 16px 18px 14px !important;
-  box-shadow: 0 4px 14px rgba(35, 84, 58, 0.05) !important;
-  transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 0.24s cubic-bezier(0.16, 1, 0.3, 1),
-              border-color 0.24s ease-out !important;
+  border: 1px solid #D4E5D8 !important;
+  border-radius: 16px !important;
+  padding: 20px 24px 18px !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 6px 16px rgba(0,0,0,0.04) !important;
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1) !important;
   box-sizing: border-box !important;
 }
 
 .tp-chart-card:hover {
-  transform: translateY(-2px) !important;
-  border-color: #74C69D !important;
-  box-shadow: 0 10px 24px -4px rgba(35, 84, 58, 0.12) !important;
+  transform: translateY(-4px) !important;
+  border-color: #25543D !important;
+  box-shadow: 0 12px 28px -4px rgba(37, 84, 61, 0.12), 0 4px 12px rgba(0,0,0,0.04) !important;
 }
 
 /* 1. Full-width Timeline card on top */
 .tp-chart-timeline-card {
   grid-column: 1 / -1 !important;
-  min-height: 290px !important;
-  padding: 18px 20px 14px !important;
+  min-height: 310px !important;
+  padding: 22px 24px 18px !important;
 }
 
 /* 2, 3, 4. Three compact balanced columns below */
@@ -176,14 +174,14 @@
   font-weight: 800 !important;
 }
 
-/* Recharts Forensic Theme Tooltips */
+/* Recharts Forensic Theme Tooltips (Matching 16px Rounded Cards) */
 .tp-recharts-tooltip {
-  background: #10241A !important;
-  color: #FFFFFF !important;
-  border: 1px solid #2B573E !important;
-  border-radius: 8px !important;
-  padding: 8px 12px !important;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.28) !important;
+  background: #FFFFFF !important;
+  color: #11261B !important;
+  border: 1px solid #D4E5D8 !important;
+  border-radius: 16px !important;
+  padding: 12px 16px !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 10px 24px -4px rgba(37, 84, 61, 0.12) !important;
   font-family: 'Inter', system-ui, sans-serif !important;
   font-size: 12px !important;
   line-height: 1.4 !important;
@@ -196,39 +194,48 @@
   align-items: center !important;
   justify-content: space-between !important;
   gap: 12px !important;
-  margin-bottom: 6px !important;
-  padding-bottom: 4px !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+  margin-bottom: 8px !important;
+  padding-bottom: 6px !important;
+  border-bottom: 1px solid #EBF2EC !important;
+}
+
+.tp-recharts-tooltip-head .mono {
+  font-family: 'IBM Plex Mono', monospace !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  color: #25543D !important;
 }
 
 .tp-recharts-tooltip-badge {
-  background: #1C4430 !important;
-  color: #74C69D !important;
+  background: #EAF4EC !important;
+  color: #1B4D36 !important;
+  border: 1px solid #C1DEC8 !important;
   font-family: 'IBM Plex Mono', monospace !important;
   font-size: 10px !important;
   font-weight: 700 !important;
-  padding: 1px 5px !important;
-  border-radius: 4px !important;
+  padding: 2px 6px !important;
+  border-radius: 9999px !important;
 }
 
 .tp-recharts-tooltip-body {
   display: flex !important;
   flex-direction: column !important;
-  gap: 3px !important;
+  gap: 4px !important;
 }
 
 .tp-recharts-tooltip-row {
   display: flex !important;
   align-items: center !important;
-  gap: 6px !important;
+  gap: 8px !important;
   font-size: 11.5px !important;
+  color: #3D5949 !important;
 }
 
 .tp-recharts-tooltip-row strong {
   margin-left: auto !important;
   font-family: 'IBM Plex Mono', monospace !important;
   font-size: 12px !important;
-  color: #FFFFFF !important;
+  color: #11261B !important;
 }
 
 .tp-recharts-pip {
@@ -238,8 +245,8 @@
   flex-shrink: 0 !important;
 }
 
-.tp-recharts-pip.fail { background: #FF6568 !important; }
-.tp-recharts-pip.ok   { background: #52B788 !important; }
+.tp-recharts-pip.fail { background: #FF4D6A !important; }
+.tp-recharts-pip.ok   { background: #25543D !important; }
 
 .tp-chart-empty {
   font-family: 'IBM Plex Mono', monospace !important;

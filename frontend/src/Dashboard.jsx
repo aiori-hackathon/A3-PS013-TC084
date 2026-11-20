@@ -43,6 +43,8 @@ import './styles/TracepointAnimations.css';
 import TracepointMark from './TracepointMark';
 import EvidenceGlobe from './EvidenceGlobe';
 import EvidenceCharts from './EvidenceCharts';
+import GlobeIntro from './GlobeIntro';
+import './styles/TracepointOverviewOverhaul.css';
 import {
   EmblemIngestion,
   EmblemTimeline,
@@ -139,21 +141,22 @@ function SeverityCard({ events }) {
   const max = Math.max(1, ...counts.map(c => c.count));
   return <section className="tp-card tp-distribution"><div className="tp-card-head"><div><h2>Severity breakdown</h2><p>Classification of collected events</p></div></div><div className="tp-severity-list">{counts.map(c => <div className="tp-severity-row" key={c.name}><span className={`tp-sev-dot ${severityClass(c.name)}`}/><span className="tp-sev-label">{c.name}</span><div className="tp-sev-track"><div className={`tp-sev-fill ${severityClass(c.name)}`} style={{ width: `${c.count / max * 100}%` }}/></div><strong>{c.count}</strong></div>)}</div><div className="tp-distribution-foot">Based on event severity fields received from the agent</div></section>;
 }
-function Metric({ label, value, note, icon: Icon, chip, isAlert, style }) {
+function Metric({ label, value, note, icon: Icon, chip, isAlert, style, accent = 'blue' }) {
   return (
-    <div className={`tp-metric ${isAlert ? 'is-alert-metric' : ''}`} style={style}>
+    <div className={`tp-metric-card tp-scroll-reveal ${isAlert ? 'is-alert-metric' : ''}`} style={style}>
+      <div className={`tp-metric-accent-bar accent-${accent}`} aria-hidden="true" />
       <div className="tp-metric-header">
         <span className="tp-metric-label">{label}</span>
         {Icon ? (
           <span className="tp-metric-icon-wrap">
-            <Icon size={24} />
+            <Icon size={22} />
           </span>
         ) : null}
       </div>
       <div className="tp-metric-body">
         <strong className="tp-metric-value">{value}</strong>
         {chip ? (
-          <span className={`tp-metric-chip ${isAlert ? 'alert' : 'normal'}`}>
+          <span className={`tp-metric-chip ${isAlert ? 'alert' : `accent-${accent}`}`}>
             <span className="tp-metric-chip-pip" aria-hidden="true" />
             {chip}
           </span>
@@ -714,6 +717,20 @@ export default function Dashboard({ user, onSignOut }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const progressBarRef = useRef(null);
   const [backToTopVisible, setBackToTopVisible] = useState(false);
+  const [showIntro, setShowIntro] = useState(() => {
+    try {
+      return !sessionStorage.getItem('intro-played');
+    } catch {
+      return false;
+    }
+  });
+
+  const replayIntro = useCallback(() => {
+    try {
+      sessionStorage.removeItem('intro-played');
+    } catch {}
+    setShowIntro(true);
+  }, []);
 
   // Ultra-lightweight native scroll progress & back-to-top handler (zero JS friction)
   useEffect(() => {
@@ -942,154 +959,333 @@ export default function Dashboard({ user, onSignOut }) {
     {/* TRACEPOINT_SINGLE_NAV_V1: status and account live in primary navigation */}
 
       <div className="tp-content">
-        {page !== 'about' && (
+        {showIntro && page === 'overview' && (
+          <GlobeIntro
+            onComplete={() => setShowIntro(false)}
+            events={events}
+            severityOf={severity}
+            deviceOf={device}
+            isFailure={fail}
+            timestampOf={timestamp}
+          />
+        )}
+        {page !== 'about' && page !== 'overview' && (
           <div className={`tp-page-header ${page === 'guide' ? 'tp-page-header-guide' : ''}`}>
             <div>
               <h1>{title}</h1>
-              <p>{page === 'overview' ? 'Security activity and collected evidence across your workspace.' : page === 'timeline' ? 'Explore, filter and inspect security events.' : page === 'ingestion' ? 'Explore sample logs and follow them through the ingestion pipeline.' : page === 'evidence' ? 'Evidence collection and integrity records.' : page === 'graph' ? 'Explore evidence-linked authentication sequences.' : page === 'investigations' ? 'Review events and prepare incident investigations.' : page === 'netlab' ? 'Network topology, observations and evidence-based root-cause findings.' : page === 'guide' ? 'Follow the workflow from raw log ingestion to an incident report.' : 'Export collected security activity.'}</p>
+              <p>{page === 'timeline' ? 'Explore, filter and inspect security events.' : page === 'ingestion' ? 'Explore sample logs and follow them through the ingestion pipeline.' : page === 'evidence' ? 'Evidence collection and integrity records.' : page === 'graph' ? 'Explore evidence-linked authentication sequences.' : page === 'investigations' ? 'Review events and prepare incident investigations.' : page === 'netlab' ? 'Network topology, observations and evidence-based root-cause findings.' : page === 'guide' ? 'Follow the workflow from raw log ingestion to an incident report.' : 'Export collected security activity.'}</p>
             </div>
             <div className="tp-actions">
-              {page !== 'overview' && (
-                <Button
-                  variant="outline"
-                  className="tp-button"
-                  onClick={() => {
-                    refresh();
-                    setEvidenceRefresh(v => v + 1);
-                  }}
-                  disabled={loading}
-                >
-                  <RefreshCw size={16} className={loading ? 'tp-spin' : ''}/> Refresh
-                </Button>
-              )}
+              <Button
+                variant="outline"
+                className="tp-button"
+                onClick={() => {
+                  refresh();
+                  setEvidenceRefresh(v => v + 1);
+                }}
+                disabled={loading}
+              >
+                <RefreshCw size={16} className={loading ? 'tp-spin' : ''}/> Refresh
+              </Button>
               {page === 'timeline' && <Button className="tp-button primary" onClick={exportCsv}><ArrowDownToLine size={16}/> Export CSV</Button>}
             </div>
           </div>
         )}
       {error && <div className="tp-error" role="alert">{error}</div>}
-      {page === 'overview' && <>
-      <div className="tp-forensic-intro">
-        <EvidenceGlobe
-          events={events}
-          severityOf={severity}
-          deviceOf={device}
-          isFailure={fail}
-          timestampOf={timestamp}
-        />
-        <div className="tp-forensic-intro-copy">
-          <span className="tp-forensic-kicker"><Activity size={14}/> AIORI-3 · NATIONAL TELEMETRY OVERVIEW</span>
-          <strong>Follow the signal. Verify the evidence.</strong>
-          <p>Real-time internet operations and security incident telemetry for Indian infrastructure. Every evidence chain cryptographically sealed.</p>
-        </div>
-        <div className="tp-forensic-intro-side">
-          <span>COLLECTION STATUS</span>
-          <strong><span className="tp-forensic-status-dot"/> {loading ? 'Loading events…' : `${events.length} events indexed`}</strong>
-          <small>Based on the current event timeline</small>
-        </div>
-        <div className="aiori-spotlight-pill">
-          <div className="aiori-spotlight-top">
-            <span className="aiori-flag-icon">🇮🇳</span>
-            <strong>AIORI-3 Telemetry Observation Hub</strong>
-            <span className="aiori-active-chip">Active Node</span>
-          </div>
-          <div className="aiori-spotlight-sub">
-            Locked on India (<span className="mono">21.5°N, 78.5°E</span>) · Continuous Cryptographic Verification
-          </div>
-        </div>
-      </div>
-      {/* 1. Core KPIs directly under Hero */}
-      <div className="tp-metrics tp-forensic-metrics tp-scroll-reveal tp-stagger-parent">
-        <Metric
-          style={{ '--card-idx': 0 }}
-          label="Collected events"
-          value={loading ? '…' : <AnimatedCount value={events.length} />}
-          note="Available for inspection"
-          icon={EmblemMetricCollected}
-          chip="LIVE PROBE"
-        />
-        <Metric
-          style={{ '--card-idx': 1 }}
-          label="Authentication failures"
-          value={loading ? '…' : <AnimatedCount value={failures} />}
-          note={`${affectedDevices} source ${affectedDevices === 1 ? 'device' : 'devices'} affected`}
-          icon={EmblemMetricFailures}
-          chip={failures > 0 ? 'ACTIVE ALERT' : 'NOMINAL'}
-          isAlert={failures > 0}
-        />
-        <Metric
-          style={{ '--card-idx': 2 }}
-          label="Source devices"
-          value={loading ? '…' : <AnimatedCount value={devices} />}
-          note="Unique device identifiers"
-          icon={EmblemMetricDevices}
-          chip="VERIFIED"
-        />
-        <Metric
-          style={{ '--card-idx': 3 }}
-          label="Users observed"
-          value={loading ? '…' : <AnimatedCount value={users} />}
-          note="Unique usernames"
-          icon={EmblemMetricUsers}
-          chip="IDENTIFIED"
-        />
-      </div>
-
-      {/* 2. Interactive Tool Launchpad with custom vector emblems */}
-      <nav className="tp-portal-services tp-scroll-reveal tp-stagger-parent" aria-label="Quick access to TracePoint tools">
-        {[
-          ['ingestion', 'Log Ingestion Lab', 'Submit & parse raw log telemetry', EmblemIngestion, 'INGEST-01', 'LIVE'],
-          ['timeline', 'Event Timeline', 'Search and filter collected events', EmblemTimeline, 'RADAR-02', 'ACTIVE'],
-          ['evidence', 'Evidence Register', 'Review cryptographic SHA-256 seals', EmblemEvidence, 'VAULT-03', 'SEALED'],
-          ['graph', 'Investigation Graph', 'Trace multi-hop attack topologies', EmblemGraph, 'GRAPH-04', 'TOPOLOGY'],
-          ['reports', 'Reports & Export', 'Compile statutory forensic dossiers', EmblemReports, 'AUDIT-05', 'EXPORT'],
-        ].map(([id, label, description, Emblem, code, badge], idx) => (
-          <button key={id} type="button" className="tp-portal-service" style={{ '--card-idx': idx }} onClick={() => openPage(id)}>
-            <div className="tp-portal-service-top">
-              <span className="tp-portal-service-icon">
-                <Emblem size={26} />
-              </span>
-              <div className="tp-portal-tags">
-                <span className="tp-portal-code">{code}</span>
-                <span className={`tp-portal-badge ${id}`}>{badge}</span>
+      {page === 'overview' && (
+        <div className="tp-overview-container">
+          {/* 1. Overview Hero Header with Docked Globe */}
+          <section className="tp-overview-hero-wrapper tp-scroll-reveal" aria-label="Overview Hero">
+            <div className="tp-overview-hero-content">
+              <div className="tp-overview-eyebrow">
+                <span>🇮🇳</span> AIORI-3 · TELEMETRY HUB
+              </div>
+              <h1 className="tp-overview-title">
+                Follow the signal. <span className="tp-overview-accent">Verify the evidence.</span>
+              </h1>
+              <p className="tp-overview-subtitle">
+                Real-time internet operations and security incident telemetry for Indian infrastructure.
+                Every evidence chain cryptographically sealed with RFC 5424 normalization.
+              </p>
+              <div className="tp-overview-hero-meta">
+                <div className="tp-overview-status-pill">
+                  <span className="tp-overview-status-dot" aria-hidden="true" />
+                  <span>{loading ? 'Connecting telemetry probe…' : `${events.length.toLocaleString()} events indexed`}</span>
+                </div>
+                <div className="tp-overview-status-pill">
+                  <span>Locked: 21.5°N, 78.5°E</span>
+                </div>
+                <button
+                  type="button"
+                  className="tp-intro-replay-btn"
+                  onClick={replayIntro}
+                  title="Replay cinematic globe intro animation"
+                >
+                  ↺ Replay Intro
+                </button>
               </div>
             </div>
-            <div className="tp-portal-service-copy">
-              <strong>{label}</strong>
-              <small>{description}</small>
+            <div className="tp-overview-hero-globe-slot">
+              <EvidenceGlobe
+                events={events}
+                severityOf={severity}
+                deviceOf={device}
+                isFailure={fail}
+                timestampOf={timestamp}
+              />
             </div>
-            <div className="tp-portal-service-open">
-              <span>Open tool</span>
-              <ChevronRight size={14} className="tp-portal-arrow" aria-hidden="true" />
-            </div>
-          </button>
-        ))}
-      </nav>
+          </section>
 
-      {/* 3. Deep Evidence & Telemetry Analytics */}
-      <EvidenceCharts
-        events={events}
-        timestampOf={timestamp}
-        eventTypeOf={eventType}
-        deviceOf={device}
-        isFailure={fail}
-      />
-      <div className="tp-forensic-section-title tp-scroll-reveal"><div><span className="tp-forensic-section-index">01 / ACTIVITY</span><h2>Event analysis</h2></div><span>Last 7 days · current collection</span></div>
-      <div className="tp-analytics tp-forensic-analytics tp-scroll-reveal tp-stagger-parent"><TrendChart events={events}/><SeverityCard events={events}/></div>
-      <div className="tp-forensic-review tp-scroll-reveal tp-stagger-parent">
-        <div className="tp-forensic-review-title">
-          <img src="/icons/3d/warning-triangle.png" alt="" className="tp-3d-inline-icon" aria-hidden="true" />
-          <div><strong>Data quality signals</strong><span>Indicators detected in collected events, not verified incidents</span></div>
+          <hr className="tp-section-divider" />
+
+          {/* 2. Operational Signals Section Header & Metric Cards */}
+          <div className="tp-overview-section-header tp-scroll-reveal">
+            <div>
+              <h2>Operational Signals</h2>
+            </div>
+            <span>Live probe telemetry</span>
+          </div>
+
+          <div className="tp-overview-metrics-grid tp-scroll-reveal tp-stagger-parent">
+            <Metric
+              style={{ '--card-idx': 0 }}
+              label="Collected events"
+              value={loading ? '…' : <AnimatedCount value={events.length} />}
+              note="Available for inspection"
+              icon={EmblemMetricCollected}
+              chip="LIVE PROBE"
+              accent="blue"
+            />
+            <Metric
+              style={{ '--card-idx': 1 }}
+              label="Authentication failures"
+              value={loading ? '…' : <AnimatedCount value={failures} />}
+              note={`${affectedDevices} source ${affectedDevices === 1 ? 'device' : 'devices'} affected`}
+              icon={EmblemMetricFailures}
+              chip={failures > 0 ? 'ACTIVE ALERT' : 'NOMINAL'}
+              isAlert={failures > 0}
+              accent="red"
+            />
+            <Metric
+              style={{ '--card-idx': 2 }}
+              label="Source devices"
+              value={loading ? '…' : <AnimatedCount value={devices} />}
+              note="Unique device identifiers"
+              icon={EmblemMetricDevices}
+              chip="VERIFIED"
+              accent="green"
+            />
+            <Metric
+              style={{ '--card-idx': 3 }}
+              label="Users observed"
+              value={loading ? '…' : <AnimatedCount value={users} />}
+              note="Unique usernames"
+              icon={EmblemMetricUsers}
+              chip="IDENTIFIED"
+              accent="sage"
+            />
+          </div>
+
+          <hr className="tp-section-divider" />
+
+          {/* 3. Forensic Tool Launchpad Section Header & Cards */}
+          <div className="tp-overview-section-header tp-scroll-reveal">
+            <div>
+              <h2>Forensic Tool Launchpad</h2>
+            </div>
+            <span>Deep inspection modules</span>
+          </div>
+
+          <nav className="tp-overview-tools-grid tp-scroll-reveal tp-stagger-parent" aria-label="Quick access to TracePoint tools">
+            {[
+              {
+                id: 'ingestion',
+                label: 'Log Ingestion Lab',
+                description: 'Submit & parse raw log telemetry',
+                code: 'INGEST-01',
+                badge: 'LIVE',
+                badgeClass: 'live',
+                renderIllustration: () => (
+                  <div className="tp-ill-terminal">
+                    <div className="tp-ill-terminal-bar">
+                      <span className="tp-ill-terminal-dot r" />
+                      <span className="tp-ill-terminal-dot y" />
+                      <span className="tp-ill-terminal-dot g" />
+                    </div>
+                    <div className="tp-ill-terminal-code">
+                      <div><span className="cmd">$</span> tracepoint ingest --live</div>
+                      <div>[RFC 5424] <span className="alert">AUTH_FAIL</span> root</div>
+                      <div>SHA-256 genesis linked ✓</div>
+                    </div>
+                  </div>
+                ),
+              },
+              {
+                id: 'timeline',
+                label: 'Event Timeline',
+                description: 'Search & filter collected events',
+                code: 'RADAR-02',
+                badge: 'ACTIVE',
+                badgeClass: 'active',
+                renderIllustration: () => (
+                  <div className="tp-ill-timeline">
+                    <svg viewBox="0 0 160 70" width="100%" height="100%">
+                      <line x1="10" y1="35" x2="150" y2="35" stroke="rgba(255,255,255,0.25)" strokeWidth="1.5" strokeDasharray="3 3" />
+                      <circle cx="28" cy="35" r="4.5" fill="#34D399" />
+                      <circle cx="68" cy="35" r="6" fill="#F87171" stroke="#FFFFFF" strokeWidth="1.5" />
+                      <circle cx="108" cy="35" r="4.5" fill="#34D399" />
+                      <circle cx="138" cy="35" r="4.5" fill="#60A5FA" />
+                      <path d="M 68 35 L 68 16" stroke="#F87171" strokeWidth="1.2" strokeDasharray="2 2" />
+                      <rect x="50" y="6" width="36" height="12" rx="3" fill="#13281E" />
+                      <text x="68" y="15" fill="#F87171" fontSize="7" fontFamily="monospace" textAnchor="middle" fontWeight="bold">ALERT</text>
+                    </svg>
+                  </div>
+                ),
+              },
+              {
+                id: 'evidence',
+                label: 'Evidence Register',
+                description: 'Review cryptographic SHA-256 seals',
+                code: 'VAULT-03',
+                badge: 'SEALED',
+                badgeClass: 'sealed',
+                renderIllustration: () => (
+                  <div className="tp-ill-evidence">
+                    <svg viewBox="0 0 160 70" width="100%" height="100%">
+                      <rect x="15" y="14" width="60" height="42" rx="6" fill="rgba(255,255,255,0.08)" stroke="#818CF8" strokeWidth="1.2" />
+                      <circle cx="45" cy="32" r="7" fill="none" stroke="#C7D2FE" strokeWidth="1.5" />
+                      <rect x="40" y="31" width="10" height="9" rx="1.5" fill="#C7D2FE" />
+                      <path d="M 82 35 L 98 35" stroke="#A5B4FC" strokeWidth="1.5" strokeDasharray="2 2" />
+                      <rect x="105" y="18" width="42" height="34" rx="4" fill="rgba(255,255,255,0.12)" stroke="#C7D2FE" strokeWidth="1" />
+                      <text x="126" y="32" fill="#E0E7FF" fontSize="7.5" fontFamily="monospace" textAnchor="middle" fontWeight="bold">SHA-256</text>
+                      <text x="126" y="43" fill="#34D399" fontSize="6.5" fontFamily="monospace" textAnchor="middle">SEALED ✓</text>
+                    </svg>
+                  </div>
+                ),
+              },
+              {
+                id: 'graph',
+                label: 'Investigation Graph',
+                description: 'Trace multi-hop attack topologies',
+                code: 'GRAPH-04',
+                badge: 'TOPOLOGY',
+                badgeClass: 'topology',
+                renderIllustration: () => (
+                  <div className="tp-ill-graph">
+                    <svg viewBox="0 0 160 70" width="100%" height="100%">
+                      <line x1="30" y1="35" x2="80" y2="20" stroke="#2DD4BF" strokeWidth="1.5" opacity="0.7" />
+                      <line x1="80" y1="20" x2="130" y2="45" stroke="#F43F5E" strokeWidth="1.8" />
+                      <line x1="30" y1="35" x2="80" y2="52" stroke="#2DD4BF" strokeWidth="1.5" opacity="0.7" />
+                      <circle cx="30" cy="35" r="6" fill="#14B8A6" stroke="#FFFFFF" strokeWidth="1.5" />
+                      <circle cx="80" cy="20" r="5" fill="#2DD4BF" />
+                      <circle cx="80" cy="52" r="5" fill="#2DD4BF" />
+                      <circle cx="130" cy="45" r="7.5" fill="#F43F5E" stroke="#FFFFFF" strokeWidth="1.8" />
+                      <circle cx="130" cy="45" r="12" fill="none" stroke="#F43F5E" opacity="0.4" strokeWidth="1" />
+                    </svg>
+                  </div>
+                ),
+              },
+              {
+                id: 'reports',
+                label: 'Reports & Export',
+                description: 'Compile statutory forensic dossiers',
+                code: 'AUDIT-05',
+                badge: 'EXPORT',
+                badgeClass: 'export',
+                renderIllustration: () => (
+                  <div className="tp-ill-reports">
+                    <svg viewBox="0 0 160 70" width="100%" height="100%">
+                      <rect x="42" y="10" width="46" height="52" rx="4" fill="#FEF3C7" stroke="#D97706" strokeWidth="1.2" />
+                      <line x1="50" y1="20" x2="72" y2="20" stroke="#92400E" strokeWidth="1.8" strokeLinecap="round" />
+                      <line x1="50" y1="26" x2="80" y2="26" stroke="#B45309" strokeWidth="1.2" strokeLinecap="round" />
+                      <line x1="50" y1="32" x2="78" y2="32" stroke="#B45309" strokeWidth="1.2" strokeLinecap="round" />
+                      <line x1="50" y1="38" x2="68" y2="38" stroke="#B45309" strokeWidth="1.2" strokeLinecap="round" />
+                      <circle cx="75" cy="48" r="7" fill="#DC2626" />
+                      <text x="75" y="51" fill="#FFFFFF" fontSize="6.5" fontFamily="monospace" textAnchor="middle" fontWeight="bold">OFFICIAL</text>
+                      <circle cx="112" cy="35" r="14" fill="rgba(255,255,255,0.15)" stroke="#FDE68A" strokeWidth="1" />
+                      <path d="M 112 28 L 112 40 M 108 36 L 112 40 L 116 36" stroke="#FFFFFF" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </div>
+                ),
+              },
+            ].map((tool, idx) => (
+              <button
+                key={tool.id}
+                type="button"
+                className="tp-tool-card"
+                style={{ '--card-idx': idx }}
+                onClick={() => openPage(tool.id)}
+              >
+                <div className="tp-tool-illustration">
+                  {tool.renderIllustration()}
+                </div>
+                <div className="tp-tool-meta-row">
+                  <span className="tp-tool-code">{tool.code}</span>
+                  <span className={`tp-tool-badge ${tool.badgeClass}`}>{tool.badge}</span>
+                </div>
+                <div className="tp-tool-copy">
+                  <strong className="tp-tool-title">{tool.label}</strong>
+                  <p className="tp-tool-desc">{tool.description}</p>
+                </div>
+                <div className="tp-tool-footer">
+                  <span className="tp-tool-link-text">
+                    Open tool
+                    <ArrowRight size={13} className="tp-tool-arrow" aria-hidden="true" />
+                  </span>
+                </div>
+              </button>
+            ))}
+          </nav>
+
+          <hr className="tp-section-divider" />
+
+          {/* 4. Authentication Outcomes Timeline Bar Chart */}
+          <div className="tp-overview-section-header tp-scroll-reveal">
+            <div>
+              <h2>Authentication Outcomes Timeline</h2>
+            </div>
+            <span>Stacked telemetry · Nominal vs Failure indicators</span>
+          </div>
+
+          <EvidenceCharts
+            events={events}
+            timestampOf={timestamp}
+            eventTypeOf={eventType}
+            deviceOf={device}
+            isFailure={fail}
+            showRanked={false}
+          />
+
+          <hr className="tp-section-divider" />
+
+          {/* 5. Data Quality Signals */}
+          <div className="tp-forensic-review tp-scroll-reveal tp-stagger-parent">
+            <div className="tp-forensic-review-title">
+              <img src="/icons/3d/warning-triangle.png" alt="" className="tp-3d-inline-icon" aria-hidden="true" />
+              <div><strong>Data quality signals</strong><span>Indicators detected in collected events, not verified incidents</span></div>
+            </div>
+            <div className="tp-forensic-review-items">
+              <div><strong>{loading ? '…' : parsingIssues}</strong><span>Events with parsing gaps</span></div>
+              <div><strong>{loading ? '…' : timestampIssues}</strong><span>Inferred or conflicting timestamps</span></div>
+              <div><strong>{loading ? '…' : clockAhead}</strong><span>Events dated after receipt</span></div>
+              <div><strong>{loading ? '…' : failures}</strong><span>Events matching failure indicators</span></div>
+            </div>
+          </div>
+
+          <hr className="tp-section-divider" />
+
+          {/* 6. Recent Security Events */}
+          <div className="tp-forensic-section-title tp-scroll-reveal">
+            <div><span className="tp-forensic-section-index">02 / EVIDENCE</span><h2>Recent security events</h2></div>
+            <button className="tp-forensic-all-events" onClick={() => openPage('timeline')}>
+              Open event explorer <ChevronRight size={16} />
+            </button>
+          </div>
+          <section className="tp-card tp-events-card tp-forensic-events tp-scroll-reveal">
+            <EventTable rows={sorted.slice(0, 6)} loading={loading} onSelect={setSelected} />
+          </section>
         </div>
-        <div className="tp-forensic-review-items">
-          <div><strong>{loading ? '…' : parsingIssues}</strong><span>Events with parsing gaps</span></div>
-          <div><strong>{loading ? '…' : timestampIssues}</strong><span>Inferred or conflicting timestamps</span></div>
-          <div><strong>{loading ? '…' : clockAhead}</strong><span>Events dated after receipt</span></div>
-          <div><strong>{loading ? '…' : failures}</strong><span>Events matching failure indicators</span></div>
-        </div>
-      </div>
-      <div className="tp-forensic-section-title tp-scroll-reveal"><div><span className="tp-forensic-section-index">02 / EVIDENCE</span><h2>Recent security events</h2></div><button className="tp-forensic-all-events" onClick={() => openPage('timeline')}>Open event explorer <ChevronRight size={16}/></button></div>
-      <section className="tp-card tp-events-card tp-forensic-events tp-scroll-reveal"><EventTable rows={sorted.slice(0, 6)} loading={loading} onSelect={setSelected}/></section>
-    </>}
+      )}
     {/* TRACEPOINT_TIMELINE_WORKSPACE_V1 */}
     {page === 'timeline' && <div className="tp-timeline-workspace">
       <div className="tp-timeline-summary tp-scroll-reveal tp-stagger-parent" aria-label="Timeline summary">
