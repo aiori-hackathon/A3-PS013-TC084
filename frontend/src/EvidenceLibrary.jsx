@@ -225,7 +225,6 @@ export default function EvidenceLibrary({ refreshSignal = 0 }) {
               <AnimatedEvidenceCount value={batches.length} />
             </strong>
             <span className="tp-ev-stat-badge badge-emerald">
-              <span className="tp-ev-stat-pulse-dot dot-emerald" />
               COLLECTED
             </span>
           </div>
@@ -245,7 +244,6 @@ export default function EvidenceLibrary({ refreshSignal = 0 }) {
               <AnimatedEvidenceCount value={totalLines} />
             </strong>
             <span className="tp-ev-stat-badge badge-cyan">
-              <span className="tp-ev-stat-pulse-dot dot-cyan" />
               TELEMETRY
             </span>
           </div>
@@ -265,7 +263,6 @@ export default function EvidenceLibrary({ refreshSignal = 0 }) {
               <AnimatedEvidenceCount value={verifiedCount} />
             </strong>
             <span className="tp-ev-stat-badge badge-violet">
-              <span className="tp-ev-stat-pulse-dot dot-violet" />
               SHA-256 SEAL
             </span>
           </div>

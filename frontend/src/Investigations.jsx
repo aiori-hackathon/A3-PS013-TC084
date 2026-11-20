@@ -302,7 +302,6 @@ export default function Investigations({ events = [] }) {
             <AnimatedMetricCount value={counts.total} />
           </strong>
           <span className="tp-stat-badge badge-violet">
-            <span className="tp-stat-pulse-dot dot-violet" />
             REGISTERED
           </span>
         </div>
@@ -322,7 +321,6 @@ export default function Investigations({ events = [] }) {
             <AnimatedMetricCount value={counts.open} />
           </strong>
           <span className="tp-stat-badge badge-amber">
-            <span className="tp-stat-pulse-dot dot-amber" />
             ACTIVE
           </span>
         </div>
@@ -342,7 +340,6 @@ export default function Investigations({ events = [] }) {
             <AnimatedMetricCount value={counts.investigating} />
           </strong>
           <span className="tp-stat-badge badge-cyan">
-            <span className="tp-stat-pulse-dot dot-cyan" />
             IN PROGRESS
           </span>
         </div>
@@ -362,7 +359,6 @@ export default function Investigations({ events = [] }) {
             <AnimatedMetricCount value={counts.resolved} />
           </strong>
           <span className="tp-stat-badge badge-emerald">
-            <span className="tp-stat-pulse-dot dot-emerald" />
             CLOSED
           </span>
         </div>

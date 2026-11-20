@@ -1035,14 +1035,14 @@ export default function Dashboard({ user, onSignOut }) {
 
     {/* TRACEPOINT_PUBLIC_PORTAL_LAYOUT_V1: formal utility strip */}
     <div className="tp-public-utility-bar">
-      <div className="tp-public-utility-label"><span style={{ marginRight: '6px' }}>🇮🇳</span><strong>AIORI-3 / TRACEPOINT</strong><span>/</span><span>National Internet Operations & Incident Investigation</span></div>
+      <div className="tp-public-utility-label"><TracepointMark size={14} className="tp-utility-mark" style={{ marginRight: '8px', verticalAlign: 'middle', display: 'inline-block' }} /><strong>AIORI-3 / TRACEPOINT</strong><span>/</span><span>National Internet Operations & Incident Investigation</span></div>
       <div className="tp-public-utility-state" role="status"><span className={`tp-public-utility-dot ${apiStatus === 'online' ? 'is-online' : apiStatus === 'offline' ? 'is-offline' : ''}`} aria-hidden="true" />{apiStatus === 'online' ? 'National Gateway Online' : apiStatus === 'offline' ? 'Gateway Offline' : 'Connecting…'}<span>·</span><span>AIORI-3 Node</span></div>
     </div>
 
     <aside className={`tp-sidebar ${mobileOpen ? 'tp-open' : ''}`} data-lenis-prevent="true">
       <div className="aiori-sidebar-brand">
         <div className="aiori-brand-row">
-          <span className="aiori-brand-flag">🇮🇳</span>
+          <TracepointMark size={22} className="aiori-brand-logo" />
           <span className="aiori-brand-title">Tracepoint<span className="aiori-brand-dot">.</span></span>
           <span className="aiori-brand-badge">AIORI-3</span>
         </div>
@@ -1118,9 +1118,6 @@ export default function Dashboard({ user, onSignOut }) {
                 boxShadow: 'none',
               }}
             >
-              <div className="tp-overview-eyebrow">
-                <span>🇮🇳</span> AIORI-3 · TELEMETRY HUB
-              </div>
               <h1
                 className="tp-overview-title"
                 style={{
@@ -1148,7 +1145,6 @@ export default function Dashboard({ user, onSignOut }) {
                 }}
               >
                 <div className="tp-overview-status-pill">
-                  <span className="tp-overview-status-dot" aria-hidden="true" />
                   <span>{loading ? 'Connecting telemetry probe…' : `${events.length.toLocaleString()} events indexed`}</span>
                 </div>
                 <div className="tp-overview-status-pill">
@@ -1187,7 +1183,6 @@ export default function Dashboard({ user, onSignOut }) {
               <div className="tp-globe-floating-card tp-card-top-right" role="status">
                 <div className="tp-floating-card-header">
                   <div className="tp-floating-pill-row">
-                    <span className="tp-floating-card-dot" aria-hidden="true" />
                     <span className="tp-floating-card-label">NOW MONITORING</span>
                   </div>
                   <span className="tp-floating-badge-mono">RFC 5424</span>
@@ -1238,9 +1233,9 @@ export default function Dashboard({ user, onSignOut }) {
                   SHA-256 Merkle Provenance
                 </div>
                 <div className="tp-floating-card-tags">
-                  <span className="tp-floating-tag">● Verified</span>
-                  <span className="tp-floating-tag">● Immutable</span>
-                  <span className="tp-floating-tag">● Live</span>
+                  <span className="tp-floating-tag">Verified</span>
+                  <span className="tp-floating-tag">Immutable</span>
+                  <span className="tp-floating-tag">Live</span>
                 </div>
               </div>
             </div>
@@ -1264,7 +1259,7 @@ export default function Dashboard({ user, onSignOut }) {
               chip="LIVE PROBE"
               accent="blue"
               terminalHeader="ingest.stream — rfc5424"
-              terminalTag="● LIVE"
+              terminalTag="LIVE"
               terminalTagClass="live"
               terminalLines={[
                 <>
@@ -1291,7 +1286,7 @@ export default function Dashboard({ user, onSignOut }) {
               isAlert={failures > 0}
               accent="red"
               terminalHeader="auth_watchdog — alert.err"
-              terminalTag={failures > 0 ? "● CRITICAL" : "● NOMINAL"}
+              terminalTag={failures > 0 ? "CRITICAL" : "NOMINAL"}
               terminalTagClass={failures > 0 ? "alert-blink" : "green"}
               terminalLines={[
                 <>
@@ -1317,17 +1312,17 @@ export default function Dashboard({ user, onSignOut }) {
               chip="VERIFIED"
               accent="green"
               terminalHeader="net.topology — arp_matrix"
-              terminalTag="● 2 NODES"
+              terminalTag="2 NODES"
               terminalTagClass="green"
               terminalLines={[
                 <>
                   <span className="t-prompt">$</span> arp-probe --subnet=192.168.0.0
                 </>,
                 <>
-                  <span className="t-node">● DEV-01:</span> 192.168.1.42 <span className="t-badge-mini green">UP</span>
+                  <span className="t-node">DEV-01:</span> 192.168.1.42 <span className="t-badge-mini green">UP</span>
                 </>,
                 <>
-                  <span className="t-node">● DEV-02:</span> 192.168.1.88 <span className="t-badge-mini green">SEALED</span>
+                  <span className="t-node">DEV-02:</span> 192.168.1.88 <span className="t-badge-mini green">SEALED</span>
                 </>,
                 <>
                   <span className="t-dim">link: gigabit_eth (0 drop)</span> <span className="t-cursor">▋</span>
@@ -1343,7 +1338,7 @@ export default function Dashboard({ user, onSignOut }) {
               chip="IDENTIFIED"
               accent="sage"
               terminalHeader="iam.audit — identity.log"
-              terminalTag="● 2 USERS"
+              terminalTag="2 USERS"
               terminalTagClass="purple"
               terminalLines={[
                 <>
@@ -1552,7 +1547,7 @@ export default function Dashboard({ user, onSignOut }) {
               chip={parsingIssues > 0 ? "GAPS" : "CLEAN"}
               accent="amber"
               terminalHeader="schema_linter — rfc5424"
-              terminalTag={parsingIssues > 0 ? `● ${parsingIssues} GAPS` : "● CLEAN"}
+              terminalTag={parsingIssues > 0 ? `${parsingIssues} GAPS` : "CLEAN"}
               terminalTagClass="amber"
               terminalLines={[
                 <>
@@ -1579,7 +1574,7 @@ export default function Dashboard({ user, onSignOut }) {
               chip={timestampIssues > 0 ? "SKEW" : "SYNCED"}
               accent="amber"
               terminalHeader="ntp_sync — clock_drift.io"
-              terminalTag={timestampIssues > 0 ? `● ${timestampIssues} SKEW` : "● LOCKED"}
+              terminalTag={timestampIssues > 0 ? `${timestampIssues} SKEW` : "LOCKED"}
               terminalTagClass="amber"
               terminalLines={[
                 <>
@@ -1606,7 +1601,7 @@ export default function Dashboard({ user, onSignOut }) {
               chip="NOMINAL"
               accent="sage"
               terminalHeader="chrono_guard — causality.lock"
-              terminalTag="● 0 NOMINAL"
+              terminalTag="0 NOMINAL"
               terminalTagClass="sage"
               terminalLines={[
                 <>
@@ -1634,7 +1629,7 @@ export default function Dashboard({ user, onSignOut }) {
               isAlert={failures > 0}
               accent="red"
               terminalHeader="heuristics — sig_matcher.bin"
-              terminalTag={failures > 0 ? `● ${failures} MATCHED` : "● CLEAN"}
+              terminalTag={failures > 0 ? `${failures} MATCHED` : "CLEAN"}
               terminalTagClass={failures > 0 ? "alert-blink" : "green"}
               terminalLines={[
                 <>

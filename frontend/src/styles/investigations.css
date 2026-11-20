@@ -283,61 +283,110 @@ html .tp-app .tp-graph-phase5 .tp-graph-stats > .tp-card strong.tp-stat-value {
 .tp-stat-badge {
   display: inline-flex !important;
   align-items: center !important;
-  gap: 6px !important;
-  padding: 4px 9px !important;
+  justify-content: center !important;
+  padding: 4px 10px !important;
   border-radius: 999px !important;
-  font-size: 10.5px !important;
-  font-weight: 750 !important;
-  letter-spacing: 0.05em !important;
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.07em !important;
   text-transform: uppercase !important;
   white-space: nowrap !important;
+  transition: all 0.25s ease !important;
+  cursor: default !important;
 }
 .tp-stat-badge.badge-emerald {
   background: rgba(16, 185, 129, 0.14) !important;
   color: #065f46 !important;
+  border: 1px solid rgba(16, 185, 129, 0.45) !important;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.25), inset 0 0 4px rgba(16, 185, 129, 0.15) !important;
+  animation: tpStatGlowEmerald 2.4s infinite ease-in-out !important;
 }
 .tp-stat-badge.badge-cyan {
   background: rgba(14, 165, 233, 0.14) !important;
   color: #0369a1 !important;
+  border: 1px solid rgba(14, 165, 233, 0.45) !important;
+  box-shadow: 0 0 10px rgba(14, 165, 233, 0.25), inset 0 0 4px rgba(14, 165, 233, 0.15) !important;
+  animation: tpStatGlowCyan 2.4s infinite ease-in-out !important;
 }
 .tp-stat-badge.badge-violet {
   background: rgba(139, 92, 246, 0.14) !important;
   color: #5b21b6 !important;
+  border: 1px solid rgba(139, 92, 246, 0.45) !important;
+  box-shadow: 0 0 10px rgba(139, 92, 246, 0.25), inset 0 0 4px rgba(139, 92, 246, 0.15) !important;
+  animation: tpStatGlowViolet 2.4s infinite ease-in-out !important;
 }
 .tp-stat-badge.badge-amber {
   background: rgba(245, 158, 11, 0.14) !important;
   color: #92400e !important;
+  border: 1px solid rgba(245, 158, 11, 0.5) !important;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.25), inset 0 0 4px rgba(245, 158, 11, 0.15) !important;
+  animation: tpStatGlowAmber 2.4s infinite ease-in-out !important;
 }
 
-/* Pulsing radar dots */
+@keyframes tpStatGlowEmerald {
+  0%, 100% {
+    box-shadow: 0 0 6px rgba(16, 185, 129, 0.25), inset 0 0 2px rgba(16, 185, 129, 0.1);
+    border-color: rgba(16, 185, 129, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 14px rgba(16, 185, 129, 0.55), 0 0 4px rgba(16, 185, 129, 0.3), inset 0 0 6px rgba(16, 185, 129, 0.25);
+    border-color: rgba(16, 185, 129, 0.8);
+  }
+}
+
+@keyframes tpStatGlowCyan {
+  0%, 100% {
+    box-shadow: 0 0 6px rgba(14, 165, 233, 0.25), inset 0 0 2px rgba(14, 165, 233, 0.1);
+    border-color: rgba(14, 165, 233, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 14px rgba(14, 165, 233, 0.55), 0 0 4px rgba(14, 165, 233, 0.3), inset 0 0 6px rgba(14, 165, 233, 0.25);
+    border-color: rgba(14, 165, 233, 0.8);
+  }
+}
+
+@keyframes tpStatGlowViolet {
+  0%, 100% {
+    box-shadow: 0 0 6px rgba(139, 92, 246, 0.25), inset 0 0 2px rgba(139, 92, 246, 0.1);
+    border-color: rgba(139, 92, 246, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 14px rgba(139, 92, 246, 0.55), 0 0 4px rgba(139, 92, 246, 0.3), inset 0 0 6px rgba(139, 92, 246, 0.25);
+    border-color: rgba(139, 92, 246, 0.8);
+  }
+}
+
+@keyframes tpStatGlowAmber {
+  0%, 100% {
+    box-shadow: 0 0 6px rgba(245, 158, 11, 0.25), inset 0 0 2px rgba(245, 158, 11, 0.1);
+    border-color: rgba(245, 158, 11, 0.45);
+  }
+  50% {
+    box-shadow: 0 0 14px rgba(245, 158, 11, 0.6), 0 0 4px rgba(245, 158, 11, 0.35), inset 0 0 6px rgba(245, 158, 11, 0.25);
+    border-color: rgba(245, 158, 11, 0.85);
+  }
+}
+
+.tp-stat-card:hover .tp-stat-badge.badge-emerald {
+  box-shadow: 0 0 18px rgba(16, 185, 129, 0.75), inset 0 0 8px rgba(16, 185, 129, 0.3) !important;
+  transform: scale(1.05) !important;
+}
+.tp-stat-card:hover .tp-stat-badge.badge-cyan {
+  box-shadow: 0 0 18px rgba(14, 165, 233, 0.75), inset 0 0 8px rgba(14, 165, 233, 0.3) !important;
+  transform: scale(1.05) !important;
+}
+.tp-stat-card:hover .tp-stat-badge.badge-violet {
+  box-shadow: 0 0 18px rgba(139, 92, 246, 0.75), inset 0 0 8px rgba(139, 92, 246, 0.3) !important;
+  transform: scale(1.05) !important;
+}
+.tp-stat-card:hover .tp-stat-badge.badge-amber {
+  box-shadow: 0 0 18px rgba(245, 158, 11, 0.8), inset 0 0 8px rgba(245, 158, 11, 0.3) !important;
+  transform: scale(1.05) !important;
+}
+
+/* Pulsing radar dots removed across website */
 .tp-stat-pulse-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  display: inline-block;
-  animation: tpStatPulse 1.8s infinite ease-in-out;
-}
-.tp-stat-pulse-dot.dot-emerald {
-  background-color: #10b981;
-  box-shadow: 0 0 8px rgba(16, 185, 129, 0.8);
-}
-.tp-stat-pulse-dot.dot-cyan {
-  background-color: #0ea5e9;
-  box-shadow: 0 0 8px rgba(14, 165, 233, 0.8);
-}
-.tp-stat-pulse-dot.dot-violet {
-  background-color: #8b5cf6;
-  box-shadow: 0 0 8px rgba(139, 92, 246, 0.8);
-}
-.tp-stat-pulse-dot.dot-amber {
-  background-color: #f59e0b;
-  box-shadow: 0 0 8px rgba(245, 158, 11, 0.8);
-}
-
-@keyframes tpStatPulse {
-  0% { transform: scale(0.9); opacity: 0.75; }
-  50% { transform: scale(1.35); opacity: 1; filter: drop-shadow(0 0 4px currentColor); }
-  100% { transform: scale(0.9); opacity: 0.75; }
+  display: none !important;
 }
 
 .tp-stat-hint {

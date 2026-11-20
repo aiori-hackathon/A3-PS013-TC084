@@ -119,7 +119,6 @@ export default function InvestigationGraph() {
             <AnimatedMetricCount value={nodes.length} />
           </strong>
           <span className="tp-stat-badge badge-emerald">
-            <span className="tp-stat-pulse-dot dot-emerald" />
             INDEXED
           </span>
         </div>
@@ -139,7 +138,6 @@ export default function InvestigationGraph() {
             <AnimatedMetricCount value={edges.length} />
           </strong>
           <span className="tp-stat-badge badge-cyan">
-            <span className="tp-stat-pulse-dot dot-cyan" />
             CORRELATED
           </span>
         </div>
@@ -159,7 +157,6 @@ export default function InvestigationGraph() {
             <AnimatedMetricCount value={gaps.length} />
           </strong>
           <span className="tp-stat-badge badge-violet">
-            <span className="tp-stat-pulse-dot dot-violet" />
             REVIEW NEEDED
           </span>
         </div>

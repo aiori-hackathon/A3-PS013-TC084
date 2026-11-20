@@ -35,6 +35,22 @@
   white-space: nowrap !important;
 }
 
+.aiori-brand-logo {
+  color: #1A5436 !important;
+  flex-shrink: 0 !important;
+  --tp-mark-bg: #EAF3EC !important;
+  transition: transform 0.25s ease, filter 0.25s ease !important;
+}
+.aiori-sidebar-brand:hover .aiori-brand-logo {
+  transform: rotate(6deg) scale(1.08) !important;
+  filter: drop-shadow(0 2px 6px rgba(26, 84, 54, 0.35)) !important;
+}
+
+.tp-utility-mark {
+  color: #1A5436 !important;
+  --tp-mark-bg: #EAF3EC !important;
+}
+
 .aiori-brand-flag {
   font-size: 20px !important;
   line-height: 1 !important;
