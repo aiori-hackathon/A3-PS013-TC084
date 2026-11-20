@@ -701,13 +701,19 @@ export default function Investigations({ events = [] }) {
                       </button>
                     ) : (
                       <button
-                        className="tp-button primary tp-ai-submit-btn"
+                        className="tp-button primary is-primary tp-ai-submit-btn"
+                        data-variant="primary"
                         type="submit"
-                        disabled={chatQuestion.trim().length < 3}
+                        disabled={chatBusy || chatQuestion.trim().length < 3}
                         title="Ask AI Agent (Enter ↵)"
+                        style={{
+                          backgroundColor: chatQuestion.trim().length < 3 ? '#6E9B82' : '#1A5436',
+                          color: '#FFFFFF',
+                          borderColor: chatQuestion.trim().length < 3 ? '#5D8A71' : '#14432B',
+                        }}
                       >
-                        <Send size={15} />
-                        <span>Ask Agent ↵</span>
+                        <Send size={15} color="#FFFFFF" stroke="#FFFFFF" />
+                        <span style={{ color: '#FFFFFF' }}>Ask Agent ↵</span>
                       </button>
                     )}
                   </div>
@@ -761,12 +767,19 @@ export default function Investigations({ events = [] }) {
               <div className="tp-inv-note-actions">
                 <span className="tp-inv-keyboard-hint">Press <strong>Enter ↵</strong> to save note</span>
                 <button
-                  className="tp-button primary tp-inv-note-submit-btn"
+                  className="tp-button primary is-primary tp-inv-note-submit-btn"
+                  data-variant="primary"
                   disabled={busy || !note.trim()}
                   type="submit"
                   title="Save note (Enter ↵)"
+                  style={{
+                    backgroundColor: busy || !note.trim() ? '#6E9B82' : '#1A5436',
+                    color: '#FFFFFF',
+                    borderColor: busy || !note.trim() ? '#5D8A71' : '#14432B',
+                  }}
                 >
-                  <Send size={15}/> Add note ↵
+                  <Send size={15} color="#FFFFFF" stroke="#FFFFFF" />
+                  <span style={{ color: '#FFFFFF' }}>Add note ↵</span>
                 </button>
               </div>
             </form>

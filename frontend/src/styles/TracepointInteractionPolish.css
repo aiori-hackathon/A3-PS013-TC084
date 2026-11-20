@@ -86,7 +86,7 @@ html body .tp-overlay.tp-inv-modal-overlay .tp-investigation-modal,
 :is(.tp-app, body) .tp-investigation-modal .tp-drawer-body,
 .tp-investigation-modal .tp-drawer-body {
   flex: 1 1 auto !important; min-height: 0 !important; overflow-y: auto !important;
-  padding: 24px 28px 70px !important; background: #ffffff !important; color: #2c4055 !important;
+  padding: 24px 28px 90px !important; background: #ffffff !important; color: #2c4055 !important;
   overscroll-behavior: contain;
 }
 :is(.tp-app, body) .tp-investigation-modal .tp-drawer-body h3,
@@ -125,51 +125,84 @@ html body .tp-overlay.tp-inv-modal-overlay .tp-investigation-modal,
 .tp-investigation-modal textarea::placeholder { color: #78899b !important; opacity: 1; }
 
 /* Buttons inside investigation modal: vibrant, institutional green with high visibility */
+html body .tp-investigation-modal button.tp-ai-submit-btn,
+html body .tp-investigation-modal .tp-button.tp-ai-submit-btn,
+html body .tp-investigation-modal button.tp-inv-note-submit-btn,
+html body .tp-investigation-modal .tp-button.tp-inv-note-submit-btn,
 .tp-investigation-modal .tp-button.primary,
 :is(.tp-app, body) .tp-investigation-modal .tp-button.primary,
-.tp-investigation-modal button.tp-button.primary {
+.tp-investigation-modal button.tp-button.primary,
+button.tp-ai-submit-btn,
+button.tp-inv-note-submit-btn {
   background-color: #1A5436 !important;
+  background: #1A5436 !important;
   color: #FFFFFF !important;
-  border: 1px solid #14432B !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  border: 1.5px solid #14432B !important;
   border-radius: 8px !important;
-  font-weight: 700 !important;
+  font-weight: 750 !important;
   font-size: 13.5px !important;
-  padding: 10px 18px !important;
+  padding: 10px 20px !important;
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
   gap: 8px !important;
   cursor: pointer !important;
-  box-shadow: 0 2px 8px rgba(26, 84, 54, 0.22) !important;
+  box-shadow: 0 3px 10px rgba(26, 84, 54, 0.35) !important;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
   min-height: 40px !important;
   line-height: 1 !important;
+  white-space: nowrap !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
+html body .tp-investigation-modal button.tp-ai-submit-btn:hover:not(:disabled),
+html body .tp-investigation-modal button.tp-inv-note-submit-btn:hover:not(:disabled),
 .tp-investigation-modal .tp-button.primary:hover:not(:disabled),
 :is(.tp-app, body) .tp-investigation-modal .tp-button.primary:hover:not(:disabled) {
   background-color: #246B46 !important;
+  background: #246B46 !important;
   border-color: #1A5436 !important;
-  box-shadow: 0 4px 14px rgba(26, 84, 54, 0.35) !important;
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  box-shadow: 0 5px 16px rgba(26, 84, 54, 0.45) !important;
   transform: translateY(-1px) !important;
 }
 
+html body .tp-investigation-modal button.tp-ai-submit-btn:disabled,
+html body .tp-investigation-modal button.tp-inv-note-submit-btn:disabled,
 .tp-investigation-modal .tp-button.primary:disabled,
 :is(.tp-app, body) .tp-investigation-modal .tp-button.primary:disabled {
-  background-color: #9EC0AB !important;
-  color: #FFFFFF !important;
-  border-color: #8EB79D !important;
-  opacity: 0.9 !important;
+  background-color: #6E9B82 !important;
+  background: #6E9B82 !important;
+  color: #F0F7F3 !important;
+  -webkit-text-fill-color: #F0F7F3 !important;
+  border-color: #5D8A71 !important;
+  opacity: 0.85 !important;
   cursor: not-allowed !important;
   box-shadow: none !important;
   transform: none !important;
 }
 
+html body .tp-investigation-modal button.tp-ai-submit-btn svg,
+html body .tp-investigation-modal button.tp-inv-note-submit-btn svg,
 .tp-investigation-modal .tp-button.primary svg,
 :is(.tp-app, body) .tp-investigation-modal .tp-button.primary svg {
   color: #FFFFFF !important;
   stroke: #FFFFFF !important;
   flex-shrink: 0 !important;
+  display: inline-block !important;
+  visibility: visible !important;
+}
+
+html body .tp-investigation-modal button.tp-ai-submit-btn span,
+html body .tp-investigation-modal button.tp-inv-note-submit-btn span {
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  font-weight: 750 !important;
+  display: inline-block !important;
+  visibility: visible !important;
 }
 
 /* AI chat section styling: institutional light theme */

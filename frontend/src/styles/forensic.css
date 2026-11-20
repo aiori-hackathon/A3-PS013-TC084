@@ -4119,6 +4119,80 @@ html :is(.tp-app.tp-app[data-theme='forensic'], [data-theme='forensic']) .tp-inv
   color: var(--fx-on-signal) !important;
 }
 
+/* Explicit high-visibility styles for AI submit and Note submit buttons */
+html :is(.tp-app.tp-app[data-theme='forensic'], [data-theme='forensic']) button.tp-ai-submit-btn,
+html :is(.tp-app.tp-app[data-theme='forensic'], [data-theme='forensic']) button.tp-inv-note-submit-btn,
+button.tp-ai-submit-btn,
+button.tp-inv-note-submit-btn {
+  background: #1A5436 !important;
+  background-color: #1A5436 !important;
+  border: 1.5px solid #14432B !important;
+  border-color: #14432B !important;
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  box-shadow: 0 3px 10px rgba(26, 84, 54, 0.35) !important;
+  opacity: 1 !important;
+  font-weight: 750 !important;
+  font-size: 13.5px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  min-height: 40px !important;
+  padding: 10px 20px !important;
+  visibility: visible !important;
+  text-transform: none !important;
+}
+
+html :is(.tp-app.tp-app[data-theme='forensic'], [data-theme='forensic']) button.tp-ai-submit-btn:hover:not(:disabled),
+html :is(.tp-app.tp-app[data-theme='forensic'], [data-theme='forensic']) button.tp-inv-note-submit-btn:hover:not(:disabled),
+button.tp-ai-submit-btn:hover:not(:disabled),
+button.tp-inv-note-submit-btn:hover:not(:disabled) {
+  background: #246B46 !important;
+  background-color: #246B46 !important;
+  border-color: #1A5436 !important;
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  box-shadow: 0 5px 16px rgba(26, 84, 54, 0.45) !important;
+  transform: translateY(-1px) !important;
+}
+
+html :is(.tp-app.tp-app[data-theme='forensic'], [data-theme='forensic']) button.tp-ai-submit-btn:disabled,
+html :is(.tp-app.tp-app[data-theme='forensic'], [data-theme='forensic']) button.tp-inv-note-submit-btn:disabled,
+button.tp-ai-submit-btn:disabled,
+button.tp-inv-note-submit-btn:disabled {
+  background: #6E9B82 !important;
+  background-color: #6E9B82 !important;
+  border-color: #5D8A71 !important;
+  color: #F0F7F3 !important;
+  -webkit-text-fill-color: #F0F7F3 !important;
+  opacity: 0.85 !important;
+  box-shadow: none !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+}
+
+html :is(.tp-app.tp-app[data-theme='forensic'], [data-theme='forensic']) button.tp-ai-submit-btn svg,
+html :is(.tp-app.tp-app[data-theme='forensic'], [data-theme='forensic']) button.tp-inv-note-submit-btn svg,
+button.tp-ai-submit-btn svg,
+button.tp-inv-note-submit-btn svg {
+  color: #FFFFFF !important;
+  stroke: #FFFFFF !important;
+  display: inline-block !important;
+  visibility: visible !important;
+}
+
+html :is(.tp-app.tp-app[data-theme='forensic'], [data-theme='forensic']) button.tp-ai-submit-btn span,
+html :is(.tp-app.tp-app[data-theme='forensic'], [data-theme='forensic']) button.tp-inv-note-submit-btn span,
+button.tp-ai-submit-btn span,
+button.tp-inv-note-submit-btn span {
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  font-weight: 750 !important;
+  display: inline-block !important;
+  visibility: visible !important;
+}
+
 /* TRACEPOINT INVESTIGATION GRAPH TYPOGRAPHY REFINEMENT V1 */
 /* Typography only. No layout, spacing, colour, or behaviour changes. */
 
