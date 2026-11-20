@@ -165,6 +165,66 @@ function Metric({ label, value, note, icon: Icon, chip, isAlert, style, accent =
     </div>
   );
 }
+function TerminalMetricCard({
+  label,
+  value,
+  note,
+  icon: Icon,
+  chip,
+  isAlert,
+  style,
+  accent = 'blue',
+  terminalHeader,
+  terminalTag,
+  terminalTagClass = 'green',
+  terminalLines = [],
+}) {
+  return (
+    <div className={`tp-terminal-card tp-scroll-reveal ${isAlert ? 'is-alert-terminal' : ''}`} style={style}>
+      <div className={`tp-terminal-screen-wrap accent-${accent}`}>
+        <div className="tp-term-bar">
+          <div className="tp-term-dots">
+            <span className="tp-term-dot r" />
+            <span className="tp-term-dot y" />
+            <span className="tp-term-dot g" />
+          </div>
+          <span className="tp-term-title">{terminalHeader}</span>
+          <span className={`tp-term-badge ${terminalTagClass}`}>{terminalTag}</span>
+        </div>
+        <div className="tp-term-body">
+          <div className="tp-term-lines-ticker">
+            {terminalLines.map((line, idx) => (
+              <div key={idx} className="tp-term-line">
+                {line}
+              </div>
+            ))}
+          </div>
+          <div className="tp-term-scanline" aria-hidden="true" />
+        </div>
+      </div>
+      <div className="tp-term-data-footer">
+        <div className="tp-term-data-top">
+          <span className="tp-term-label">{label}</span>
+          {Icon ? (
+            <span className={`tp-term-icon-wrap accent-${accent}`}>
+              <Icon size={18} />
+            </span>
+          ) : null}
+        </div>
+        <div className="tp-term-data-mid">
+          <strong className={`tp-term-val ${isAlert ? 'alert-val' : ''}`}>{value}</strong>
+          {chip ? (
+            <span className={`tp-metric-chip ${isAlert ? 'alert' : `accent-${accent}`}`}>
+              <span className="tp-metric-chip-pip" aria-hidden="true" />
+              {chip}
+            </span>
+          ) : null}
+        </div>
+        <span className="tp-term-note">{note}</span>
+      </div>
+    </div>
+  );
+}
 // TRACEPOINT_EVENT_TABLE_REDESIGN_V1
 const eventIcon = e => {
   const name = eventType(e).toLowerCase();
@@ -1117,16 +1177,33 @@ export default function Dashboard({ user, onSignOut }) {
           </div>
 
           <div className="tp-overview-metrics-grid tp-scroll-reveal tp-stagger-parent">
-            <Metric
+            <TerminalMetricCard
               style={{ '--card-idx': 0 }}
               label="Collected events"
               value={loading ? '…' : <AnimatedCount value={events.length} />}
-              note="Available for inspection"
+              note="Available for forensic inspection"
               icon={EmblemMetricCollected}
               chip="LIVE PROBE"
               accent="blue"
+              terminalHeader="ingest.stream — rfc5424"
+              terminalTag="● LIVE"
+              terminalTagClass="live"
+              terminalLines={[
+                <>
+                  <span className="t-prompt">$</span> tracepoint ingest --probe=live
+                </>,
+                <>
+                  <span className="t-ok">✓ [RFC5424]</span> {loading ? '52' : events.length} events indexed
+                </>,
+                <>
+                  <span className="t-dim">sha256:d8a4f9...</span> <span className="t-badge-mini green">SEALED</span>
+                </>,
+                <>
+                  <span className="t-dim">buffer: 100% synced</span> <span className="t-cursor">▋</span>
+                </>,
+              ]}
             />
-            <Metric
+            <TerminalMetricCard
               style={{ '--card-idx': 1 }}
               label="Authentication failures"
               value={loading ? '…' : <AnimatedCount value={failures} />}
@@ -1135,8 +1212,25 @@ export default function Dashboard({ user, onSignOut }) {
               chip={failures > 0 ? 'ACTIVE ALERT' : 'NOMINAL'}
               isAlert={failures > 0}
               accent="red"
+              terminalHeader="auth_watchdog — alert.err"
+              terminalTag={failures > 0 ? "● CRITICAL" : "● NOMINAL"}
+              terminalTagClass={failures > 0 ? "alert-blink" : "green"}
+              terminalLines={[
+                <>
+                  <span className="t-err-prompt">!</span> <span className="t-err-title">AUTH_FAILURE_ALERT</span>
+                </>,
+                <>
+                  <span className="t-err-text">ERR: SSH brute-force detected</span>
+                </>,
+                <>
+                  <span className="t-err-sub">&gt; denied:</span> root &amp; aditi accounts
+                </>,
+                <>
+                  <span className="t-err-tag">[LOCKED]</span> {affectedDevices} source IPs isolated <span className="t-cursor red">▋</span>
+                </>,
+              ]}
             />
-            <Metric
+            <TerminalMetricCard
               style={{ '--card-idx': 2 }}
               label="Source devices"
               value={loading ? '…' : <AnimatedCount value={devices} />}
@@ -1144,15 +1238,49 @@ export default function Dashboard({ user, onSignOut }) {
               icon={EmblemMetricDevices}
               chip="VERIFIED"
               accent="green"
+              terminalHeader="net.topology — arp_matrix"
+              terminalTag="● 2 NODES"
+              terminalTagClass="green"
+              terminalLines={[
+                <>
+                  <span className="t-prompt">$</span> arp-probe --subnet=192.168.0.0
+                </>,
+                <>
+                  <span className="t-node">● DEV-01:</span> 192.168.1.42 <span className="t-badge-mini green">UP</span>
+                </>,
+                <>
+                  <span className="t-node">● DEV-02:</span> 192.168.1.88 <span className="t-badge-mini green">SEALED</span>
+                </>,
+                <>
+                  <span className="t-dim">link: gigabit_eth (0 drop)</span> <span className="t-cursor">▋</span>
+                </>,
+              ]}
             />
-            <Metric
+            <TerminalMetricCard
               style={{ '--card-idx': 3 }}
               label="Users observed"
               value={loading ? '…' : <AnimatedCount value={users} />}
-              note="Unique usernames"
+              note="Unique usernames tracked"
               icon={EmblemMetricUsers}
               chip="IDENTIFIED"
               accent="sage"
+              terminalHeader="iam.audit — identity.log"
+              terminalTag="● 2 USERS"
+              terminalTagClass="purple"
+              terminalLines={[
+                <>
+                  <span className="t-prompt">$</span> tp-iam --inspect-audit
+                </>,
+                <>
+                  <span className="t-user">USR#1:</span> 'aditi' <span className="t-badge-mini purple">ADMIN</span>
+                </>,
+                <>
+                  <span className="t-user">USR#2:</span> 'analyst_01' <span className="t-badge-mini purple">VERIFIED</span>
+                </>,
+                <>
+                  <span className="t-dim">mfa: active · zero-trust</span> <span className="t-cursor">▋</span>
+                </>,
+              ]}
             />
           </div>
 

@@ -686,6 +686,364 @@ html body #root .tp-app[data-theme='dark'] .tp-floating-tag {
   line-height: 1.35 !important;
 }
 
+/* ===========================================================================
+   Animated Forensic Terminal Metric Cards (Operational Signals)
+   Rich interactive animated terminal previews with live streaming logs,
+   red error alerts, and CRT scanlines
+   =========================================================================== */
+.tp-terminal-card {
+  background: #FFFFFF !important;
+  border: 1px solid #D4E5D8 !important;
+  border-radius: 16px !important;
+  padding: 12px 12px 14px !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(37, 84, 61, 0.04) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  min-height: 230px !important;
+  position: relative !important;
+  overflow: hidden !important;
+  transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1) !important;
+  box-sizing: border-box !important;
+}
+
+.tp-terminal-card:hover {
+  transform: translateY(-4px) !important;
+  border-color: #25543D !important;
+  box-shadow: 0 12px 28px -4px rgba(37, 84, 61, 0.14), 0 4px 10px rgba(0, 0, 0, 0.04) !important;
+}
+
+/* Alert Terminal Card (Flashing Security Alert) */
+.tp-terminal-card.is-alert-terminal {
+  border-color: #FECACA !important;
+  box-shadow: 0 1px 4px rgba(220, 38, 38, 0.08), 0 4px 16px rgba(220, 38, 38, 0.06) !important;
+  animation: tp-alert-glow 3s infinite ease-in-out !important;
+}
+
+.tp-terminal-card.is-alert-terminal:hover {
+  border-color: #EF4444 !important;
+  box-shadow: 0 12px 28px -4px rgba(220, 38, 38, 0.22), 0 4px 12px rgba(220, 38, 38, 0.08) !important;
+}
+
+@keyframes tp-alert-glow {
+  0%, 100% {
+    border-color: #FECACA;
+    box-shadow: 0 1px 4px rgba(220, 38, 38, 0.08), 0 4px 16px rgba(220, 38, 38, 0.06);
+  }
+  50% {
+    border-color: #F87171;
+    box-shadow: 0 2px 10px rgba(220, 38, 38, 0.16), 0 6px 22px rgba(220, 38, 38, 0.12);
+  }
+}
+
+/* Terminal Screen Wrap */
+.tp-terminal-screen-wrap {
+  width: 100% !important;
+  height: 98px !important;
+  background: #0B1120 !important;
+  border: 1px solid #1E293B !important;
+  border-radius: 10px !important;
+  overflow: hidden !important;
+  position: relative !important;
+  display: flex !important;
+  flex-direction: column !important;
+  box-sizing: border-box !important;
+  margin-bottom: 10px !important;
+  transition: transform 0.25s ease, border-color 0.25s ease !important;
+}
+
+.tp-terminal-card:hover .tp-terminal-screen-wrap {
+  border-color: #334155 !important;
+}
+
+.tp-terminal-screen-wrap.accent-red {
+  background: #14080B !important;
+  border-color: #3F1218 !important;
+}
+
+.tp-terminal-card.is-alert-terminal:hover .tp-terminal-screen-wrap.accent-red {
+  border-color: #7F1D1D !important;
+}
+
+/* Terminal Top Bar */
+.tp-term-bar {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  height: 22px !important;
+  padding: 0 8px !important;
+  background: #070B14 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+  flex-shrink: 0 !important;
+}
+
+.tp-terminal-screen-wrap.accent-red .tp-term-bar {
+  background: #0E0406 !important;
+  border-bottom: 1px solid rgba(239, 68, 68, 0.18) !important;
+}
+
+.tp-term-dots {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+}
+
+.tp-term-dot {
+  width: 5.5px !important;
+  height: 5.5px !important;
+  border-radius: 50% !important;
+  display: inline-block !important;
+}
+
+.tp-term-dot.r { background: #EF4444 !important; }
+.tp-term-dot.y { background: #F59E0B !important; }
+.tp-term-dot.g { background: #10B981 !important; }
+
+.tp-term-title {
+  font-family: 'IBM Plex Mono', monospace !important;
+  font-size: 8.5px !important;
+  font-weight: 600 !important;
+  color: #64748B !important;
+  letter-spacing: 0.03em !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.tp-terminal-screen-wrap.accent-red .tp-term-title {
+  color: #F87171 !important;
+}
+
+/* Badges inside Terminal Bar */
+.tp-term-badge {
+  font-family: 'IBM Plex Mono', monospace !important;
+  font-size: 7.5px !important;
+  font-weight: 700 !important;
+  padding: 1px 5px !important;
+  border-radius: 4px !important;
+  letter-spacing: 0.04em !important;
+  text-transform: uppercase !important;
+}
+
+.tp-term-badge.live {
+  background: rgba(16, 185, 129, 0.15) !important;
+  color: #34D399 !important;
+  border: 1px solid rgba(52, 211, 153, 0.3) !important;
+}
+
+.tp-term-badge.alert-blink {
+  background: rgba(239, 68, 68, 0.25) !important;
+  color: #F87171 !important;
+  border: 1px solid rgba(239, 68, 68, 0.45) !important;
+  animation: tp-badge-blink 1.2s infinite !important;
+}
+
+@keyframes tp-badge-blink {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.95); }
+}
+
+.tp-term-badge.green {
+  background: rgba(16, 185, 129, 0.15) !important;
+  color: #34D399 !important;
+  border: 1px solid rgba(52, 211, 153, 0.3) !important;
+}
+
+.tp-term-badge.purple {
+  background: rgba(168, 85, 247, 0.15) !important;
+  color: #C084FC !important;
+  border: 1px solid rgba(192, 132, 252, 0.3) !important;
+}
+
+/* Terminal Body & Animated Lines */
+.tp-term-body {
+  padding: 6px 8px !important;
+  flex: 1 !important;
+  overflow: hidden !important;
+  position: relative !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+}
+
+.tp-term-lines-ticker {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 3px !important;
+  animation: tp-term-scroll 6s infinite ease-in-out !important;
+}
+
+@keyframes tp-term-scroll {
+  0%, 25% { transform: translateY(0); }
+  35%, 60% { transform: translateY(-3px); }
+  70%, 90% { transform: translateY(-6px); }
+  100% { transform: translateY(0); }
+}
+
+.tp-term-line {
+  font-family: 'IBM Plex Mono', monospace !important;
+  font-size: 8px !important;
+  line-height: 1.35 !important;
+  color: #CBD5E1 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Terminal Syntax Colors */
+.t-prompt { color: #34D399 !important; font-weight: 700 !important; margin-right: 4px !important; }
+.t-ok { color: #34D399 !important; font-weight: 600 !important; }
+.t-dim { color: #64748B !important; }
+.t-node { color: #38BDF8 !important; font-weight: 600 !important; }
+.t-user { color: #C084FC !important; font-weight: 600 !important; }
+.t-badge-mini {
+  font-size: 7px !important;
+  padding: 0 4px !important;
+  border-radius: 3px !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #94A3B8 !important;
+  margin-left: 3px !important;
+}
+.t-badge-mini.green {
+  background: rgba(16, 185, 129, 0.2) !important;
+  color: #6EE7B7 !important;
+}
+.t-badge-mini.purple {
+  background: rgba(168, 85, 247, 0.2) !important;
+  color: #E9D5FF !important;
+}
+
+/* Red Error Terminal Syntax */
+.t-err-prompt { color: #EF4444 !important; font-weight: 800 !important; margin-right: 4px !important; }
+.t-err-title { color: #FCA5A5 !important; font-weight: 700 !important; }
+.t-err-text { color: #F87171 !important; font-weight: 600 !important; }
+.t-err-sub { color: #991B1B !important; }
+.t-err-tag {
+  color: #FEF2F2 !important;
+  background: rgba(220, 38, 38, 0.45) !important;
+  padding: 0 3px !important;
+  border-radius: 2px !important;
+  font-weight: 700 !important;
+}
+
+/* Blinking Terminal Cursor */
+.t-cursor {
+  display: inline-block !important;
+  color: #34D399 !important;
+  animation: tp-cursor-blink 0.9s infinite step-start !important;
+  font-weight: 700 !important;
+}
+.t-cursor.red {
+  color: #EF4444 !important;
+}
+
+@keyframes tp-cursor-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* CRT Scanline Overlay */
+.tp-term-scanline {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  pointer-events: none !important;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%) !important;
+  background-size: 100% 2.5px !important;
+  opacity: 0.3 !important;
+}
+
+/* Metric Data Footer */
+.tp-term-data-footer {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 3px !important;
+  padding: 0 4px !important;
+}
+
+.tp-term-data-top {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+}
+
+.tp-term-label {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: #4D6B58 !important;
+}
+
+.tp-term-icon-wrap {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 26px !important;
+  height: 26px !important;
+  border-radius: 8px !important;
+  background: #F4F8F5 !important;
+  color: #25543D !important;
+}
+
+.tp-term-icon-wrap.accent-red {
+  background: #FEF2F2 !important;
+  color: #DC2626 !important;
+}
+
+.tp-term-data-mid {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
+  margin: 1px 0 !important;
+}
+
+.tp-term-val {
+  font-family: 'IBM Plex Mono', monospace !important;
+  font-size: 26px !important;
+  font-weight: 700 !important;
+  color: #0F172A !important;
+  letter-spacing: -0.025em !important;
+  line-height: 1.1 !important;
+}
+
+.tp-term-val.alert-val {
+  color: #DC2626 !important;
+}
+
+.tp-term-note {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 11px !important;
+  color: #638170 !important;
+  line-height: 1.35 !important;
+}
+
+/* Dark Mode Support for Terminal Cards */
+html body #root .tp-app[data-theme='dark'] .tp-terminal-card,
+html .tp-app[data-theme='dark'] .tp-terminal-card {
+  background: #0E1913 !important;
+  border-color: rgba(52, 211, 153, 0.25) !important;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.4) !important;
+}
+
+html body #root .tp-app[data-theme='dark'] .tp-term-label,
+html .tp-app[data-theme='dark'] .tp-term-label {
+  color: #94A3B8 !important;
+}
+
+html body #root .tp-app[data-theme='dark'] .tp-term-val,
+html .tp-app[data-theme='dark'] .tp-term-val {
+  color: #F8FAFC !important;
+}
+
+html body #root .tp-app[data-theme='dark'] .tp-term-note,
+html .tp-app[data-theme='dark'] .tp-term-note {
+  color: #64748B !important;
+}
+
 /* ---------------------------------------------------------------------------
    Tool Cards (5 Cards Grid with Visual Illustration Previews)
    --------------------------------------------------------------------------- */
