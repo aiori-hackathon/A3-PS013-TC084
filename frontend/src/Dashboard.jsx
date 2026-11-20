@@ -993,7 +993,17 @@ export default function Dashboard({ user, onSignOut }) {
               <div className="tp-overview-eyebrow">
                 <span>🇮🇳</span> AIORI-3 · TELEMETRY HUB
               </div>
-              <h1 className="tp-overview-title">
+              <h1
+                className="tp-overview-title"
+                style={{
+                  fontSize: 'clamp(42px, 4.4vw, 58px)',
+                  fontWeight: 800,
+                  letterSpacing: '-0.035em',
+                  lineHeight: 1.1,
+                  color: '#0F172A',
+                  margin: '0 0 16px 0',
+                }}
+              >
                 Follow the signal. <span className="tp-overview-accent">Verify the evidence.</span>
               </h1>
               <p className="tp-overview-subtitle">

@@ -104,13 +104,17 @@
   box-shadow: none !important;
 }
 
+html body #root .tp-app.tp-app[data-theme='forensic'] .tp-overview-title,
+html .tp-app.tp-app[data-theme='forensic'] .tp-overview-title,
+html body #root .tp-overview-title,
 .tp-overview-title {
-  font-size: clamp(34px, 3.4vw, 46px) !important;
+  font-size: clamp(42px, 4.4vw, 58px) !important;
   font-weight: 800 !important;
   letter-spacing: -0.035em !important;
-  line-height: 1.12 !important;
+  line-height: 1.1 !important;
   color: #0F172A !important;
-  margin: 0 0 12px 0 !important;
+  margin: 0 0 16px 0 !important;
+  max-width: 640px !important;
 }
 
 .tp-overview-accent {
@@ -119,12 +123,17 @@
   -webkit-text-fill-color: transparent !important;
 }
 
+html body #root .tp-app[data-theme='dark'] .tp-overview-title,
+html .tp-app[data-theme='dark'] .tp-overview-title {
+  color: #F8FAFC !important;
+}
+
 .tp-overview-subtitle {
-  font-size: 15px !important;
+  font-size: 16px !important;
   color: #3D5949 !important;
   line-height: 1.6 !important;
-  margin: 0 0 18px 0 !important;
-  max-width: 560px !important;
+  margin: 0 0 20px 0 !important;
+  max-width: 580px !important;
 }
 
 .tp-overview-pills,
