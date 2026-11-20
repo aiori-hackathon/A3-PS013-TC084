@@ -1026,6 +1026,67 @@ export default function Dashboard({ user, onSignOut }) {
                 isFailure={fail}
                 timestampOf={timestamp}
               />
+
+              {/* Floating Card 1: Top Right — OpenTrain-inspired Live Telemetry Card */}
+              <div className="tp-globe-floating-card tp-card-top-right" role="status">
+                <div className="tp-floating-card-header">
+                  <div className="tp-floating-pill-row">
+                    <span className="tp-floating-card-dot" aria-hidden="true" />
+                    <span className="tp-floating-card-label">NOW MONITORING</span>
+                  </div>
+                  <span className="tp-floating-badge-mono">RFC 5424</span>
+                </div>
+                <div className="tp-floating-card-val">
+                  {loading ? 'Connecting…' : `${events.length.toLocaleString()} Sealed Events`}
+                </div>
+                <div className="tp-floating-card-sub">
+                  Active probe telemetry across 2 source nodes
+                </div>
+              </div>
+
+              {/* Floating Card 2: Mid Left — OpenTrain-inspired Target Lock Card */}
+              <div className="tp-globe-floating-card tp-card-mid-left" role="status">
+                <div className="tp-floating-card-header">
+                  <div className="tp-floating-pill-row">
+                    <span className="tp-floating-card-icon">🎯</span>
+                    <span className="tp-floating-card-label">TARGET LOCK</span>
+                  </div>
+                  <span className="tp-floating-badge-mono live">LOCKED</span>
+                </div>
+                <div className="tp-floating-card-title">
+                  National Observation Node
+                </div>
+                <div className="tp-floating-card-meta-list">
+                  <div className="tp-floating-meta-item">
+                    <span>Target:</span> <strong>21.5°N, 78.5°E (India)</strong>
+                  </div>
+                  <div className="tp-floating-meta-item">
+                    <span>Zone:</span> <strong>Asia/Kolkata (IST)</strong>
+                  </div>
+                </div>
+              </div>
+
+              {/* Floating Card 3: Bottom Right — OpenTrain-inspired Forensic Integrity Card */}
+              <div className="tp-globe-floating-card tp-card-bottom-right" role="status">
+                <div className="tp-floating-card-header">
+                  <div className="tp-floating-pill-row">
+                    <span className="tp-floating-card-icon">🔒</span>
+                    <span className="tp-floating-card-label">CHAIN INTEGRITY</span>
+                  </div>
+                  <span className="tp-floating-badge-mono verified">SEALED</span>
+                </div>
+                <div className="tp-floating-card-title">
+                  Zero Tamper Detected
+                </div>
+                <div className="tp-floating-card-sub">
+                  SHA-256 Merkle Provenance
+                </div>
+                <div className="tp-floating-card-tags">
+                  <span className="tp-floating-tag">● Verified</span>
+                  <span className="tp-floating-tag">● Immutable</span>
+                  <span className="tp-floating-tag">● Live</span>
+                </div>
+              </div>
             </div>
           </section>
 
