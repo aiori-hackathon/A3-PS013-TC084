@@ -429,7 +429,7 @@ export default function Investigations({ events = [] }) {
     </section>
 
     {creating && typeof document !== 'undefined' && createPortal(
-      <div className="tp-overlay tp-inv-modal-overlay tp-inv-create-overlay" data-theme={pageTheme} onMouseDown={() => setCreating(false)}>
+      <div className="tp-overlay tp-inv-modal-overlay tp-inv-create-overlay tp-app" data-theme={pageTheme} onMouseDown={() => setCreating(false)}>
         <aside className="tp-drawer tp-investigation-modal tp-investigation-create-modal" role="dialog" aria-modal="true" aria-label="Create investigation" onMouseDown={e => e.stopPropagation()}>
           <div className="tp-drawer-header"><div><span>New case</span><h2>Create investigation</h2></div><button onClick={() => setCreating(false)} aria-label="Close"><X size={21}/></button></div>
           {createScanOn && <InvestigationScan states={createStates} stages={CREATE_STAGES} />}
@@ -445,7 +445,7 @@ export default function Investigations({ events = [] }) {
     )}
 
     {active && !creating && typeof document !== 'undefined' && createPortal(
-      <div className="tp-overlay tp-inv-modal-overlay tp-inv-detail-overlay" data-theme={pageTheme} onMouseDown={() => setActive(null)}>
+      <div className="tp-overlay tp-inv-modal-overlay tp-inv-detail-overlay tp-app" data-theme={pageTheme} onMouseDown={() => setActive(null)}>
         <aside className="tp-drawer tp-inv-drawer tp-investigation-modal tp-investigation-detail-modal" role="dialog" aria-modal="true" aria-label="Investigation details" onMouseDown={e => e.stopPropagation()}>
           <div className="tp-drawer-header"><div><span>TP-{String(active.id).padStart(4, '0')}</span><h2>{active.title}</h2><span className={`tp-inv-pill ${active.severity}`}>{active.severity}</span></div><button onClick={() => setActive(null)} aria-label="Close"><X size={21}/></button></div>
           <div className="tp-drawer-body tp-inv-detail">
@@ -531,35 +531,96 @@ export default function Investigations({ events = [] }) {
               {chatError && <p className="tp-ai-error" role="alert">{chatError}</p>}
 
               <form className="tp-ai-form" onSubmit={askInvestigationAssistant}>
-                <textarea
-                  rows={2}
-                  minLength={3}
-                  maxLength={2000}
-                  value={chatQuestion}
-                  onChange={e => setChatQuestion(e.target.value)}
-                  placeholder="Ask a question about the evidence…"
-                  aria-label="Question about this investigation"
-                  disabled={chatBusy}
-                  required
-                />
-                <button
-                  className="tp-button primary"
-                  type="submit"
-                  disabled={chatBusy || chatQuestion.trim().length < 3}
-                >
-                  <Send size={15} />
-                  {chatBusy ? 'Analysing…' : 'Ask AI'}
-                </button>
+                <div className="tp-ai-input-wrap">
+                  <textarea
+                    rows={2}
+                    minLength={3}
+                    maxLength={2000}
+                    value={chatQuestion}
+                    onChange={e => setChatQuestion(e.target.value)}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        if (!chatBusy && chatQuestion.trim().length >= 3) {
+                          askInvestigationAssistant(e);
+                        }
+                      }
+                    }}
+                    placeholder="Ask a question about the evidence (Press Enter ↵ to send)…"
+                    aria-label="Question about this investigation"
+                    disabled={chatBusy}
+                    required
+                  />
+                </div>
+                <div className="tp-ai-form-actions">
+                  <span className="tp-ai-keyboard-hint">Press <strong>Enter ↵</strong> to ask AI · <strong>Shift + Enter</strong> for new line</span>
+                  <button
+                    className="tp-button primary tp-ai-submit-btn"
+                    type="submit"
+                    disabled={chatBusy || chatQuestion.trim().length < 3}
+                    title="Ask AI Agent (Enter ↵)"
+                  >
+                    <Send size={15} />
+                    <span>{chatBusy ? 'Analysing…' : 'Ask Agent ↵'}</span>
+                  </button>
+                </div>
               </form>
               <p className="tp-ai-disclaimer">
                 Verify conclusions against the original logs. The assistant may make mistakes.
               </p>
             </section>
 
-            <h3>Analyst notes ({active.notes?.length || 0})</h3>
-            <form onSubmit={e => { e.preventDefault(); const content = note.trim(); if (!content) return; perform(async () => { await request(`${API}/${active.id}/notes`, { method: 'POST', body: JSON.stringify({ content }) }); setNote(''); }); }}>
-              <textarea rows={3} maxLength={5000} required value={note} onChange={e => setNote(e.target.value)} placeholder="Record findings, actions, or next steps…" aria-label="Analyst note"/>
-              <button className="tp-button primary" disabled={busy || !note.trim()} type="submit"><Send size={15}/> Add note</button>
+            <h3 className="tp-inv-notes-heading">Analyst notes ({active.notes?.length || 0})</h3>
+            <form
+              className="tp-inv-note-form"
+              onSubmit={e => {
+                e.preventDefault();
+                const content = note.trim();
+                if (!content) return;
+                perform(async () => {
+                  await request(`${API}/${active.id}/notes`, {
+                    method: 'POST',
+                    body: JSON.stringify({ content }),
+                  });
+                  setNote('');
+                });
+              }}
+            >
+              <textarea
+                rows={3}
+                maxLength={5000}
+                required
+                value={note}
+                onChange={e => setNote(e.target.value)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    const content = note.trim();
+                    if (!busy && content) {
+                      perform(async () => {
+                        await request(`${API}/${active.id}/notes`, {
+                          method: 'POST',
+                          body: JSON.stringify({ content }),
+                        });
+                        setNote('');
+                      });
+                    }
+                  }
+                }}
+                placeholder="Record findings, actions, or next steps (Press Enter ↵ to add note)…"
+                aria-label="Analyst note"
+              />
+              <div className="tp-inv-note-actions">
+                <span className="tp-inv-keyboard-hint">Press <strong>Enter ↵</strong> to save note</span>
+                <button
+                  className="tp-button primary tp-inv-note-submit-btn"
+                  disabled={busy || !note.trim()}
+                  type="submit"
+                  title="Save note (Enter ↵)"
+                >
+                  <Send size={15}/> Add note ↵
+                </button>
+              </div>
             </form>
             {(active.notes || []).map(n => <div className="tp-inv-note" key={n.id}><small>{stamp(n.created_at)}</small><p>{n.content}</p></div>)}
           </div>

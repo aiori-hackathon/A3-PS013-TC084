@@ -68,7 +68,7 @@
 :is(.tp-app, body) .tp-investigation-modal .tp-drawer-body,
 .tp-investigation-modal .tp-drawer-body {
   flex: 1 1 auto !important; min-height: 0 !important; overflow-y: auto !important;
-  padding: 24px 26px 28px !important; background: #ffffff !important; color: #2c4055 !important;
+  padding: 24px 28px 70px !important; background: #ffffff !important; color: #2c4055 !important;
   overscroll-behavior: contain;
 }
 :is(.tp-app, body) .tp-investigation-modal .tp-drawer-body h3,
@@ -100,23 +100,219 @@
 .tp-investigation-modal textarea,
 .tp-investigation-modal select { min-height: 42px; background: #ffffff !important; color: #21354a !important; border-color: #cbd8e5 !important; font-size: 14px !important; }
 :is(.tp-app, body) .tp-investigation-modal textarea,
-.tp-investigation-modal textarea { min-height: 120px; }
+.tp-investigation-modal textarea { min-height: 90px; }
 :is(.tp-app, body) .tp-investigation-modal input::placeholder,
 :is(.tp-app, body) .tp-investigation-modal textarea::placeholder,
 .tp-investigation-modal input::placeholder,
 .tp-investigation-modal textarea::placeholder { color: #78899b !important; opacity: 1; }
+
+/* Buttons inside investigation modal: vibrant, institutional green with high visibility */
+.tp-investigation-modal .tp-button.primary,
+:is(.tp-app, body) .tp-investigation-modal .tp-button.primary,
+.tp-investigation-modal button.tp-button.primary {
+  background-color: #1A5436 !important;
+  color: #FFFFFF !important;
+  border: 1px solid #14432B !important;
+  border-radius: 8px !important;
+  font-weight: 700 !important;
+  font-size: 13.5px !important;
+  padding: 10px 18px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  cursor: pointer !important;
+  box-shadow: 0 2px 8px rgba(26, 84, 54, 0.22) !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  min-height: 40px !important;
+  line-height: 1 !important;
+}
+
+.tp-investigation-modal .tp-button.primary:hover:not(:disabled),
+:is(.tp-app, body) .tp-investigation-modal .tp-button.primary:hover:not(:disabled) {
+  background-color: #246B46 !important;
+  border-color: #1A5436 !important;
+  box-shadow: 0 4px 14px rgba(26, 84, 54, 0.35) !important;
+  transform: translateY(-1px) !important;
+}
+
+.tp-investigation-modal .tp-button.primary:disabled,
+:is(.tp-app, body) .tp-investigation-modal .tp-button.primary:disabled {
+  background-color: #9EC0AB !important;
+  color: #FFFFFF !important;
+  border-color: #8EB79D !important;
+  opacity: 0.9 !important;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.tp-investigation-modal .tp-button.primary svg,
+:is(.tp-app, body) .tp-investigation-modal .tp-button.primary svg {
+  color: #FFFFFF !important;
+  stroke: #FFFFFF !important;
+  flex-shrink: 0 !important;
+}
+
+/* AI chat section styling: institutional light theme */
 :is(.tp-app, body) .tp-investigation-modal .tp-ai-chat,
-.tp-investigation-modal .tp-ai-chat { background: #f5f8fb !important; border-color: #d7e1eb !important; }
+.tp-investigation-modal .tp-ai-chat {
+  background: #F4F8F5 !important;
+  border: 1px solid #D5E5D8 !important;
+  border-radius: 12px !important;
+  padding: 18px 20px !important;
+  margin: 22px 0 !important;
+}
 :is(.tp-app, body) .tp-investigation-modal .tp-ai-chat h3,
+.tp-investigation-modal .tp-ai-chat h3 {
+  margin: 4px 0 !important;
+  color: #13281E !important;
+  font-size: 16px !important;
+  font-weight: 750 !important;
+}
 :is(.tp-app, body) .tp-investigation-modal .tp-ai-chat strong,
-.tp-investigation-modal .tp-ai-chat h3,
 .tp-investigation-modal .tp-ai-chat strong { color: #173a5c !important; }
 :is(.tp-app, body) .tp-investigation-modal .tp-ai-chat p,
+.tp-investigation-modal .tp-ai-chat p { color: #3D5949 !important; font-size: 12.5px !important; margin: 3px 0 0 !important; }
+
 :is(.tp-app, body) .tp-investigation-modal .tp-ai-chat .tp-ai-empty,
-.tp-investigation-modal .tp-ai-chat p,
-.tp-investigation-modal .tp-ai-chat .tp-ai-empty { color: #52677c !important; }
+.tp-investigation-modal .tp-ai-chat .tp-ai-empty {
+  background: #E8F2EA !important;
+  border: 1px dashed #A9CCA9 !important;
+  color: #25543D !important;
+  border-radius: 8px !important;
+  padding: 12px 16px !important;
+  font-size: 13px !important;
+  line-height: 1.5 !important;
+}
+
 :is(.tp-app, body) .tp-investigation-modal .tp-ai-message,
 .tp-investigation-modal .tp-ai-message { border-color: #dce5ee !important; }
+
+/* AI Form & Input: Full width with dedicated Enter button */
+.tp-investigation-modal .tp-ai-form {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 10px !important;
+  width: 100% !important;
+  margin-top: 14px !important;
+}
+
+.tp-investigation-modal .tp-ai-input-wrap {
+  width: 100% !important;
+}
+
+.tp-investigation-modal .tp-ai-form textarea {
+  width: 100% !important;
+  min-width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  min-height: 64px !important;
+  height: 64px !important;
+  padding: 11px 14px !important;
+  border-radius: 9px !important;
+  background: #FFFFFF !important;
+  color: #13281E !important;
+  border: 1.5px solid #CBD8E5 !important;
+  font-size: 13.5px !important;
+  line-height: 1.5 !important;
+  resize: vertical !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.tp-investigation-modal .tp-ai-form textarea:focus {
+  border-color: #25543D !important;
+  box-shadow: 0 0 0 3px rgba(37, 84, 61, 0.16) !important;
+  outline: none !important;
+}
+
+.tp-investigation-modal .tp-ai-form-actions {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  width: 100% !important;
+}
+
+.tp-investigation-modal .tp-ai-keyboard-hint {
+  font-size: 11.5px !important;
+  color: #638170 !important;
+}
+
+.tp-investigation-modal .tp-ai-keyboard-hint strong {
+  color: #25543D !important;
+  font-weight: 700 !important;
+}
+
+.tp-investigation-modal .tp-ai-submit-btn {
+  flex-shrink: 0 !important;
+  margin-left: auto !important;
+}
+
+/* Analyst Notes form: Full width, prominent Add note button */
+.tp-investigation-modal .tp-inv-notes-heading {
+  margin: 24px 0 12px !important;
+  color: #13281E !important;
+  font-size: 16px !important;
+  font-weight: 750 !important;
+}
+
+.tp-investigation-modal .tp-inv-note-form {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 10px !important;
+  width: 100% !important;
+  margin-bottom: 24px !important;
+}
+
+.tp-investigation-modal .tp-inv-note-form textarea {
+  width: 100% !important;
+  min-width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  min-height: 75px !important;
+  height: 75px !important;
+  padding: 11px 14px !important;
+  border-radius: 9px !important;
+  background: #FFFFFF !important;
+  color: #13281E !important;
+  border: 1.5px solid #CBD8E5 !important;
+  font-size: 13.5px !important;
+  line-height: 1.5 !important;
+  resize: vertical !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.tp-investigation-modal .tp-inv-note-form textarea:focus {
+  border-color: #25543D !important;
+  box-shadow: 0 0 0 3px rgba(37, 84, 61, 0.16) !important;
+  outline: none !important;
+}
+
+.tp-investigation-modal .tp-inv-note-actions {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  width: 100% !important;
+}
+
+.tp-investigation-modal .tp-inv-keyboard-hint {
+  font-size: 11.5px !important;
+  color: #638170 !important;
+}
+
+.tp-investigation-modal .tp-inv-keyboard-hint strong {
+  color: #25543D !important;
+  font-weight: 700 !important;
+}
+
+.tp-investigation-modal .tp-inv-note-submit-btn {
+  flex-shrink: 0 !important;
+  margin-left: auto !important;
+}
 
 /* Dark-mode surfaces and form controls. */
 :is(.tp-app[data-theme="dark"], [data-theme="dark"]) .tp-overlay.tp-inv-modal-overlay,
